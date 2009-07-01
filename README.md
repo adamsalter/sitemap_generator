@@ -15,19 +15,17 @@ I say "it actually works" because in the process of creating this plugin I tried
 Installation
 =======
 
-1. Install plugin as normal
+1.Install plugin as normal
 
     ./script/plugin install git://github.com/adamsalter/sitemap_generator-plugin.git
 
-2. Installation will create a 'config/sitemap.rb' file which will contain your logic for generation of the Sitemap files. Explanation of syntax for this file is contained in the file itself. (If you want to recreate this file manually run `rake sitemap:install`)
+2.Installation will create a 'config/sitemap.rb' file which will contain your logic for generation of the Sitemap files. Explanation of syntax for this file is contained in the file itself. (If you want to recreate this file manually run `rake sitemap:install`)
 
-3. Run `rake sitemap:refresh` as needed to create sitemap files. This will also ping all the major search engines.
+3.Run `rake sitemap:refresh` as needed to create sitemap files. This will also ping all the major search engines.
 
-4. Add the following to your robots.txt file. 
+4.Add the following to your robots.txt file. The &lt;sitemap_index_location> should be the complete URL to the Sitemap index, such as: http://www.example.org/sitemap_index.xml.gz
 
-    Sitemap: &lt;sitemap_index_location>
-
-The &lt;sitemap_index_location> should be the complete URL to the Sitemap index, such as: http://www.example.org/sitemap_index.xml.gz
+    Sitemap: <sitemap_index_location>
 
 Notes
 =======
