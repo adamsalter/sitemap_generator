@@ -1,0 +1,17 @@
+xml.instruct! :encoding => 'UTF-8'
+xml.instruct! :"xml-stylesheet", :type=>"text/xsl", :href=>"sitemap.xsl"
+ 
+xml.urlset "xmlns:xsi" => "http://www.w3.org/2001/XMLSchema-instance", 
+    "xsi:schemaLocation" => "http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/siteindex.xsd", 
+    "xmlns" => "http://www.sitemaps.org/schemas/sitemap/0.9" do
+
+  links.each do |link|
+    xml.url do
+      xml.loc         link.loc
+      xml.lastmod     w3c_date(link.lastmod)
+      xml.changefreq  link.changefreq
+      xml.priority    link.priority
+    end 
+  end
+ 
+end
