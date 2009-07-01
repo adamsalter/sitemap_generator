@@ -33,7 +33,7 @@ Notes
 =======
 
 - only tested/working on Rails 2.3.2, no guarantees made for any other versions of Rails.
-- currently only supports one sitemap index file, which can contain 50,000 sitemap files which can each contain 50,000 urls, so plugin only supports up to 500,000,000 urls. I personally have no need of support for more urls, but plugin could be improved to support this.
+- currently only supports one sitemap index file, which can contain 50,000 sitemap files which can each contain 50,000 urls, so plugin only supports up to 2,500,000,000 urls. I personally have no need of support for more urls, but plugin could be improved to support this.
 
 Copyright (c) 2009 Adam @ [Codebright.net][cb], released under the MIT license
 
