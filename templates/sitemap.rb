@@ -1,7 +1,7 @@
 # Set the host name for URL creation
-SitemapPlugin::Sitemap.default_host = "http://www.example.com"
+SitemapGenerator::Sitemap.default_host = "http://www.example.com"
 
-SitemapPlugin::Sitemap.add_links do |sitemap|
+SitemapGenerator::Sitemap.add_links do |sitemap|
   # Put links creation logic here.
   #
   # The root path '/' and sitemap index file are added automatically.

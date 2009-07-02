@@ -18,7 +18,7 @@ b) How would you infer the correct series of links for the following route?
 
     map.connect 'location/:state/:city/:zipcode', :controller => 'zipcode', :action => 'index'
     
-Don't tell me it's trivial because it isn't. It just looks trivial.
+Don't tell me it's trivial, because it isn't. It just looks trivial.
 
 So my solution is to have another file similar to 'routes.rb' called 'sitemap.rb', where you can define what goes into the Sitemap.
 
@@ -65,9 +65,9 @@ Example 'config/sitemap.rb'
 ==========
 
     # Set the host name for URL creation
-    SitemapPlugin::Sitemap.default_host = "http://www.example.com"
+    SitemapGenerator::Sitemap.default_host = "http://www.example.com"
 
-    SitemapPlugin::Sitemap.add_links do |sitemap|
+    SitemapGenerator::Sitemap.add_links do |sitemap|
       # Put links creation logic here.
       #
       # The root path '/' and sitemap index file are added automatically.

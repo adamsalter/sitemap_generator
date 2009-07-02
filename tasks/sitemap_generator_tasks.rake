@@ -9,14 +9,14 @@ namespace :sitemap do
 
   desc "Regenerate Google Sitemap files in public/ directory"
   task :refresh => :environment do
-    include SitemapPlugin::Helper
+    include SitemapGenerator::Helper
   
     # update links from config/sitemap.rb
     load_sitemap_rb
   
-    raise(ArgumentError, "Default hostname not defined") unless SitemapPlugin::Sitemap.default_host.present?
+    raise(ArgumentError, "Default hostname not defined") unless SitemapGenerator::Sitemap.default_host.present?
 
-    links_grps = SitemapPlugin::Sitemap.links.in_groups_of(50000, false)
+    links_grps = SitemapGenerator::Sitemap.links.in_groups_of(50000, false)
   
     raise(ArgumentError, "TOO MANY LINKS!! I really thought 2,500,000,000 links would be enough for anybody!") if links_grps.length > 50000
 

@@ -1,5 +1,5 @@
 
-module SitemapPlugin
+module SitemapGenerator
   # Generator instances are used to build links.
   # The object passed to the add_links block in config/sitemap.rb is a Generator instance.
   class Mapper

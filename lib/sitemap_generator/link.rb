@@ -1,5 +1,5 @@
 
-module SitemapPlugin
+module SitemapGenerator
   class Link
     attr_accessor :path, :priority, :changefreq, :lastmod, :host
   

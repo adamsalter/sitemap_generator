@@ -1,4 +1,4 @@
-module SitemapPlugin
+module SitemapGenerator
   module Helper
     def load_sitemap_rb
       controller = ApplicationController.new

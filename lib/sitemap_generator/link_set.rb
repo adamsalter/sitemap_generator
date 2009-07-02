@@ -1,4 +1,4 @@
-module SitemapPlugin
+module SitemapGenerator
   class LinkSet
     attr_accessor :default_host, :links
     
