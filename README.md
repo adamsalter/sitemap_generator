@@ -1,9 +1,7 @@
 SitemapGenerator
 ================
 
-This plugin enables Google Sitemaps to be easily generated for a Rails site as a rake task, using a simple 'Rails Routes'-like DSL. (and it _actually_ works the way you would expect)
-
-> I say "it works the way you would expect" because in the process of creating this plugin I tried about 6 different plugins, none of which (IMHO) worked in a natural 'railsy' way. Your mileage may differ of course.
+This plugin enables Google Sitemaps to be easily generated for a Rails site as a rake task, using a simple 'Rails Routes'-like DSL.
 
 Raison d'être
 -------
@@ -98,13 +96,13 @@ Example 'config/sitemap.rb'
 Notes
 =======
 
-- only tested/working on Rails 2.3.2, no guarantees made for any other versions of Rails.
+- Only tested/working on Rails 2.3.2, no guarantees made for any other versions of Rails.
 
 Known Bugs
 ========
 
 - Sitemaps.org [states][sitemaps_org] that no Sitemap XML file should be more than 10Mb uncompressed. The plugin does not check this.
-- currently only supports one Sitemap index file, which can contain 50,000 Sitemap files which can each contain 50,000 urls, so it _only_ supports up to 2,500,000,000 (2.5 billion) urls. I personally have no need of support for more urls, but plugin could be improved to support this.
+- Currently only supports one Sitemap index file, which can contain 50,000 Sitemap files which can each contain 50,000 urls, so it _only_ supports up to 2,500,000,000 (2.5 billion) urls. I personally have no need of support for more urls, but plugin could be improved to support this.
 
 Copyright (c) 2009 Adam @ [Codebright.net][cb], released under the MIT license
 
