@@ -27,8 +27,8 @@ namespace :sitemap do
       buffer = ''
       xml = Builder::XmlMarkup.new(:target=>buffer)
       eval(open(xml_sitemap_template).read, binding)
-      filename = "sitemap#{index+1}.xml.gz"
-      Zlib::GzipWriter.open(File.join(RAILS_ROOT, "public", filename)) do |gz|
+      filename = File.join(RAILS_ROOT, "public/sitemap#{index+1}.xml.gz")
+      Zlib::GzipWriter.open(filename) do |gz|
         gz.write buffer
       end
       puts "+ #{filename}"

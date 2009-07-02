@@ -14,7 +14,7 @@ xml.instruct!
 xml.sitemapindex "xmlns" => "http://www.sitemaps.org/schemas/sitemap/0.9" do
   sitemap_files.each do |file|
     xml.sitemap do
-      xml.loc url_with_hostname(file)
+      xml.loc url_with_hostname(File.basename(file))
       xml.lastmod w3c_date(File.mtime(file))
     end
   end
