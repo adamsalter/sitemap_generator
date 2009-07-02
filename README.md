@@ -30,7 +30,7 @@ Here's my solution:
 
 Easy hey?
 
-Other Sitemap settings for the link, like `lastmod`, `priority` and `changefreq` are entered automatically, although you can override them if you need to.
+Other Sitemap settings for the link, like `lastmod`, `priority`, `changefreq` and `host` are entered automatically, although you can override them if you need to.
 
 Other "difficult" examples, solved by my plugin:
 
@@ -38,6 +38,7 @@ Other "difficult" examples, solved by my plugin:
 - variable priority of links
 - paging/sorting links (e.g. my_list?page=3)
 - SSL host links (e.g. https:)
+- Rails apps which are installed on a sub-path (e.g. example.com/blog_app/)
 - hidden ajax routes
 - etc.
 
@@ -52,11 +53,11 @@ Installation
 
 3. Run `rake sitemap:refresh` as needed to create sitemap files. This will also ping all the major search engines.
 
-    SiteMaps with many urls (100,000+) take quite a long time to generate and are therefore generally not required to be dynamic, so if you need to refresh your Sitemaps regularly you can set the rake task up as a cron job.
+    SiteMaps with many urls (100,000+) take quite a long time to generate, so if you need to refresh your Sitemaps regularly you can set the rake task up as a cron job.
 
-4. Finally, and optionally, add the following to your robots.txt file. The &lt;sitemap_index_location> should be the complete URL to the Sitemap index, such as: http://www.example.org/sitemap_index.xml.gz
+4. Finally, and optionally, add the following to your robots.txt file. The robots.txt file should be the complete URL to the Sitemap index, such as: `http://www.example.org/sitemap_index.xml.gz`
 
-    <code>Sitemap: &lt;sitemap_index_location></code>
+    <code>Sitemap: &lt;hostname>/sitemap_index.xml.gz</code>
 
 Example 'config/sitemap.rb'
 ==========
@@ -95,8 +96,14 @@ Notes
 =======
 
 - only tested/working on Rails 2.3.2, no guarantees made for any other versions of Rails.
-- currently only supports one sitemap index file, which can contain 50,000 sitemap files which can each contain 50,000 urls, so plugin only supports up to 2,500,000,000 urls. I personally have no need of support for more urls, but plugin could be improved to support this.
+- currently only supports one sitemap index file, which can contain 50,000 sitemap files which can each contain 50,000 urls, so it _only_ supports up to 2,500,000,000 (2.5 billion) urls. I personally have no need of support for more urls, but plugin could be improved to support this.
+
+Known Bugs
+========
+
+- Sitemaps.org [states][sitemaps_org] that no Sitemap XML file should be more than 10Mb uncompressed. The plugin does not check this.
 
 Copyright (c) 2009 Adam @ [Codebright.net][cb], released under the MIT license
 
 [cb]:http://codebright.net
+[sitemaps_org]:http://www.sitemaps.org/protocol.php
