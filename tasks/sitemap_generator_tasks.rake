@@ -18,6 +18,8 @@ namespace :sitemap do
 
     links_grps = SitemapPlugin::Sitemap.links.in_groups_of(50000, false)
   
+    raise(ArgumentError, "TOO MANY LINKS!! I really thought 2,500,000,000 links would be enough for anybody!") if links_grps.length > 50000
+
     # render individual sitemaps
     sitemap_files = []
     xml_sitemap_template = File.join(File.dirname(__FILE__), '../templates/xml_sitemap.builder')

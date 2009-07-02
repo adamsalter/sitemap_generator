@@ -3,14 +3,43 @@ SitemapGenerator
 
 This plugin enables Google Sitemaps to be easily generated for a Rails site as a rake task. (and it _actually_ works)
 
+> I say "it actually works" because in the process of creating this plugin I tried about 6 different plugins, none of which (IMHO) worked in a natural 'railsy' way. Your mileage may differ of course.
+
 SiteMaps are generally not required to be dynamic, so if you need to refresh your Sitemaps regularly you can set the rake task up as a cron job.
 
 Raison d'être
 -------
 
-I was dissatisfied with any of the current Rails sitemap plugins that I found. So I decided I would write my own. ;)
+I was dissatisfied with any of the current Rails sitemap plugins that I found. So I decided I would write my own. ;) Most of the plugins out there seem to try to recreate the sitemap links by iterating the Rails routes. In some cases this is possible, but for a great deal of cases it isn't. 
 
-I say "it actually works" because in the process of creating this plugin I tried about 6 different plugins, none of which (IMHO) worked in a natural 'railsy' way. Your mileage may differ of course.
+a) There are probably quite a few routes that don't need inclusion in the sitemap.
+
+and
+
+b) How would you infer the correct series of links for the following route?
+
+    map.connect 'location/:state/:city/:zipcode', :controller => 'zipcode', :action => 'index'
+    
+Don't tell me it's trivial because it isn't. It just looks trivial.
+
+So my solution is to have another file similar to 'routes.rb' called 'sitemap.rb', where you can define what goes into the sitemap.
+
+Here's my solution:
+
+    Zipcode.find(:all, :include => :city).each do |z|
+      sitemap.add zipcode_path(:state => z.city.state, :city => z.city, :zipcode => z)
+    end
+
+Easy hey?
+
+Other Sitemap settings for the link, like `lastmod`, `priority` and `changefreq` are entered automatically, although you can override them if you need to.
+
+Other "difficult" examples, solved by my plugin:
+
+- paging
+- sorting
+- hidden ajax routes
+- etc.
 
 Installation
 =======
@@ -19,13 +48,36 @@ Installation
 
     <code>./script/plugin install git://github.com/adamsalter/sitemap_generator-plugin.git</code>
 
-2. Installation should create a 'config/sitemap.rb' file which will contain your logic for generation of the Sitemap files. Explanation of syntax for this file is contained in the file itself. (If you want to recreate this file manually run `rake sitemap:install`)
+2. Installation should create a 'config/sitemap.rb' file which will contain your logic for generation of the Sitemap files. (If you want to recreate this file manually run `rake sitemap:install`)
 
 3. Run `rake sitemap:refresh` as needed to create sitemap files. This will also ping all the major search engines.
 
 4. Finally, and optionally, add the following to your robots.txt file. The &lt;sitemap_index_location> should be the complete URL to the Sitemap index, such as: http://www.example.org/sitemap_index.xml.gz
 
     <code>Sitemap: &lt;sitemap_index_location></code>
+
+Example 'config/sitemap.rb'
+==========
+
+    # Set the host name for URL creation
+    SitemapPlugin::Sitemap.default_host = "http://www.example.com"
+
+    # Put links creation logic here (the root path '/' and sitemap files are added automatically)
+    # Usage:
+    # sitemap.add path, options = { :priority => 0.5, :changefreq => 'weekly', :lastmod => Time.now, :host => default_host }
+    # default options are used if you don't specify
+    SitemapPlugin::Sitemap.add_links do |sitemap|
+      # add '/articles'
+      sitemap.add articles_path # :priority => 0.5, :changefreq => 'weekly', :lastmod => Time.now, :host => default_host
+
+      # add all individual articles
+      Article.find(:all).each do |a|
+        sitemap.add article_path(a), :lastmod => a.updated_at
+      end
+  
+      # add merchant path
+      sitemap.add '/purchase', :host => "https://www.example.com"
+    end
 
 Notes
 =======
