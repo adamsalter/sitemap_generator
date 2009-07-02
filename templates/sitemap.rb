@@ -1,4 +1,5 @@
 # Set the host name for URL creation
+
 SitemapPlugin::Sitemap.default_host = "http://www.example.com"
 
 # Put links creation logic here.
@@ -11,7 +12,9 @@ SitemapPlugin::Sitemap.default_host = "http://www.example.com"
 #
 # Defaults: :priority => 0.5, :changefreq => 'weekly', 
 #           :lastmod => Time.now, :host => default_host
+
 SitemapPlugin::Sitemap.add_links do |sitemap|
+
   # add '/articles'
   sitemap.add articles_path, :priority => 0.7, :changefreq => 'daily'
 
@@ -22,4 +25,5 @@ SitemapPlugin::Sitemap.add_links do |sitemap|
 
   # add merchant path
   sitemap.add '/purchase', :priority => 0.7, :host => "https://www.example.com"
+  
 end
