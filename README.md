@@ -32,7 +32,7 @@ Easy hey?
 
 Other Sitemap settings for the link, like `lastmod`, `priority`, `changefreq` and `host` are entered automatically, although you can override them if you need to.
 
-Other "difficult" examples, solved by my plugin:
+Other "difficult" Sitemap issues, solved by this plugin:
 
 - gzip of Sitemap files
 - variable priority of links
@@ -53,9 +53,9 @@ Installation
 
 3. Run `rake sitemap:refresh` as needed to create sitemap files. This will also ping all the major search engines.
 
-    SiteMaps with many urls (100,000+) take quite a long time to generate, so if you need to refresh your Sitemaps regularly you can set the rake task up as a cron job.
+    Sitemaps with many urls (100,000+) take quite a long time to generate, so if you need to refresh your Sitemaps regularly you can set the rake task up as a cron job.
 
-4. Finally, and optionally, add the following to your robots.txt file. The robots.txt file should be the complete URL to the Sitemap index, such as: `http://www.example.org/sitemap_index.xml.gz`
+4. Finally, and optionally, add the following to your robots.txt file. The robots.txt Sitemap URL should be the complete URL to the Sitemap index, such as: `http://www.example.org/sitemap_index.xml.gz`
 
     <code>Sitemap: &lt;hostname>/sitemap_index.xml.gz</code>
 
