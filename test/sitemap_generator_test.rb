@@ -1,5 +1,5 @@
 require 'test_helper'
-require 'sitemap_plugin'
+require 'sitemap_generator'
 
 class SitemapGeneratorTest < ActiveSupport::TestCase
   # Replace this with your real tests.
