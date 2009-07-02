@@ -8,9 +8,9 @@ This plugin enables Google Sitemaps to be easily generated for a Rails site as a
 Raison d'être
 -------
 
-Most of the plugins out there seem to try to recreate the sitemap links by iterating the Rails routes. In some cases this is possible, but for a great deal of cases it isn't. 
+Most of the plugins out there seem to try to recreate the Sitemap links by iterating the Rails routes. In some cases this is possible, but for a great deal of cases it isn't. 
 
-a) There are probably quite a few routes in your routes file that don't need inclusion in the sitemap. (AJAX routes I'm looking at you.)
+a) There are probably quite a few routes in your routes file that don't need inclusion in the Sitemap. (AJAX routes I'm looking at you.)
 
 and
 
@@ -20,7 +20,7 @@ b) How would you infer the correct series of links for the following route?
     
 Don't tell me it's trivial because it isn't. It just looks trivial.
 
-So my solution is to have another file similar to 'routes.rb' called 'sitemap.rb', where you can define what goes into the sitemap.
+So my solution is to have another file similar to 'routes.rb' called 'sitemap.rb', where you can define what goes into the Sitemap.
 
 Here's my solution:
 
@@ -51,7 +51,7 @@ Installation
 
 2. Installation should create a 'config/sitemap.rb' file which will contain your logic for generation of the Sitemap files. (If you want to recreate this file manually run `rake sitemap:install`)
 
-3. Run `rake sitemap:refresh` as needed to create sitemap files. This will also ping all the major search engines.
+3. Run `rake sitemap:refresh` as needed to create Sitemap files. This will also ping all the major search engines.
 
     Sitemaps with many urls (100,000+) take quite a long time to generate, so if you need to refresh your Sitemaps regularly you can set the rake task up as a cron job.
 
@@ -104,7 +104,7 @@ Known Bugs
 ========
 
 - Sitemaps.org [states][sitemaps_org] that no Sitemap XML file should be more than 10Mb uncompressed. The plugin does not check this.
-- currently only supports one sitemap index file, which can contain 50,000 sitemap files which can each contain 50,000 urls, so it _only_ supports up to 2,500,000,000 (2.5 billion) urls. I personally have no need of support for more urls, but plugin could be improved to support this.
+- currently only supports one Sitemap index file, which can contain 50,000 Sitemap files which can each contain 50,000 urls, so it _only_ supports up to 2,500,000,000 (2.5 billion) urls. I personally have no need of support for more urls, but plugin could be improved to support this.
 
 Copyright (c) 2009 Adam @ [Codebright.net][cb], released under the MIT license
 
