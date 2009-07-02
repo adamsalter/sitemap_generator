@@ -1,14 +1,14 @@
 SitemapGenerator
 ================
 
-This plugin enables Google Sitemaps to be easily generated for a Rails site as a rake task, using a simple 'Rails Routes'-like DSL. (and it _actually_ works)
+This plugin enables Google Sitemaps to be easily generated for a Rails site as a rake task, using a simple 'Rails Routes'-like DSL. (and it _actually_ works the way you would expect)
 
-> I say "it actually works" because in the process of creating this plugin I tried about 6 different plugins, none of which (IMHO) worked in a natural 'railsy' way. Your mileage may differ of course.
+> I say "it works the way you would expect" because in the process of creating this plugin I tried about 6 different plugins, none of which (IMHO) worked in a natural 'railsy' way. Your mileage may differ of course.
 
 Raison d'être
 -------
 
-I was dissatisfied with any of the current Rails sitemap plugins that I found. So I decided I would write my own. ;) Most of the plugins out there seem to try to recreate the sitemap links by iterating the Rails routes. In some cases this is possible, but for a great deal of cases it isn't. 
+Most of the plugins out there seem to try to recreate the sitemap links by iterating the Rails routes. In some cases this is possible, but for a great deal of cases it isn't. 
 
 a) There are probably quite a few routes in your routes file that don't need inclusion in the sitemap. (AJAX routes I'm looking at you.)
 
@@ -55,9 +55,11 @@ Installation
 
     Sitemaps with many urls (100,000+) take quite a long time to generate, so if you need to refresh your Sitemaps regularly you can set the rake task up as a cron job.
 
-4. Finally, and optionally, add the following to your robots.txt file. The robots.txt Sitemap URL should be the complete URL to the Sitemap index, such as: `http://www.example.org/sitemap_index.xml.gz`
+4. Finally, and optionally, add the following to your robots.txt file.
 
     <code>Sitemap: &lt;hostname>/sitemap_index.xml.gz</code>
+    
+    The robots.txt Sitemap URL should be the complete URL to the Sitemap index, such as: `http://www.example.org/sitemap_index.xml.gz`
 
 Example 'config/sitemap.rb'
 ==========
@@ -97,12 +99,12 @@ Notes
 =======
 
 - only tested/working on Rails 2.3.2, no guarantees made for any other versions of Rails.
-- currently only supports one sitemap index file, which can contain 50,000 sitemap files which can each contain 50,000 urls, so it _only_ supports up to 2,500,000,000 (2.5 billion) urls. I personally have no need of support for more urls, but plugin could be improved to support this.
 
 Known Bugs
 ========
 
 - Sitemaps.org [states][sitemaps_org] that no Sitemap XML file should be more than 10Mb uncompressed. The plugin does not check this.
+- currently only supports one sitemap index file, which can contain 50,000 sitemap files which can each contain 50,000 urls, so it _only_ supports up to 2,500,000,000 (2.5 billion) urls. I personally have no need of support for more urls, but plugin could be improved to support this.
 
 Copyright (c) 2009 Adam @ [Codebright.net][cb], released under the MIT license
 
