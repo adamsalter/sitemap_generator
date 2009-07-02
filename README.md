@@ -76,7 +76,10 @@ Example 'config/sitemap.rb'
       #
       # Defaults: :priority => 0.5, :changefreq => 'weekly', 
       #           :lastmod => Time.now, :host => default_host
-    
+
+  
+      # Examples:
+  
       # add '/articles'
       sitemap.add articles_path, :priority => 0.7, :changefreq => 'daily'
 
@@ -87,7 +90,7 @@ Example 'config/sitemap.rb'
 
       # add merchant path
       sitemap.add '/purchase', :priority => 0.7, :host => "https://www.example.com"
-      
+  
     end
 
 Notes
