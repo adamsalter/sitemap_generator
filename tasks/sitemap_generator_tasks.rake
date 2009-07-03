@@ -2,13 +2,27 @@ require 'zlib'
 
 namespace :sitemap do
 
-  desc "install a default config/sitemap.rb file"
+  desc "Install a default config/sitemap.rb file"
   task :install do
     load File.expand_path(File.join(File.dirname(__FILE__), "..", "install.rb"))  
   end
 
-  desc "Regenerate Google Sitemap files in public/ directory"
-  task :refresh => :environment do
+  desc "Delete all Sitemap files in public/ directory"
+  task :clean do
+    sitemap_files = Dir[File.join(RAILS_ROOT, 'public/sitemap*.xml.gz')]
+    FileUtils.rm sitemap_files
+  end
+
+  desc "Create Sitemap XML files in public/ directory"
+  task :refresh => ['sitemap:create'] do
+    ping_search_engines("sitemap_index.xml.gz")
+  end
+  
+  desc "Create Sitemap XML files (don't ping search engines)"
+  task 'refresh:no_ping' => ['sitemap:create'] do
+  end
+
+  task :create => [:environment, 'sitemap:clean'] do
     include SitemapGenerator::Helper
   
     # update links from config/sitemap.rb
@@ -45,8 +59,5 @@ namespace :sitemap do
       gz.write buffer
     end
     puts "+ #{filename}"
-  
-    ping_search_engines("sitemap_index.xml.gz")
-  
   end
 end
