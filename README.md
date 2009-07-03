@@ -1,7 +1,7 @@
 SitemapGenerator
 ================
 
-This plugin enables Google Sitemaps to be easily generated for a Rails site as a rake task, using a simple 'Rails Routes'-like DSL.
+This plugin enables 'enterprise-class' Google Sitemaps to be easily generated for a Rails site as a rake task, using a simple 'Rails Routes'-like DSL.
 
 Raison d'être
 -------
@@ -18,7 +18,7 @@ b) How would you infer the correct series of links for the following route?
     
 Don't tell me it's trivial, because it isn't. It just looks trivial.
 
-So my solution is to have another file similar to 'routes.rb' called 'sitemap.rb', where you can define what goes into the Sitemap.
+So my idea is to have another file similar to 'routes.rb' called 'sitemap.rb', where you can define what goes into the Sitemap.
 
 Here's my solution:
 
@@ -32,14 +32,13 @@ Other Sitemap settings for the link, like `lastmod`, `priority`, `changefreq` an
 
 Other "difficult" Sitemap issues, solved by this plugin:
 
-- Support for more than 50,000 urls
-- GZip of Sitemap files
+- Support for more than 50,000 urls (using Sitemap Index file)
+- Gzip of Sitemap files
 - Variable priority of links
 - Paging/sorting links (e.g. my_list?page=3)
 - SSL host links (e.g. https:)
 - Rails apps which are installed on a sub-path (e.g. example.com/blog_app/)
 - Hidden ajax routes
-- etc.
 
 Installation
 =======
