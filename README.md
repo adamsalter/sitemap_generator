@@ -14,7 +14,7 @@ and
 
 b) How would you infer the correct series of links for the following route?
 
-    map.connect 'location/:state/:city/:zipcode', :controller => 'zipcode', :action => 'index'
+    map.zipcode 'location/:state/:city/:zipcode', :controller => 'zipcode', :action => 'index'
     
 Don't tell me it's trivial, because it isn't. It just looks trivial.
 
