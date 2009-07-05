@@ -1,7 +1,7 @@
 SitemapGenerator
 ================
 
-This plugin enables ['enterprise-class'](https://twitter.com/dhh/status/1631034662 "I use enterprise in the same sense the Phusion guys do - i.e. Enterprise Ruby. Please don't look down on my use of the word 'enterprise' to represent being a cut above. It doesn't mean you ever have to work for a company the size of IBM. Or constantly fight inertia, writing crappy software, adhering to change management practices and spending hours in meetings... Not that there's anything wrong with that - Wait, what?") Google Sitemaps to be easily generated for a Rails site as a rake task, using a simple 'Rails Routes'-like DSL.
+This plugin enables ['enterprise-class'][enterprise_class] Google Sitemaps to be easily generated for a Rails site as a rake task, using a simple 'Rails Routes'-like DSL.
 
 Raison d'être
 -------
@@ -103,8 +103,22 @@ Known Bugs
 - Sitemaps.org [states][sitemaps_org] that no Sitemap XML file should be more than 10Mb uncompressed. The plugin does not check this.
 - Currently only supports one Sitemap Index file, which can contain 50,000 Sitemap files which can each contain 50,000 urls, so it _only_ supports up to 2,500,000,000 (2.5 billion) urls. I personally have no need of support for more urls, but plugin could be improved to support this.
 
+Donations?
+========
+
+I'd love to see some statistics on usage for this plugin... I.e. Approximately how many links per site are being indexed and how long it takes to generate etc.
+
+If you don't mind sharing this kind of information, put your name and site on the [SitemapGenerator Usage][sitemap_generator_usage] page.
+
+Oh wait, you mean money?
+
+... Buy me a [Boost Juice][boost_juice] when next we meet.
+
 Copyright (c) 2009 Adam @ [Codebright.net][cb], released under the MIT license
 
-[sitemap_engines]:http://en.wikipedia.org/wiki/Sitemap_index
-[sitemaps_org]:http://www.sitemaps.org/protocol.php
-[cb]:http://codebright.net
+[enterprise_class]:https://twitter.com/dhh/status/1631034662 "I use enterprise in the same sense the Phusion guys do - i.e. Enterprise Ruby. Please don't look down on my use of the word 'enterprise' to represent being a cut above. It doesn't mean you ever have to work for a company the size of IBM. Or constantly fight inertia, writing crappy software, adhering to change management practices and spending hours in meetings... Not that there's anything wrong with that - Wait, what?"
+[sitemap_engines]:http://en.wikipedia.org/wiki/Sitemap_index "http://en.wikipedia.org/wiki/Sitemap_index"
+[sitemaps_org]:http://www.sitemaps.org/protocol.php "http://www.sitemaps.org/protocol.php"
+[sitemap_generator_usage]:http://wiki.github.com/adamsalter/sitemap_generator-plugin/sitemapgenerator-usage "http://wiki.github.com/adamsalter/sitemap_generator-plugin/sitemapgenerator-usage"
+[boost_juice]:http://www.boostjuice.com.au/ "Mmmm, sweet, sweet Boost Juice."
+[cb]:http://codebright.net "http://codebright.net"
