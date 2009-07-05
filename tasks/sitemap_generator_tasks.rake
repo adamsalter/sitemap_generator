@@ -30,10 +30,12 @@ namespace :sitemap do
   
     raise(ArgumentError, "Default hostname not defined") unless SitemapGenerator::Sitemap.default_host.present?
 
-    links_grps = SitemapGenerator::Sitemap.links.in_groups_of(50000, false)
-  
+    links = SitemapGenerator::Sitemap.links
+    links_grps = links.in_groups_of(50000, false)
     raise(ArgumentError, "TOO MANY LINKS!! I really thought 2,500,000,000 links would be enough for anybody!") if links_grps.length > 50000
 
+    puts "Sitemap size: #{links.length} links"
+    
     # render individual sitemaps
     sitemap_files = []
     xml_sitemap_template = File.join(File.dirname(__FILE__), '../templates/xml_sitemap.builder')
