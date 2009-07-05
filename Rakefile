@@ -1,23 +1,12 @@
 require 'rake'
-require 'rake/testtask'
-require 'rake/rdoctask'
+require 'spec/rake/spectask'
 
-desc 'Default: run unit tests.'
-task :default => :test
+desc 'Default: run specs.'
+task :default => :spec
 
-desc 'Test the sitemap_generator plugin.'
-Rake::TestTask.new(:test) do |t|
+desc 'Run the specs'
+Spec::Rake::SpecTask.new(:spec) do |t|
   t.libs << 'lib'
-  t.libs << 'test'
-  t.pattern = 'test/**/*_test.rb'
-  t.verbose = true
-end
-
-desc 'Generate documentation for the sitemap_generator plugin.'
-Rake::RDocTask.new(:rdoc) do |rdoc|
-  rdoc.rdoc_dir = 'rdoc'
-  rdoc.title    = 'SitemapGenerator'
-  rdoc.options << '--line-numbers' << '--inline-source'
-  rdoc.rdoc_files.include('README')
-  rdoc.rdoc_files.include('lib/**/*.rb')
+  t.spec_opts = ['--colour --format progress --loadby mtime --reverse']
+  t.spec_files = FileList['spec/**/*_spec.rb']
 end
