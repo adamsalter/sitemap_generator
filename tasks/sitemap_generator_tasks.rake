@@ -4,7 +4,7 @@ namespace :sitemap do
 
   desc "Install a default config/sitemap.rb file"
   task :install do
-    load File.expand_path(File.join(File.dirname(__FILE__), "..", "install.rb"))  
+    load File.expand_path(File.join(File.dirname(__FILE__), "..", "install.rb"))
   end
 
   desc "Delete all Sitemap files in public/ directory"
@@ -17,25 +17,25 @@ namespace :sitemap do
   task :refresh => ['sitemap:create'] do
     ping_search_engines("sitemap_index.xml.gz")
   end
-  
+
   desc "Create Sitemap XML files (don't ping search engines)"
   task 'refresh:no_ping' => ['sitemap:create'] do
   end
 
   task :create => [:environment, 'sitemap:clean'] do
     include SitemapGenerator::Helper
-  
+    include ActionView::Helpers::NumberHelper
+
+    start_time = Time.now
+
     # update links from config/sitemap.rb
     load_sitemap_rb
-  
+
     raise(ArgumentError, "Default hostname not defined") unless SitemapGenerator::Sitemap.default_host.present?
 
-    links = SitemapGenerator::Sitemap.links
-    links_grps = links.in_groups_of(50000, false)
+    links_grps = SitemapGenerator::Sitemap.links.in_groups_of(50000, false)
     raise(ArgumentError, "TOO MANY LINKS!! I really thought 2,500,000,000 links would be enough for anybody!") if links_grps.length > 50000
 
-    puts "Sitemap size: #{links.length} links"
-    
     # render individual sitemaps
     sitemap_files = []
     xml_sitemap_template = File.join(File.dirname(__FILE__), '../templates/xml_sitemap.builder')
@@ -50,7 +50,7 @@ namespace :sitemap do
       puts "+ #{filename}"
       sitemap_files << filename
     end
-  
+
     # render index
     sitemap_index_template = File.join(File.dirname(__FILE__), '../templates/sitemap_index.builder')
     buffer = ''
@@ -61,5 +61,9 @@ namespace :sitemap do
       gz.write buffer
     end
     puts "+ #{filename}"
+
+    stop_time = Time.now
+    puts "Sitemap stats: #{number_with_delimiter(SitemapGenerator::Sitemap.links.length)} links, " + ("%dm%02ds" % (stop_time - start_time).divmod(60))
+
   end
 end
