@@ -1,3 +1,6 @@
+require 'action_controller'
+require 'action_controller/test_process'
+
 module SitemapGenerator
   module Helper
     def load_sitemap_rb
