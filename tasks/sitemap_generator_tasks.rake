@@ -22,7 +22,7 @@ namespace :sitemap do
   task 'refresh:no_ping' => ['sitemap:create'] do
   end
 
-  task :create => [:environment, 'sitemap:clean'] do
+  task :create => [:environment] do
     include SitemapGenerator::Helper
     include ActionView::Helpers::NumberHelper
 
@@ -35,6 +35,8 @@ namespace :sitemap do
 
     links_grps = SitemapGenerator::Sitemap.links.in_groups_of(50000, false)
     raise(ArgumentError, "TOO MANY LINKS!! I really thought 2,500,000,000 links would be enough for anybody!") if links_grps.length > 50000
+
+    Rake::Task['sitemap:clean'].invoke
 
     # render individual sitemaps
     sitemap_files = []
