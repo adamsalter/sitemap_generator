@@ -97,6 +97,16 @@ Notes
 
 - Only tested/working on Rails 2.3.2, no guarantees made for any other versions of Rails.
 
+- For large sitemaps it may be useful to split your generation into batches to avoid running out of memory. E.g.:
+
+    # add movies
+    Movie.find_in_batches(:batch_size => 1000) do |movies|
+      movies.each do |movie|
+        sitemap.add "/movies/show/#{movie.to_param}", :lastmod => movie.updated_at, :changefreq 
+  => 'weekly'
+      end
+    end
+
 Known Bugs
 ========
 
