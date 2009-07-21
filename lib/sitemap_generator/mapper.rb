@@ -10,7 +10,7 @@ module SitemapGenerator
     end
     
     def add(loc, options = {})
-      set.add_link Link.new(loc, options)
+      set.add_link Link.generate(loc, options)
     end
   end
 end

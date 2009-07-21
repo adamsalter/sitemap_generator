@@ -5,10 +5,10 @@ xml.urlset "xmlns:xsi" => "http://www.w3.org/2001/XMLSchema-instance",
 
   links.each do |link|
     xml.url do
-      xml.loc         link.loc
-      xml.lastmod     w3c_date(link.lastmod)
-      xml.changefreq  link.changefreq
-      xml.priority    link.priority
+      xml.loc         link[:loc]
+      xml.lastmod     w3c_date(link[:lastmod])
+      xml.changefreq  link[:changefreq]
+      xml.priority    link[:priority]
     end 
   end
  
