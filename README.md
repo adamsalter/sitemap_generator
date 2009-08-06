@@ -110,7 +110,8 @@ Notes
 Known Bugs
 ========
 
-- Sitemaps.org [states][sitemaps_org] that no Sitemap XML file should be more than 10Mb uncompressed. The plugin does not check this.
+- Sitemaps.org [states][sitemaps_org] that no Sitemap XML file should be more than 10Mb uncompressed. The plugin will warn you about this, but does nothing to avoid it (like move some URLs into a later file).
+- There's no check on the size of a URL which [isn't supposed to exceed 2,048 bytes][sitemaps_xml].
 - Currently only supports one Sitemap Index file, which can contain 50,000 Sitemap files which can each contain 50,000 urls, so it _only_ supports up to 2,500,000,000 (2.5 billion) urls. I personally have no need of support for more urls, but plugin could be improved to support this.
 
 Donations?
@@ -129,6 +130,7 @@ Copyright (c) 2009 Adam @ [Codebright.net][cb], released under the MIT license
 [enterprise_class]:https://twitter.com/dhh/status/1631034662 "I use enterprise in the same sense the Phusion guys do - i.e. Enterprise Ruby. Please don't look down on my use of the word 'enterprise' to represent being a cut above. It doesn't mean you ever have to work for a company the size of IBM. Or constantly fight inertia, writing crappy software, adhering to change management practices and spending hours in meetings... Not that there's anything wrong with that - Wait, what?"
 [sitemap_engines]:http://en.wikipedia.org/wiki/Sitemap_index "http://en.wikipedia.org/wiki/Sitemap_index"
 [sitemaps_org]:http://www.sitemaps.org/protocol.php "http://www.sitemaps.org/protocol.php"
+[sitemaps_xml]:http://www.sitemaps.org/protocol.php#xmlTagDefinitions "XML Tag Definitions"
 [sitemap_generator_usage]:http://wiki.github.com/adamsalter/sitemap_generator-plugin/sitemapgenerator-usage "http://wiki.github.com/adamsalter/sitemap_generator-plugin/sitemapgenerator-usage"
 [boost_juice]:http://www.boostjuice.com.au/ "Mmmm, sweet, sweet Boost Juice."
 [cb]:http://codebright.net "http://codebright.net"
