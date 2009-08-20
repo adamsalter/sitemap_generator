@@ -50,6 +50,7 @@ namespace :sitemap do
         gz.write buffer
       end
       puts "+ #{filename}"
+      puts "** Sitemap too big! The uncompressed size exceeds 10Mb" if buffer.size > 10 * 1024 * 1024
       sitemap_files << filename
     end
 
@@ -63,6 +64,7 @@ namespace :sitemap do
       gz.write buffer
     end
     puts "+ #{filename}"
+    puts "** Sitemap Index too big! The uncompressed size exceeds 10Mb" if buffer.size > 10 * 1024 * 1024
 
     stop_time = Time.now
     puts "Sitemap stats: #{number_with_delimiter(SitemapGenerator::Sitemap.links.length)} links, " + ("%dm%02ds" % (stop_time - start_time).divmod(60))

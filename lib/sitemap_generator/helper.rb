@@ -28,7 +28,7 @@ module SitemapGenerator
       {:google => "http://www.google.com/webmasters/sitemaps/ping?sitemap=#{index_location}",
         :yahoo => "http://search.yahooapis.com/SiteExplorerService/V1/ping?sitemap=#{index_location}",
         :ask => "http://submissions.ask.com/ping?sitemap=#{index_location}",
-        :msn => "http://webmaster.live.com/ping.aspx?siteMap=#{index_location}",
+        :bing => "http://www.bing.com/webmaster/ping.aspx?siteMap=#{index_location}",
         :sitemap_writer => "http://www.sitemapwriter.com/notify.php?crawler=all&url=#{index_location}"}.each do |engine, link|
         begin
           require 'open-uri'
