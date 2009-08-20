@@ -1,5 +1,6 @@
 require 'action_controller'
 require 'action_controller/test_process'
+require 'app/controllers/application'
 
 module SitemapGenerator
   module Helper

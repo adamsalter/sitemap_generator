@@ -95,7 +95,7 @@ Example 'config/sitemap.rb'
 Notes
 =======
 
-1) Only tested/working on Rails 2.3.2, no guarantees made for any other versions of Rails.
+1) Tested/working on Rails 1.x.x <=> 2.x.x, no guarantees made for Rails 3.0.
 
 2) For large sitemaps it may be useful to split your generation into batches to avoid running out of memory. E.g.:
 
