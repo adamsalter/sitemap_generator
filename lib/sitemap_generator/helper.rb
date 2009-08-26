@@ -14,7 +14,7 @@ module SitemapGenerator
       controller.request = ActionController::TestRequest.new
       controller.params = {}
       controller.send(:initialize_current_url)  
-      b = controller.send(:binding)
+      b = controller.instance_eval{binding}
       sitemap_mapper_file = File.join(RAILS_ROOT, 'config/sitemap.rb')
       eval(open(sitemap_mapper_file).read, b)
     end
