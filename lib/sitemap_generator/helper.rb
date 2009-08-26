@@ -1,6 +1,11 @@
 require 'action_controller'
 require 'action_controller/test_process'
-require 'app/controllers/application'
+begin
+  require 'application_controller'
+rescue LoadError
+  # Rails < 2.3
+  require 'application'
+end
 
 module SitemapGenerator
   module Helper
