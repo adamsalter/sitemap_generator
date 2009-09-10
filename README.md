@@ -114,16 +114,11 @@ Known Bugs
 - There's no check on the size of a URL which [isn't supposed to exceed 2,048 bytes][sitemaps_xml].
 - Currently only supports one Sitemap Index file, which can contain 50,000 Sitemap files which can each contain 50,000 urls, so it _only_ supports up to 2,500,000,000 (2.5 billion) urls. I personally have no need of support for more urls, but plugin could be improved to support this.
 
-Donations?
-========
+Follow me on:
+---------
 
-I'd love to see some statistics on usage for this plugin... I.e. Approximately how many links per site are being indexed and how long it takes to generate etc.
-
-If you don't mind sharing this kind of information, put your name and site on the [SitemapGenerator Usage][sitemap_generator_usage] page.
-
-Oh wait, you mean money?
-
-... Buy me a [Boost Juice][boost_juice] when next we meet.
+>  Twitter: [twitter.com/adamsalter](http://twitter.com/adamsalter)  
+>  Github: [github.com/adamsalter](http://github.com/adamsalter)
 
 Copyright (c) 2009 Adam @ [Codebright.net][cb], released under the MIT license
 
