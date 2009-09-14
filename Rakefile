@@ -1,12 +1,13 @@
-require 'rake'
-require 'spec/rake/spectask'
+require 'rake/testtask'
+require 'find'
 
-desc 'Default: run specs.'
-task :default => :spec
+desc 'Default: run unit tests.'
+task :default => :test
 
-desc 'Run the specs'
-Spec::Rake::SpecTask.new(:spec) do |t|
+desc 'Test ActiveScaffold.'
+Rake::TestTask.new(:test) do |t|
   t.libs << 'lib'
-  t.spec_opts = ['--colour --format progress --loadby mtime --reverse']
-  t.spec_files = FileList['spec/**/*_spec.rb']
+  t.pattern = 'test/**/*_test.rb'
+  t.verbose = true
 end
+
