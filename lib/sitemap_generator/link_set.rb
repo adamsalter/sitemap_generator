@@ -1,6 +1,6 @@
 module SitemapGenerator
   class LinkSet
-    attr_accessor :default_host, :links
+    attr_accessor :default_host, :yahoo_app_id, :links
     
     def initialize
       @links = []
