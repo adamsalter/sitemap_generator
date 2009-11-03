@@ -5,7 +5,7 @@
 
 Gem::Specification.new do |s|
   s.name = %q{sitemap_generator}
-  s.version = "0.1.0"
+  s.version = "0.1.1"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Adam Salter"]
@@ -30,6 +30,7 @@ Gem::Specification.new do |s|
      "lib/sitemap_generator/link_set.rb",
      "lib/sitemap_generator/mapper.rb",
      "lib/sitemap_generator/tasks.rb",
+     "sitemap_generator.gemspec",
      "tasks/sitemap_generator_tasks.rake",
      "templates/sitemap.rb",
      "templates/sitemap_index.builder",
