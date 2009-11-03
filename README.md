@@ -42,6 +42,8 @@ Other "difficult" Sitemap issues, solved by this plugin:
 Installation
 =======
 
+*As a plugin*
+
 1. Install plugin as normal
 
     <code>./script/plugin install git://github.com/adamsalter/sitemap_generator-plugin.git</code>
@@ -57,6 +59,21 @@ Installation
     <code>Sitemap: &lt;hostname>/sitemap_index.xml.gz</code>
     
     The robots.txt Sitemap URL should be the complete URL to the Sitemap Index, such as: `http://www.example.org/sitemap_index.xml.gz`
+
+*As a gem*
+
+1. Add the gem as a dependency in your config/environment.rb
+    <code>config.gem 'sitemap_generator', :source => 'http://gemcutter.org'</code>
+
+2. sudo rake gems:install
+
+3. Add the following line to your Rails.root/Rakefile 
+    <code>begin require 'sitemap_generator/tasks' rescue LoadError end</code>
+
+4. <code>rake sitemap:install</code>
+
+5. Follow steps 2-4 above
+
 
 Example 'config/sitemap.rb'
 ==========
