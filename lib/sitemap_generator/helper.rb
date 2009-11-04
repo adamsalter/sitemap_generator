@@ -42,7 +42,7 @@ module SitemapGenerator
             open(link)
             puts "Successful ping of #{engine.to_s.titleize}" unless ENV['SILENT'].present?
           end
-        rescue StandardError => e
+        rescue Timeout::Error, StandardError => e
           puts "Ping failed for #{engine.to_s.titleize}: #{e.inspect}"
           puts <<-END if engine == :yahoo
 Yahoo requires an 'AppID' for more than one ping per "timeframe", you can either:
