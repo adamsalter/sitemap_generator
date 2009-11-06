@@ -42,36 +42,39 @@ Other "difficult" Sitemap issues, solved by this plugin:
 Installation
 =======
 
-*As a gem*
+**As a gem**
 
 1. Add the gem as a dependency in your config/environment.rb
+
     <code>config.gem 'sitemap_generator', :source => 'http://gemcutter.org'</code>
 
-2. rake gems:install
+2. `$ rake gems:install`
 
-3. Add the following line to your RAILS_ROOT/Rakefile 
-    <code>begin require 'sitemap_generator/tasks' rescue LoadError end</code>
+3. Add the following line to your RAILS_ROOT/Rakefile
 
-4. `rake sitemap:install`
+    <code>require 'sitemap_generator/tasks' rescue LoadError</code>
 
-*As a plugin*
+4. `$ rake sitemap:install`
+
+**As a plugin**
 
 1. Install plugin as normal
 
-    <code>./script/plugin install git://github.com/adamsalter/sitemap_generator-plugin.git</code>
+    <code>$ ./script/plugin install git://github.com/adamsalter/sitemap_generator.git</code>
 
+----
 
 Installation should create a 'config/sitemap.rb' file which will contain your logic for generation of the Sitemap files. (If you want to recreate this file manually run `rake sitemap:install`)
 
 You can run `rake sitemap:refresh` as needed to create Sitemap files. This will also ping all the ['major'][sitemap_engines] search engines. (if you want to disable all non-essential output run the rake task thusly `rake -s sitemap:refresh`)
 
-    Sitemaps with many urls (100,000+) take quite a long time to generate, so if you need to refresh your Sitemaps regularly you can set the rake task up as a cron job. Most cron agents will only send you an email if there is output from the cron task.
+Sitemaps with many urls (100,000+) take quite a long time to generate, so if you need to refresh your Sitemaps regularly you can set the rake task up as a cron job. Most cron agents will only send you an email if there is output from the cron task.
 
 Optionally, you can add the following to your robots.txt file, so that robots can find the sitemap file.
 
-    <code>Sitemap: &lt;hostname>/sitemap_index.xml.gz</code>
+    Sitemap: <hostname>/sitemap_index.xml.gz
     
-    The robots.txt Sitemap URL should be the complete URL to the Sitemap Index, such as: `http://www.example.org/sitemap_index.xml.gz`
+The robots.txt Sitemap URL should be the complete URL to the Sitemap Index, such as: `http://www.example.org/sitemap_index.xml.gz`
 
 
 Example 'config/sitemap.rb'
@@ -151,6 +154,6 @@ Copyright (c) 2009 Adam @ [Codebright.net][cb], released under the MIT license
 [sitemap_engines]:http://en.wikipedia.org/wiki/Sitemap_index "http://en.wikipedia.org/wiki/Sitemap_index"
 [sitemaps_org]:http://www.sitemaps.org/protocol.php "http://www.sitemaps.org/protocol.php"
 [sitemaps_xml]:http://www.sitemaps.org/protocol.php#xmlTagDefinitions "XML Tag Definitions"
-[sitemap_generator_usage]:http://wiki.github.com/adamsalter/sitemap_generator-plugin/sitemapgenerator-usage "http://wiki.github.com/adamsalter/sitemap_generator-plugin/sitemapgenerator-usage"
+[sitemap_generator_usage]:http://wiki.github.com/adamsalter/sitemap_generator/sitemapgenerator-usage "http://wiki.github.com/adamsalter/sitemap_generator/sitemapgenerator-usage"
 [boost_juice]:http://www.boostjuice.com.au/ "Mmmm, sweet, sweet Boost Juice."
 [cb]:http://codebright.net "http://codebright.net"
