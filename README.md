@@ -63,7 +63,7 @@ Installation
 
 Installation should create a 'config/sitemap.rb' file which will contain your logic for generation of the Sitemap files. (If you want to recreate this file manually run `rake sitemap:install`)
 
-You can run `rake sitemap:refresh` as needed to create Sitemap files. This will also ping all the ['major'][sitemap_engines] search engines. (if you want to disable all non-essential output run the rake task thusly `rake -s sitemap:refresh SILENT=true`)
+You can run `rake sitemap:refresh` as needed to create Sitemap files. This will also ping all the ['major'][sitemap_engines] search engines. (if you want to disable all non-essential output run the rake task thusly `rake -s sitemap:refresh`)
 
     Sitemaps with many urls (100,000+) take quite a long time to generate, so if you need to refresh your Sitemaps regularly you can set the rake task up as a cron job. Most cron agents will only send you an email if there is output from the cron task.
 
@@ -122,6 +122,15 @@ Notes
       end
     end
 
+3) New Capistrano deploys will remove your Sitemap files, unless you run `rake sitemap:refresh`. The way around this is to create a cap task:
+
+    after "deploy:update_code", "deploy:copy_old_sitemap"
+
+    namespace :deploy do
+      task :copy_old_sitemap do
+          run "if [ -e #{previous_release}/public/sitemap_index.xml.gz ]; then cp #{previous_release}/public/sitemap* #{current_release}/public/; fi"
+      end
+    end
 
 Known Bugs
 ========

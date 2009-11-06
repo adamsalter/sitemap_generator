@@ -14,7 +14,7 @@ namespace :sitemap do
   end
 
   desc "Create Sitemap XML files in public/ directory"
-  desc "Create Sitemap XML files in public/ directory (set SILENT=true for no output)"
+  desc "Create Sitemap XML files in public/ directory (rake -s for no output)"
   task :refresh => ['sitemap:create'] do
     ping_search_engines("sitemap_index.xml.gz")
   end
@@ -50,8 +50,8 @@ namespace :sitemap do
       Zlib::GzipWriter.open(filename) do |gz|
         gz.write buffer
       end
-      puts "+ #{filename}" unless ENV['SILENT'].present?
-      puts "** Sitemap too big! The uncompressed size exceeds 10Mb" if (buffer.size > 10 * 1024 * 1024) && ENV['SILENT'].blank?
+      puts "+ #{filename}" if verbose
+      puts "** Sitemap too big! The uncompressed size exceeds 10Mb" if (buffer.size > 10 * 1024 * 1024) && verbose
       sitemap_files << filename
     end
 
@@ -65,10 +65,10 @@ namespace :sitemap do
       gz.write buffer
     end
     puts "+ #{filename}" unless ENV['SILENT'].present?
-    puts "** Sitemap Index too big! The uncompressed size exceeds 10Mb" if (buffer.size > 10 * 1024 * 1024) && ENV['SILENT'].blank?
+    puts "** Sitemap Index too big! The uncompressed size exceeds 10Mb" if (buffer.size > 10 * 1024 * 1024) && verbose
 
     stop_time = Time.now
-    puts "Sitemap stats: #{number_with_delimiter(SitemapGenerator::Sitemap.links.length)} links, " + ("%dm%02ds" % (stop_time - start_time).divmod(60)) unless ENV['SILENT'].present?
+    puts "Sitemap stats: #{number_with_delimiter(SitemapGenerator::Sitemap.links.length)} links, " + ("%dm%02ds" % (stop_time - start_time).divmod(60)) if verbose
 
   end
 end

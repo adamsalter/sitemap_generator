@@ -40,7 +40,7 @@ module SitemapGenerator
         begin
           unless SitemapGenerator::Sitemap.yahoo_app_id == false
             open(link)
-            puts "Successful ping of #{engine.to_s.titleize}" unless ENV['SILENT'].present?
+            puts "Successful ping of #{engine.to_s.titleize}" if verbose
           end
         rescue Timeout::Error, StandardError => e
           puts "Ping failed for #{engine.to_s.titleize}: #{e.inspect}"
