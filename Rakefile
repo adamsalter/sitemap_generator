@@ -10,7 +10,7 @@ begin
     s.email = "adam.salter@codebright.net "
     s.homepage = "http://github.com/adamsalter/sitemap_generator-plugin"
     s.authors = ["Adam Salter"]
-    s.files =  FileList["[A-Z]*", "{bin,lib,rails,templates}/**/*"]
+    s.files =  FileList["[A-Z]*", "{bin,lib,rails,templates,tasks}/**/*"]
     # s is a Gem::Specification... see http://www.rubygems.org/read/chapter/20 for additional settings
   end
 rescue LoadError
