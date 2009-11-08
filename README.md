@@ -46,7 +46,7 @@ Installation
 
 1. Add the gem as a dependency in your config/environment.rb
 
-    <code>config.gem 'sitemap_generator', :source => 'http://gemcutter.org'</code>
+    <code>config.gem 'sitemap_generator', :lib => false, :source => 'http://gemcutter.org'</code>
 
 2. `$ rake gems:install`
 
