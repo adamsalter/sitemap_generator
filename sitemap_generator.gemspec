@@ -5,12 +5,12 @@
 
 Gem::Specification.new do |s|
   s.name = %q{sitemap_generator}
-  s.version = "0.2.0"
+  s.version = "0.2.1"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Adam Salter"]
-  s.date = %q{2009-11-06}
-  s.description = %q{This plugin enables 'enterprise-class' Google Sitemaps to be easily generated for a Rails site as a rake task}
+  s.date = %q{2009-11-09}
+  s.description = %q{Install as a plugin or Gem to easily generate ['enterprise-class'][enterprise_class] Google Sitemaps for your Rails site, using a simple 'Rails Routes'-like DSL and a single rake task.}
   s.email = %q{adam.salter@codebright.net }
   s.extra_rdoc_files = [
     "README.md"
@@ -33,11 +33,11 @@ Gem::Specification.new do |s|
      "templates/sitemap_index.builder",
      "templates/xml_sitemap.builder"
   ]
-  s.homepage = %q{http://github.com/adamsalter/sitemap_generator-plugin}
+  s.homepage = %q{http://github.com/adamsalter/sitemap_generator}
   s.rdoc_options = ["--charset=UTF-8"]
   s.require_paths = ["lib"]
   s.rubygems_version = %q{1.3.5}
-  s.summary = %q{This plugin enables 'enterprise-class' Google Sitemaps to be easily generated for a Rails site as a rake task}
+  s.summary = %q{Generate 'enterprise-class' Sitemaps for your Rails site using a simple 'Rails Routes'-like DSL and a single Rake task}
   s.test_files = [
     "test/mock_app/app/controllers/application_controller.rb",
      "test/mock_app/app/controllers/contents_controller.rb",
