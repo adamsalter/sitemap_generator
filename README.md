@@ -142,6 +142,15 @@ Known Bugs
 - There's no check on the size of a URL which [isn't supposed to exceed 2,048 bytes][sitemaps_xml].
 - Currently only supports one Sitemap Index file, which can contain 50,000 Sitemap files which can each contain 50,000 urls, so it _only_ supports up to 2,500,000,000 (2.5 billion) urls. I personally have no need of support for more urls, but plugin could be improved to support this.
 
+Thanks (in no particular order)
+========
+
+- [Karl Varga (aka Bear Grylls)](http://github.com/kjvarga)
+- [Dan Pickett](http://github.com/dpickett)
+- [Rob Biedenharn](http://github.com/rab)
+- [Richie Vos](http://github.com/jerryvos)
+
+
 Follow me on:
 ---------
 
