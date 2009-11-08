@@ -1,1 +1,1 @@
-load "#{File.dirname(__FILE__)}/../../tasks/sitemap_generator_tasks.rake"
+load File.expand_path(File.join(File.dirname(__FILE__), '../../tasks/sitemap_generator_tasks.rake'))

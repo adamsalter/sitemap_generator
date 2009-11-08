@@ -4,7 +4,7 @@ namespace :sitemap do
 
   desc "Install a default config/sitemap.rb file"
   task :install do
-    load File.expand_path(File.join(File.dirname(__FILE__), "../../rails/install.rb"))
+    load File.expand_path(File.join(File.dirname(__FILE__), "../rails/install.rb"))
   end
 
   desc "Delete all Sitemap files in public/ directory"
@@ -41,11 +41,10 @@ namespace :sitemap do
 
     # render individual sitemaps
     sitemap_files = []
-    xml_sitemap_template = File.join(File.dirname(__FILE__), '../../templates/xml_sitemap.builder')
     links_grps.each_with_index do |links, index|
       buffer = ''
       xml = Builder::XmlMarkup.new(:target=>buffer)
-      eval(open(xml_sitemap_template).read, binding)
+      eval(open(SitemapGenerator.templates[:sitemap_xml]).read, binding)
       filename = File.join(RAILS_ROOT, "public/sitemap#{index+1}.xml.gz")
       Zlib::GzipWriter.open(filename) do |gz|
         gz.write buffer
@@ -56,10 +55,9 @@ namespace :sitemap do
     end
 
     # render index
-    sitemap_index_template = File.join(File.dirname(__FILE__), '../../templates/sitemap_index.builder')
     buffer = ''
     xml = Builder::XmlMarkup.new(:target=>buffer)
-    eval(open(sitemap_index_template).read, binding)
+    eval(open(SitemapGenerator.templates[:sitemap_index]).read, binding)
     filename = File.join(RAILS_ROOT, "public/sitemap_index.xml.gz")
     Zlib::GzipWriter.open(filename) do |gz|
       gz.write buffer
@@ -69,6 +67,5 @@ namespace :sitemap do
 
     stop_time = Time.now
     puts "Sitemap stats: #{number_with_delimiter(SitemapGenerator::Sitemap.links.length)} links, " + ("%dm%02ds" % (stop_time - start_time).divmod(60)) if verbose
-
   end
 end
