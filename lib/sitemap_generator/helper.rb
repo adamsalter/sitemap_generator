@@ -43,8 +43,8 @@ module SitemapGenerator
             puts "Successful ping of #{engine.to_s.titleize}" if verbose
           end
         rescue Timeout::Error, StandardError => e
-          puts "Ping failed for #{engine.to_s.titleize}: #{e.inspect}"
-          puts <<-END if engine == :yahoo
+          puts "Ping failed for #{engine.to_s.titleize}: #{e.inspect}" if verbose
+          puts <<-END if engine == :yahoo && verbose
 Yahoo requires an 'AppID' for more than one ping per "timeframe", you can either:
   - remove yahoo from the ping list (config/sitemap.rb):
     SitemapGenerator::Sitemap.yahoo_app_id = false

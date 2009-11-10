@@ -62,7 +62,7 @@ namespace :sitemap do
     Zlib::GzipWriter.open(filename) do |gz|
       gz.write buffer
     end
-    puts "+ #{filename}" unless ENV['SILENT'].present?
+    puts "+ #{filename}" if verbose
     puts "** Sitemap Index too big! The uncompressed size exceeds 10Mb" if (buffer.size > 10 * 1024 * 1024) && verbose
 
     stop_time = Time.now
