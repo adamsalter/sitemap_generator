@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{sitemap_generator}
-  s.version = "0.2.1"
+  s.version = "0.2.2"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Adam Salter"]
-  s.date = %q{2009-11-09}
+  s.date = %q{2009-11-10}
   s.description = %q{Install as a plugin or Gem to easily generate ['enterprise-class'][enterprise_class] Google Sitemaps for your Rails site, using a simple 'Rails Routes'-like DSL and a single rake task.}
   s.email = %q{adam.salter@codebright.net }
   s.extra_rdoc_files = [
