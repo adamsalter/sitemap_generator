@@ -18,6 +18,7 @@ class SiteMapCreateTask < Rake::Task
     build_files
   end
 
+  private
   def build_files
     start_time = Time.now
 

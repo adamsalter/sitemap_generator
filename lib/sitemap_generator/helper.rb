@@ -1,22 +1,18 @@
-require 'action_controller'
-require 'action_controller/test_process'
-begin
-  require 'application_controller'
-rescue LoadError
-  # Rails < 2.3
-  require 'application'
-end
-
 module SitemapGenerator
   module Helper
+    include ActionController::UrlWriter
+
+    def self.included(base)
+      base.class_eval do
+        def self.default_url_options(options = nil)
+          {}
+        end
+      end
+    end
+
     def load_sitemap_rb
-      controller = ApplicationController.new
-      controller.request = ActionController::TestRequest.new
-      controller.params = {}
-      controller.send(:initialize_current_url)  
-      b = controller.instance_eval{binding}
       sitemap_mapper_file = File.join(RAILS_ROOT, 'config/sitemap.rb')
-      eval(open(sitemap_mapper_file).read, b)
+      eval(open(sitemap_mapper_file).read)
     end
     
     def url_with_hostname(path)
