@@ -1,4 +1,5 @@
 require 'zlib'
+require 'sitemap_generator/helper'
 
 class SiteMapRefreshTask < Rake::Task
   include SitemapGenerator::Helper

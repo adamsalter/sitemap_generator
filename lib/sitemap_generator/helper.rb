@@ -1,3 +1,6 @@
+require 'sitemap_generator'
+require 'action_controller'
+
 module SitemapGenerator
   module Helper
     include ActionController::UrlWriter
@@ -5,7 +8,7 @@ module SitemapGenerator
     def self.included(base)
       base.class_eval do
         def self.default_url_options(options = nil)
-          {}
+          { :host => SitemapGenerator::Sitemap.default_host }
         end
       end
     end
@@ -16,7 +19,7 @@ module SitemapGenerator
     end
     
     def url_with_hostname(path)
-      URI.join(Sitemap.default_host, path).to_s
+      URI.join(SitemapGenerator::Sitemap.default_host, path).to_s
     end
     
     def w3c_date(date)

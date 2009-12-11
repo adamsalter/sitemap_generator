@@ -3,6 +3,13 @@ SitemapGenerator
 
 This plugin enables ['enterprise-class'][enterprise_class] Google Sitemaps to be easily generated for a Rails site as a rake task, using a simple 'Rails Routes'-like DSL.
 
+Foreword
+-------
+
+Unfortunately, Adam Salter passed away recently.  Those who knew him know what an amazing guy he was, and what an excellent Rails programmer he was.  His passing is a great loss to the Rails community.
+
+I will be taking over maintaining this gem from him. -- Karl
+
 Raison d'être
 -------
 
@@ -60,7 +67,7 @@ Installation
 
 1. Install plugin as normal
 
-    <code>$ ./script/plugin install git://github.com/adamsalter/sitemap_generator.git</code>
+    <code>$ ./script/plugin install git://github.com/kjvarga/sitemap_generator.git</code>
 
 ----
 
@@ -111,6 +118,18 @@ Example 'config/sitemap.rb'
   
     end
 
+    # Including Sitemaps from Rails Engines.
+    #
+    # These Sitemaps should be almost identical to a regular Sitemap file except 
+    # they needn't define their own SitemapGenerator::Sitemap.default_host since
+    # they will undoubtedly share the host name of the application they belong to.
+    #
+    # As an example, say we have a Rails Engine in vendor/plugins/cadability_client
+    # We can include its Sitemap here as follows:
+    # 
+    file = File.join(Rails.root, 'vendor/plugins/cadability_client/config/sitemap.rb')
+    eval(open(file).read, binding, file)
+
 Notes
 =======
 
@@ -135,12 +154,19 @@ Notes
       end
     end
 
+4) If generation of your sitemap fails for some reason, the old sitemap will remain in public/.  This ensures that robots will always find a valid sitemap.  Running silently (`rake -s sitemap:refresh`) and with email forwarding setup you'll only get an email if your sitemap fails to build, and no notification when everything is fine - which will be most of the time.
+
 Known Bugs
 ========
 
 - Sitemaps.org [states][sitemaps_org] that no Sitemap XML file should be more than 10Mb uncompressed. The plugin will warn you about this, but does nothing to avoid it (like move some URLs into a later file).
 - There's no check on the size of a URL which [isn't supposed to exceed 2,048 bytes][sitemaps_xml].
 - Currently only supports one Sitemap Index file, which can contain 50,000 Sitemap files which can each contain 50,000 urls, so it _only_ supports up to 2,500,000,000 (2.5 billion) urls. I personally have no need of support for more urls, but plugin could be improved to support this.
+
+Wishlist
+========
+
+- Auto coverage testing.  Generate a report of broken URLs by checking the status codes of each page in the sitemap.
 
 Thanks (in no particular order)
 ========
