@@ -3,6 +3,7 @@ require File.dirname(__FILE__) + '/helper'
 module SitemapGenerator
   class LinkSet
     include SitemapGenerator::Helper
+    include ActionView::Helpers::NumberHelper
 
     attr_accessor :default_host, :yahoo_app_id, :links
     attr_accessor :sitemap_files
@@ -86,6 +87,28 @@ module SitemapGenerator
       if File.exist?(File.join(RAILS_ROOT, 'config/sitemap.rb'))
         File.rm(File.join(RAILS_ROOT, 'config/sitemap.rb'))
       end
+    end
+
+    # Clean sitemap files in output directory.
+    def clean_files
+      FileUtils.rm(Dir[File.join(RAILS_ROOT, 'public/sitemap*.xml.gz')])
+    end
+
+     # Ping search engines passing sitemap location.
+     def ping_search_engines
+       super "sitemap_index.xml.gz"
+     end
+
+    # Create sitemap files in output directory.
+    def create_files(verbose = true)
+      start_time = Time.now
+      load_sitemap_rb
+      raise(ArgumentError, "Default hostname not defined") if SitemapGenerator::Sitemap.default_host.blank?
+      clean_files
+      render_sitemaps(verbose)
+      render_index(verbose)
+      stop_time = Time.now
+      puts "Sitemap stats: #{number_with_delimiter(SitemapGenerator::Sitemap.links.length)} links, " + ("%dm%02ds" % (stop_time - start_time).divmod(60)) if verbose
     end
   end
 end
