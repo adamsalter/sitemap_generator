@@ -44,12 +44,8 @@ module SitemapGenerator
         xml = Builder::XmlMarkup.new(:target => buffer)
         eval(open(SitemapGenerator.templates[:sitemap_xml]).read, binding)
         filename = File.join(RAILS_ROOT, "public/sitemap#{index+1}.xml.gz")
-        Zlib::GzipWriter.open(filename) do |gz|
-          gz.write buffer
-        end
-        sitemap_files.push filename
-        puts "+ #{filename}" if verbose
-        puts "** Sitemap too big! The uncompressed size exceeds 10Mb" if (buffer.size > 10 * 1024 * 1024) && verbose
+        write_file(filename, buffer)
+        show_progress("Sitemap", filename, buffer) if verbose
       end
       sitemap_files
     end
@@ -60,12 +56,19 @@ module SitemapGenerator
       xml = Builder::XmlMarkup.new(:target => buffer)
       eval(open(SitemapGenerator.templates[:sitemap_index]).read, binding)
       filename = File.join(RAILS_ROOT, "public/sitemap_index.xml.gz")
-      Zlib::GzipWriter.open(filename) do |gz|
-        gz.write buffer
-      end
+      write_file(filename, buffer)
+      show_progress("Sitemap Index", filename, buffer) if verbose
+    end
 
-      puts "+ #{filename}" if verbose
-      puts "** Sitemap Index too big! The uncompressed size exceeds 10Mb" if (buffer.size > 10 * 1024 * 1024) && verbose
+    # Commit buffer to gzipped file.
+    def write_file(name, buffer)
+      Zlib::GzipWriter.open(name) { |gz| gz.write buffer }
+    end
+
+    # Report progress line.
+    def show_progress(title, filename, buffer)
+      puts "+ #{filename}"
+      puts "** #{title} too big! The uncompressed size exceeds 10Mb" if buffer.size > 10.megabytes
     end
   end
 end
