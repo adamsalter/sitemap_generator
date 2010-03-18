@@ -28,13 +28,13 @@ class SiteMapCreateTask < Rake::Task
 
     raise(ArgumentError, "Default hostname not defined") if SitemapGenerator::Sitemap.default_host.blank?
 
-    links_grps = SitemapGenerator::Sitemap.links.in_groups_of(50_000, false)
-    raise(ArgumentError, "TOO MANY LINKS!! I really thought 2,500,000,000 links would be enough for anybody!") if links_grps.length > 50000
+    link_groups = SitemapGenerator::Sitemap.link_groups
+    raise(ArgumentError, "TOO MANY LINKS!! I really thought 2,500,000,000 links would be enough for anybody!") if link_groups.length > SitemapGenerator::MAX_ENTRIES
 
     Rake::Task['sitemap:clean'].invoke
 
     # render individual sitemaps
-    sitemap_files = render_sitemap(links_grps)
+    sitemap_files = render_sitemap(link_groups)
 
     # render index
     render_index(sitemap_files)
@@ -43,9 +43,9 @@ class SiteMapCreateTask < Rake::Task
     puts "Sitemap stats: #{number_with_delimiter(SitemapGenerator::Sitemap.links.length)} links, " + ("%dm%02ds" % (stop_time - start_time).divmod(60)) if verbose
   end
 
-  def render_sitemap(links_grps)
+  def render_sitemap(link_groups)
     sitemap_files = []
-    links_grps.each_with_index do |links, index|
+    link_groups.each_with_index do |links, index|
       buffer = ''
       xml = Builder::XmlMarkup.new(:target=>buffer)
       eval(open(SitemapGenerator.templates[:sitemap_xml]).read, binding)

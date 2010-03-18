@@ -6,6 +6,8 @@ require 'sitemap_generator/helper'
 module SitemapGenerator
   VERSION = File.read(File.dirname(__FILE__) + "/../VERSION").strip
 
+  MAX_ENTRIES = 50_000
+
   class << self
     attr_accessor :root, :templates
   end
