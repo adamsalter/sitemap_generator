@@ -6,59 +6,129 @@ module SitemapGenerator
     include ActionView::Helpers::NumberHelper
 
     attr_accessor :default_host, :yahoo_app_id, :links
-    attr_accessor :sitemap_files
+    attr_accessor :sitemaps
+    attr_accessor :max_entries
+    attr_accessor :link_count
 
+    alias :sitemap_files :sitemaps
+
+    # Create new link set instance.
     def initialize
-      self.links         = []
-      self.sitemap_files = []
+      self.links       = []
+      self.sitemaps    = []
+      self.max_entries = SitemapGenerator::MAX_ENTRIES
+      self.link_count  = 0
     end
 
-    def default_host=(host)
-      @default_host = host
-      add_default_links
-    end
-
+    # Add default links to sitemap files.
     def add_default_links
-      # Add default links
-      @links << Link.generate('/', :lastmod => Time.now, :changefreq => 'always', :priority => 1.0)
-      @links << Link.generate('/sitemap_index.xml.gz', :lastmod => Time.now, :changefreq => 'always', :priority => 1.0)
+      links.push Link.generate('/', :lastmod => Time.now, :changefreq => 'always', :priority => 1.0)
+      links.push Link.generate("/#{index_file}", :lastmod => Time.now, :changefreq => 'always', :priority => 1.0)
+      self.link_count += 2
     end
 
+    # Add links to sitemap files passing a block.
     def add_links
+      raise ArgumentError, "Default hostname not set" if default_host.blank?
+      add_default_links if first_link?
       yield Mapper.new(self)
     end
 
+    # Add links from mapper to sitemap files.
     def add_link(link)
-      @links << link
+      write_upcoming if enough_links?
+      links.push link
+      self.link_count += 1
     end
 
-    # Return groups with no more than maximum allowed links.
-    def link_groups
-      links.in_groups_of(SitemapGenerator::MAX_ENTRIES, false)
+    # Write links to sitemap file.
+    def write
+      write_pending
     end
 
-    # Render individual sitemap files.
-    def render_sitemaps(verbose = true)
-      sitemap_files.clear
-      link_groups.each_with_index do |links, index|
-        buffer = ''
-        xml = Builder::XmlMarkup.new(:target => buffer)
-        eval(open(SitemapGenerator.templates[:sitemap_xml]).read, binding)
-        filename = File.join(RAILS_ROOT, "public/sitemap#{index+1}.xml.gz")
-        write_file(filename, buffer)
-        show_progress("Sitemap", filename, buffer) if verbose
-      end
-      sitemap_files
+    # Write links to upcoming sitemap file.
+    def write_upcoming
+      write_sitemap(upcoming_file)
     end
 
-    # Render sitemap index file.
-    def render_index(verbose = true)
-      buffer = ''
+    # Write pending links to sitemap, write index file if needed.
+    def write_pending
+      write_upcoming
+      write_index
+    end
+
+    # Write links to sitemap file.
+    def write_sitemap(file = upcoming_file)
+      buffer = ""
       xml = Builder::XmlMarkup.new(:target => buffer)
-      eval(open(SitemapGenerator.templates[:sitemap_index]).read, binding)
-      filename = File.join(RAILS_ROOT, "public/sitemap_index.xml.gz")
+      eval(File.read(SitemapGenerator.templates[:sitemap_xml]), binding)
+      filename = File.join(RAILS_ROOT, "public", file)
+      write_file(filename, buffer)
+      show_progress("Sitemap", filename, buffer) if verbose
+      links.clear
+      sitemaps.push filename
+    end
+
+    # Write sitemap links to sitemap index file.
+    def write_index
+      buffer = ""
+      xml = Builder::XmlMarkup.new(:target => buffer)
+      eval(File.read(SitemapGenerator.templates[:sitemap_index]), binding)
+      filename = File.join(RAILS_ROOT, "public", index_file)
       write_file(filename, buffer)
       show_progress("Sitemap Index", filename, buffer) if verbose
+      links.clear
+      sitemaps.clear
+    end
+
+    # Return sitemap or sitemap index main name.
+    def index_file
+      "sitemap_index.xml.gz"
+    end
+
+    # Return upcoming sitemap name with index.
+    def upcoming_file
+      "sitemap#{upcoming_index}.xml.gz" unless enough_sitemaps?
+    end
+
+    # Return upcoming sitemap index, first is 1.
+    def upcoming_index
+      sitemaps.length + 1 unless enough_sitemaps?
+    end
+
+    # Return true if upcoming is first sitemap.
+    def first_sitemap?
+      sitemaps.empty?
+    end
+
+    # Return true if sitemap index needed.
+    def multiple_sitemaps?
+      !first_sitemap?
+    end
+
+    # Return true if more sitemaps can be added.
+    def more_sitemaps?
+      sitemaps.length < max_entries
+    end
+
+    # Return true if no sitemaps can be added.
+    def enough_sitemaps?
+      !more_sitemaps?
+    end
+
+    # Return true if this is the first link added.
+    def first_link?
+      links.empty? && first_sitemap?
+    end
+
+    # Return true if more links can be added.
+    def more_links?
+      links.length < max_entries
+    end
+
+    # Return true if no further links can be added.
+    def enough_links?
+      !more_links?
     end
 
     # Commit buffer to gzipped file.
@@ -94,26 +164,18 @@ module SitemapGenerator
       FileUtils.rm(Dir[File.join(RAILS_ROOT, 'public/sitemap*.xml.gz')])
     end
 
-     # Ping search engines passing sitemap location.
-     def ping_search_engines
-       super "sitemap_index.xml.gz"
-     end
+    # Ping search engines passing sitemap location.
+    def ping_search_engines
+      super index_file
+    end
 
     # Create sitemap files in output directory.
     def create_files(verbose = true)
       start_time = Time.now
       load_sitemap_rb
-      raise(ArgumentError, "Default hostname not defined") if SitemapGenerator::Sitemap.default_host.blank?
-      clean_files
-      render_sitemaps(verbose)
-      render_index(verbose)
+      write
       stop_time = Time.now
       puts "Sitemap stats: #{number_with_delimiter(SitemapGenerator::Sitemap.link_count)} links, " + ("%dm%02ds" % (stop_time - start_time).divmod(60)) if verbose
-    end
-
-    # Return total link count.
-    def link_count
-      links.length
     end
   end
 end
