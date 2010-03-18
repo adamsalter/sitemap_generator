@@ -62,7 +62,7 @@ class SitemapGeneratorTest < Test::Unit::TestCase
     end
         
     should "be have x elements" do
-      assert_equal 14, SitemapGenerator::Sitemap.links.size
+      assert_equal 14, SitemapGenerator::Sitemap.link_count
     end
   end
   

@@ -108,7 +108,12 @@ module SitemapGenerator
       render_sitemaps(verbose)
       render_index(verbose)
       stop_time = Time.now
-      puts "Sitemap stats: #{number_with_delimiter(SitemapGenerator::Sitemap.links.length)} links, " + ("%dm%02ds" % (stop_time - start_time).divmod(60)) if verbose
+      puts "Sitemap stats: #{number_with_delimiter(SitemapGenerator::Sitemap.link_count)} links, " + ("%dm%02ds" % (stop_time - start_time).divmod(60)) if verbose
+    end
+
+    # Return total link count.
+    def link_count
+      links.length
     end
   end
 end
