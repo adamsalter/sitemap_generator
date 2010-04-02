@@ -1,18 +1,19 @@
-require 'rake/testtask'
-require 'find'
+require 'rake'
+require 'rake/rdoctask'
+require 'spec/rake/spectask'
 
 begin
   require 'jeweler'
-  Jeweler::Tasks.new do |s|
-    s.name = "sitemap_generator"
-    s.summary = %Q{Generate 'enterprise-class' Sitemaps for your Rails site using a simple 'Rails Routes'-like DSL and a single Rake task}
-    s.description = %Q{Install as a plugin or Gem to easily generate ['enterprise-class'][enterprise_class] Google Sitemaps for your Rails site, using a simple 'Rails Routes'-like DSL and a single rake task.}
-    s.email = "kjvarga@gmail.com"
-    s.homepage = "http://github.com/kjvarga/sitemap_generator"
-    s.authors = ["Adam Salter", "Karl Varga"]
-    s.files =  FileList["[A-Z]*", "{bin,lib,rails,templates,tasks}/**/*"]
-    s.test_files = []
-    # s is a Gem::Specification... see http://www.rubygems.org/read/chapter/20 for additional settings
+  Jeweler::Tasks.new do |gem|
+    gem.name = "sitemap_generator"
+    gem.summary = %Q{Easily generate enterprise class Sitemaps for your Rails site using a simple 'Rails Routes'-like DSL and a single Rake task}
+    gem.description = %Q{Installs as a plugin or Gem to easily generate enterprise class Sitemaps readable by all search engines.  Automatically ping search engines to notify them of new sitemaps, including Google, Yahoo and Bing. Provides rake tasks to easily manage your sitemaps.  Won't clobber your old sitemaps if the new one fails to generate. Setup a cron schedule and never worry about your sitemaps again.}
+    gem.email = "kjvarga@gmail.com"
+    gem.homepage = "http://github.com/kjvarga/sitemap_generator"
+    gem.authors = ["Adam Salter", "Karl Varga"]
+    gem.files =  FileList["[A-Z]*", "{bin,lib,rails,templates,tasks}/**/*"]
+    gem.test_files = []
+    gem.add_development_dependency "rspec"
   end
   Jeweler::GemcutterTasks.new
 rescue LoadError
@@ -21,25 +22,60 @@ end
 
 task :default => :test
 
-desc "Run tests"
-task :test do
-  Rake::Task["test:prepare"].invoke
-  Rake::Task["test:sitemap_generator"].invoke
-end
-
 namespace :test do
-  desc "Copy sitemap_generator files to mock apps"
-  task :prepare do
-    %w(test/mock_app_gem/vendor/gems/sitemap_generator-1.2.3 test/mock_app_plugin/vendor/plugins/sitemap_generator).each do |path|
+  task :gem => ['test:prepare:gem', 'multi_spec']
+  task :plugin => ['test:prepare:plugin', 'multi_spec']
+  
+  task :multi_spec do
+    Rake::Task['spec'].invoke
+    Rake::Task['spec'].reenable
+  end
+  
+  namespace :prepare do
+    task :gem do
+      ENV["SITEMAP_RAILS"] = 'gem'
+      prepare_path(local_path('spec/mock_app_gem/vendor/gems/sitemap_generator-1.2.3'))
+      rm_rf(local_path('spec/mock_app_gem/public/sitemap*'))
+    end
+    
+    task :plugin do
+      ENV["SITEMAP_RAILS"] = 'plugin'
+      prepare_path(local_path('spec/mock_app_plugin/vendor/plugins/sitemap_generator-1.2.3'))
+      rm_rf(local_path('spec/mock_app_plugin/public/sitemap*'))
+    end
+
+    def local_path(path)
+      File.join(File.dirname(__FILE__), path)
+    end
+    
+    def prepare_path(path)
       rm_rf path
       mkdir_p path
-      cp_r FileList["[A-Z]*", "{bin,lib,rails,templates,tasks}"], path
+      cp_r(FileList["[A-Z]*", "{bin,lib,rails,templates,tasks}"], path)
     end
   end
+end
 
-  Rake::TestTask.new(:sitemap_generator) do |t|
-    t.libs << 'lib'
-    t.pattern = 'test/**/*_test.rb'
-    t.verbose = true
-  end
+desc "Run all tests both as a plugin and gem"
+task :test => ['test:plugin', 'test:gem']
+
+Spec::Rake::SpecTask.new(:spec) do |spec|
+  spec.libs << 'lib' << 'spec'
+  spec.spec_files = FileList['spec/**/*_spec.rb']
+end
+task :spec => :check_dependencies
+
+Spec::Rake::SpecTask.new(:rcov) do |spec|
+  spec.libs << 'lib' << 'spec'
+  spec.pattern = 'spec/**/*_spec.rb'
+  spec.rcov = true
+end
+
+desc 'Generate documentation'
+Rake::RDocTask.new(:rdoc) do |rdoc|
+  rdoc.rdoc_dir = 'rdoc'
+  rdoc.title    = 'SitemapGenerator'
+  rdoc.options << '--line-numbers' << '--inline-source'
+  rdoc.rdoc_files.include('README.md')
+  rdoc.rdoc_files.include('lib/**/*.rb')
 end

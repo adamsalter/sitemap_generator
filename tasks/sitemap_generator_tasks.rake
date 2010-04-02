@@ -1,5 +1,5 @@
 require 'zlib'
-require 'sitemap_generator/helper'
+require 'sitemap_generator'
 
 namespace :sitemap do
   desc "Install a default config/sitemap.rb file"
