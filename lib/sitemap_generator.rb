@@ -4,10 +4,12 @@ require 'sitemap_generator/link_set'
 require 'sitemap_generator/helper'
 
 module SitemapGenerator
-  VERSION = File.read(File.dirname(__FILE__) + "/../VERSION").strip
-
-  MAX_ENTRIES = 50_000
-
+  silence_warnings do
+    VERSION = File.read(File.dirname(__FILE__) + "/../VERSION").strip
+    MAX_ENTRIES = 50_000
+    Sitemap = LinkSet.new
+  end
+  
   class << self
     attr_accessor :root, :templates
   end
@@ -18,6 +20,4 @@ module SitemapGenerator
     :sitemap_xml    => File.join(self.root, 'templates/xml_sitemap.builder'),
     :sitemap_sample => File.join(self.root, 'templates/sitemap.rb'),
   }
-
-  Sitemap = LinkSet.new
 end
