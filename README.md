@@ -6,9 +6,9 @@ This plugin enables ['enterprise-class'][enterprise_class] Google Sitemaps to be
 Foreword
 -------
 
-Unfortunately, Adam Salter passed away recently.  Those who knew him know what an amazing guy he was, and what an excellent Rails programmer he was.  His passing is a great loss to the Rails community.
+Unfortunately, Adam Salter passed away in 2009.  Those who knew him know what an amazing guy he was, and what an excellent Rails programmer he was.  His passing is a great loss to the Rails community.
 
-I will be taking over maintaining this gem from him. -- Karl
+[Karl Varga](http://github.com/kjvarga) has taken over development of SitemapGenerator.  The canonical repository is [http://github.com/kjvarga/sitemap_generator][canonical_repo]
 
 Raison d'être
 -------
@@ -171,20 +171,15 @@ Wishlist
 Thanks (in no particular order)
 ========
 
-- [Karl Varga (aka Bear Grylls)](http://github.com/kjvarga)
 - [Dan Pickett](http://github.com/dpickett)
 - [Rob Biedenharn](http://github.com/rab)
 - [Richie Vos](http://github.com/jerryvos)
+- [Adrian Mugnolo](http://github.com/xymbol)
 
-
-Follow me on:
----------
-
->  Twitter: [twitter.com/adamsalter](http://twitter.com/adamsalter)  
->  Github: [github.com/adamsalter](http://github.com/adamsalter)
 
 Copyright (c) 2009 Adam @ [Codebright.net][cb], released under the MIT license
 
+[canonical_repo]:http://github.com/kjvarga/sitemap_generator
 [enterprise_class]:https://twitter.com/dhh/status/1631034662 "I use enterprise in the same sense the Phusion guys do - i.e. Enterprise Ruby. Please don't look down on my use of the word 'enterprise' to represent being a cut above. It doesn't mean you ever have to work for a company the size of IBM. Or constantly fight inertia, writing crappy software, adhering to change management practices and spending hours in meetings... Not that there's anything wrong with that - Wait, what?"
 [sitemap_engines]:http://en.wikipedia.org/wiki/Sitemap_index "http://en.wikipedia.org/wiki/Sitemap_index"
 [sitemaps_org]:http://www.sitemaps.org/protocol.php "http://www.sitemaps.org/protocol.php"
