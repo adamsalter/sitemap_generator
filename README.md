@@ -75,13 +75,13 @@ Installation
 
 ----
 
-Installation creates a <tt>config/sitemap.rb</tt> file which will contain your logic for generating the Sitemap files.  If you want to create this file manually run <tt>rake sitemap:install</tt>.
+Installation creates a <tt>config/sitemap.rb</tt> file which will contain your logic for generating the Sitemap files.  If you want to create this file manually run <code>rake sitemap:install</code>.
 
-You can run <tt>rake sitemap:refresh</tt> as needed to create Sitemap files. This will also ping all the ['major'][sitemap_engines] search engines.  If you want to disable all non-essential output run the rake task with <tt>rake -s sitemap:refresh</tt>.
+You can run <code>rake sitemap:refresh</code> as needed to create Sitemap files. This will also ping all the ['major'][sitemap_engines] search engines.  If you want to disable all non-essential output run the rake task with <code>rake -s sitemap:refresh</code>.
 
 Sitemaps with many urls (100,000+) take quite a long time to generate, so if you need to refresh your Sitemaps regularly you can set the rake task up as a cron job. Most cron agents will only send you an email if there is output from the cron task.
 
-Optionally, you can add the following to your <tt>public/robots.txt</tt> file, so that robots can find the sitemap file.
+Optionally, you can add the following to your <code>public/robots.txt</code> file, so that robots can find the sitemap file.
 
     Sitemap: <hostname>/sitemap_index.xml.gz
     
