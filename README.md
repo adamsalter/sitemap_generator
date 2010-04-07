@@ -59,7 +59,11 @@ Installation
 
 3. Add the following line to your RAILS_ROOT/Rakefile
 
-    <code>require 'sitemap_generator/tasks' rescue LoadError</code>
+    <code>begin
+      require 'sitemap_generator/tasks'
+    rescue Exception => e
+      puts "Warning, couldn't load gem tasks: #{e.message}! Skipping..."
+    end</code>
 
 4. `$ rake sitemap:install`
 
