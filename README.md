@@ -51,19 +51,19 @@ Installation
 
 **As a gem**
 
-1. Add the gem as a dependency in your config/environment.rb
+1. Add the gem as a dependency in your <tt>config/environment.rb</tt>
 
     <code>config.gem 'sitemap_generator', :lib => false, :source => 'http://gemcutter.org'</code>
 
 2. `$ rake gems:install`
 
-3. Add the following line to your RAILS_ROOT/Rakefile
+3. Add the following to your <tt>RAILS_ROOT/Rakefile</tt>
 
-    <code>begin
+    <pre>begin
       require 'sitemap_generator/tasks'
     rescue Exception => e
       puts "Warning, couldn't load gem tasks: #{e.message}! Skipping..."
-    end</code>
+    end</pre>
 
 4. `$ rake sitemap:install`
 
@@ -75,17 +75,17 @@ Installation
 
 ----
 
-Installation should create a 'config/sitemap.rb' file which will contain your logic for generation of the Sitemap files. (If you want to recreate this file manually run `rake sitemap:install`)
+Installation creates a <tt>config/sitemap.rb</tt> file which will contain your logic for generating the Sitemap files.  If you want to create this file manually run <tt>rake sitemap:install</tt>.
 
-You can run `rake sitemap:refresh` as needed to create Sitemap files. This will also ping all the ['major'][sitemap_engines] search engines. (if you want to disable all non-essential output run the rake task thusly `rake -s sitemap:refresh`)
+You can run <tt>rake sitemap:refresh</tt> as needed to create Sitemap files. This will also ping all the ['major'][sitemap_engines] search engines.  If you want to disable all non-essential output run the rake task with <tt>rake -s sitemap:refresh</tt>.
 
 Sitemaps with many urls (100,000+) take quite a long time to generate, so if you need to refresh your Sitemaps regularly you can set the rake task up as a cron job. Most cron agents will only send you an email if there is output from the cron task.
 
-Optionally, you can add the following to your robots.txt file, so that robots can find the sitemap file.
+Optionally, you can add the following to your <tt>public/robots.txt</tt> file, so that robots can find the sitemap file.
 
     Sitemap: <hostname>/sitemap_index.xml.gz
     
-The robots.txt Sitemap URL should be the complete URL to the Sitemap Index, such as: `http://www.example.org/sitemap_index.xml.gz`
+The Sitemap URL in the robots file should be the complete URL to the Sitemap Index, such as <tt>http://www.example.org/sitemap_index.xml.gz</tt>
 
 
 Example 'config/sitemap.rb'
