@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe "SitemapGenerator" do
-
+  
   context "clean task" do
     before :all do
       copy_sitemap_file_to_rails_app
@@ -19,11 +19,11 @@ describe "SitemapGenerator" do
       delete_sitemap_file_from_rails_app
       Rake::Task['sitemap:install'].invoke
     end
-
+  
     it "should create config/sitemap.rb" do
       file_should_exist(rails_path('config/sitemap.rb'))
     end
-
+  
     it "should create config/sitemap.rb matching template" do
       sitemap_template = SitemapGenerator.templates[:sitemap_sample]
       files_should_be_identical(rails_path('config/sitemap.rb'), sitemap_template)
@@ -41,7 +41,7 @@ describe "SitemapGenerator" do
       end
     end
   end  
-
+  
   context "generate sitemap" do
     before :each do
       Rake::Task['sitemap:refresh:no_ping'].invoke
@@ -56,7 +56,7 @@ describe "SitemapGenerator" do
       SitemapGenerator::Sitemap.link_count.should == 14
     end    
   end
-  
+   
   protected
     
   #
