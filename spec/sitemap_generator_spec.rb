@@ -25,7 +25,7 @@ describe "SitemapGenerator" do
     end
   
     it "should create config/sitemap.rb matching template" do
-      sitemap_template = SitemapGenerator.templates[:sitemap_sample]
+      sitemap_template = SitemapGenerator.templates.template_path(:sitemap_sample)
       files_should_be_identical(rails_path('config/sitemap.rb'), sitemap_template)
     end
   

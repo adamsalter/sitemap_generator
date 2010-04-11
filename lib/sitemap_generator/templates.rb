@@ -23,12 +23,12 @@ module SitemapGenerator
       @root = root
     end
     
-    protected
-    
     def template_path(file)
       File.join(@root, 'templates', file)
     end
     
+    protected
+        
     def read_template(template)
       File.read(template_path(self.class::FILES[template]))
     end

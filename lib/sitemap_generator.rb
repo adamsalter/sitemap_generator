@@ -12,7 +12,7 @@ module SitemapGenerator
   end
   
   class << self
-    attr_accessor :root, :templates, :template, :x
+    attr_accessor :root, :templates
   end
 
   self.root = File.expand_path(File.join(File.dirname(__FILE__), '../'))

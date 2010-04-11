@@ -18,7 +18,12 @@ module SitemapGenerator
         set = LinkSet.new
         add_default_links if first_link?
         yield Mapper.new(self)
-      end      
+      end
+          
+      # Clean sitemap files from output directory.
+      #def clean_files      
+      #  FileUtils.rm(Dir[File.join(RAILS_ROOT, 'public/sitemap*.xml.gz')])
+      #end            
     end
   end
 end
