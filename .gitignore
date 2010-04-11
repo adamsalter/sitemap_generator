@@ -1,4 +1,4 @@
 *.swp
 pkg
-test/mock_app_gem/vendor/gems/sitemap_generator-1.2.3
-test/mock_app_plugin/vendor/plugins/sitemap_generator
+spec/mock_app_gem/vendor/gems/sitemap_generator-1.2.3
+spec/mock_app_plugin/vendor/plugins/sitemap_generator-1.2.3
