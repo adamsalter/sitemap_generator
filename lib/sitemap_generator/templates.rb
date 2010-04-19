@@ -1,8 +1,10 @@
 module SitemapGenerator
-  # Provide convenient access to template files.
+  # Provide convenient access to template files.  E.g.
   #
-  # Only read the template file once and store the result.
-  # Define accessor methods for each template file.
+  #   SitemapGenerator.templates.sitemap_index
+  #
+  # Lazy-load and cache for efficient access.
+  # Define an accessor method for each template file.
   class Templates
     FILES = {
       :sitemap_index  =>  'sitemap_index.builder',
