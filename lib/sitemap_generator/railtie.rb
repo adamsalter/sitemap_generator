@@ -1,7 +1,5 @@
 module SitemapGenerator
   class Railtie < Rails::Railtie
-    railtie_name :sitemap_generator
-
     rake_tasks do
       load File.expand_path('../../../tasks/sitemap_generator_tasks.rake', __FILE__)
     end

@@ -1,5 +1,3 @@
-require File.dirname(__FILE__) + '/helper'
-
 module SitemapGenerator
   class LinkSet
     include SitemapGenerator::Helper
@@ -62,7 +60,7 @@ module SitemapGenerator
       buffer = ""
       xml = Builder::XmlMarkup.new(:target => buffer)
       eval(File.read(SitemapGenerator.templates[:sitemap_xml]), binding)
-      filename = File.join(RAILS_ROOT, "public", file)
+      filename = File.join(Rails.root, "public", file)
       write_file(filename, buffer)
       show_progress("Sitemap", filename, buffer) if verbose
       links.clear
@@ -74,7 +72,7 @@ module SitemapGenerator
       buffer = ""
       xml = Builder::XmlMarkup.new(:target => buffer)
       eval(File.read(SitemapGenerator.templates[:sitemap_index]), binding)
-      filename = File.join(RAILS_ROOT, "public", index_file)
+      filename = File.join(Rails.root, "public", index_file)
       write_file(filename, buffer)
       show_progress("Sitemap Index", filename, buffer) if verbose
       links.clear
@@ -144,24 +142,24 @@ module SitemapGenerator
 
     # Copy templates/sitemap.rb to config if not there yet.
     def install_sitemap_rb
-      if File.exist?(File.join(RAILS_ROOT, 'config/sitemap.rb'))
+      if File.exist?(File.join(Rails.root, 'config/sitemap.rb'))
         puts "already exists: config/sitemap.rb, file not copied"
       else
-        FileUtils.cp(SitemapGenerator.templates[:sitemap_sample], File.join(RAILS_ROOT, 'config/sitemap.rb'))
+        FileUtils.cp(SitemapGenerator.templates[:sitemap_sample], File.join(Rails.root, 'config/sitemap.rb'))
         puts "created: config/sitemap.rb"
       end
     end
 
     # Remove config/sitemap.rb if exists.
     def uninstall_sitemap_rb
-      if File.exist?(File.join(RAILS_ROOT, 'config/sitemap.rb'))
-        File.rm(File.join(RAILS_ROOT, 'config/sitemap.rb'))
+      if File.exist?(File.join(Rails.root, 'config/sitemap.rb'))
+        File.rm(File.join(Rails.root, 'config/sitemap.rb'))
       end
     end
 
     # Clean sitemap files in output directory.
     def clean_files
-      FileUtils.rm(Dir[File.join(RAILS_ROOT, 'public/sitemap*.xml.gz')])
+      FileUtils.rm(Dir[File.join(Rails.root, 'public/sitemap*.xml.gz')])
     end
 
     # Ping search engines passing sitemap location.

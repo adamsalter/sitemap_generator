@@ -1,8 +1,8 @@
 require 'sitemap_generator/mapper'
 require 'sitemap_generator/link'
-require 'sitemap_generator/link_set'
+require 'sitemap_generator/rails_helper'
 require 'sitemap_generator/helper'
-require 'sitemap_generator/railtie' if defined?(Rails)
+require 'sitemap_generator/link_set'
 
 module SitemapGenerator
   silence_warnings do
@@ -20,5 +20,5 @@ module SitemapGenerator
     :sitemap_index  => File.join(self.root, 'templates/sitemap_index.builder'),
     :sitemap_xml    => File.join(self.root, 'templates/xml_sitemap.builder'),
     :sitemap_sample => File.join(self.root, 'templates/sitemap.rb'),
-  }
+  }  
 end

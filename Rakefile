@@ -47,8 +47,6 @@ namespace :test do
 
     task :rails3 do
       ENV["SITEMAP_RAILS"] = 'rails3'
-      prepare_path(local_path('spec/mock_rails3_gem/vendor/gems/sitemap_generator-1.2.3'))
-      cp(local_path('sitemap_generator.gemspec'), local_path('spec/mock_rails3_gem/vendor/gems/sitemap_generator-1.2.3/'))
       rm_rf(local_path('spec/mock_rails3_gem/public/sitemap*'))
     end
     

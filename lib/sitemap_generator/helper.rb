@@ -1,8 +1,8 @@
-require 'sitemap_generator'
+require 'action_controller' unless SitemapGenerator::RailsHelper.rails3?
 
 module SitemapGenerator
   module Helper
-    # include ActionController::UrlWriter
+    include ActionController::UrlWriter unless SitemapGenerator::RailsHelper.rails3?
 
     def self.included(base)
       base.class_eval do
@@ -13,7 +13,7 @@ module SitemapGenerator
     end
 
     def load_sitemap_rb
-      sitemap_mapper_file = File.join(RAILS_ROOT, 'config/sitemap.rb')
+      sitemap_mapper_file = File.join(Rails.root, 'config/sitemap.rb')
       eval(open(sitemap_mapper_file).read)
     end
 
