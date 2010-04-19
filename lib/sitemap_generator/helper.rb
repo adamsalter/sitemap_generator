@@ -1,9 +1,8 @@
 require 'sitemap_generator'
-require 'action_controller'
 
 module SitemapGenerator
   module Helper
-    include ActionController::UrlWriter
+    # include ActionController::UrlWriter
 
     def self.included(base)
       base.class_eval do
@@ -17,15 +16,15 @@ module SitemapGenerator
       sitemap_mapper_file = File.join(RAILS_ROOT, 'config/sitemap.rb')
       eval(open(sitemap_mapper_file).read)
     end
-    
+
     def url_with_hostname(path)
       URI.join(SitemapGenerator::Sitemap.default_host, path).to_s
     end
-    
+
     def w3c_date(date)
        date.utc.strftime("%Y-%m-%dT%H:%M:%S+00:00")
     end
-    
+
     def ping_search_engines(sitemap_index)
       require 'open-uri'
       index_location = CGI.escape(url_with_hostname(sitemap_index))
