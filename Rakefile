@@ -25,6 +25,7 @@ task :default => :test
 namespace :test do
   task :gem => ['test:prepare:gem', 'multi_spec']
   task :plugin => ['test:prepare:plugin', 'multi_spec']
+  task :rails3 => ['test:prepare:rails3', 'multi_spec']
   
   task :multi_spec do
     Rake::Task['spec'].invoke
@@ -44,6 +45,13 @@ namespace :test do
       rm_rf(local_path('spec/mock_app_plugin/public/sitemap*'))
     end
 
+    task :rails3 do
+      ENV["SITEMAP_RAILS"] = 'rails3'
+      prepare_path(local_path('spec/mock_rails3_gem/vendor/gems/sitemap_generator-1.2.3'))
+      cp(local_path('sitemap_generator.gemspec'), local_path('spec/mock_rails3_gem/vendor/gems/sitemap_generator-1.2.3/'))
+      rm_rf(local_path('spec/mock_rails3_gem/public/sitemap*'))
+    end
+    
     def local_path(path)
       File.join(File.dirname(__FILE__), path)
     end
