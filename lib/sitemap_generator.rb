@@ -4,6 +4,8 @@ require 'sitemap_generator/rails_helper'
 require 'sitemap_generator/helper'
 require 'sitemap_generator/link_set'
 
+require 'sitemap_generator/railtie' if SitemapGenerator::RailsHelper.rails3?
+
 module SitemapGenerator
   silence_warnings do
     VERSION = File.read(File.dirname(__FILE__) + "/../VERSION").strip

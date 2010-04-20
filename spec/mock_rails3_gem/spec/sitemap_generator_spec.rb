@@ -64,14 +64,14 @@ describe "SitemapGenerator" do
   #
   
   def rails_path(file)
-    File.join(RAILS_ROOT, file)
+    File.join(Rails.root, file)
   end
   
   def copy_sitemap_file_to_rails_app
-    FileUtils.cp(File.join(File.dirname(__FILE__), '/sitemap.file'), File.join(RAILS_ROOT, '/config/sitemap.rb'))
+    FileUtils.cp(File.join(File.dirname(__FILE__), '/sitemap.file'), File.join(Rails.root, '/config/sitemap.rb'))
   end
   
   def delete_sitemap_file_from_rails_app
-    FileUtils.remove(File.join(RAILS_ROOT, '/config/sitemap.rb')) rescue nil
+    FileUtils.remove(File.join(Rails.root, '/config/sitemap.rb')) rescue nil
   end
 end
