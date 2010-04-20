@@ -1,3 +1,5 @@
+require 'builder'
+
 module SitemapGenerator
   class LinkSet
     include SitemapGenerator::Helper

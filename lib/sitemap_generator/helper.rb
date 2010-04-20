@@ -1,9 +1,7 @@
-require 'action_controller' unless SitemapGenerator::RailsHelper.rails3?
-
 module SitemapGenerator
+  # UrlHelpers are included by the rake tasks.  This is not ideal, but should
+  # suffice until things are better organized.
   module Helper
-    include ActionController::UrlWriter unless SitemapGenerator::RailsHelper.rails3?
-
     def self.included(base)
       base.class_eval do
         def self.default_url_options(options = nil)

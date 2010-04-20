@@ -21,6 +21,18 @@ namespace :sitemap do
   task 'refresh:no_ping' => ['sitemap:create']
 
   task :create => [:environment] do
+    # TODO: Move away from auto-instantiating SitemapGenerator::Sitemap
+    # and move to a more natural Sitemap.new or similar.
+    if SitemapGenerator::RailsHelper.rails3?
+      SitemapGenerator::Sitemap.class_eval do
+        include Rails.application.routes.url_helpers
+      end
+    else
+      require 'action_controller'
+      SitemapGenerator::Sitemap.class_eval do
+        include ActionController::UrlWriter
+      end
+    end    
     SitemapGenerator::Sitemap.create_files
   end
 end

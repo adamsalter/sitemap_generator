@@ -1,5 +1,6 @@
 *.swp
 pkg
-test/mock_app_gem/vendor/gems/sitemap_generator-1.2.3
-test/mock_app_plugin/vendor/plugins/sitemap_generator
-test/mock_rails3_gem/vendor/gems/*
+spec/mock_app_gem/vendor/**/*
+spec/mock_app_plugin/vendor/**/*
+spec/mock_rails3_gem/vendor/**/*
+tmp/**/*
