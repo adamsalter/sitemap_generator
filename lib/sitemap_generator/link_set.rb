@@ -1,4 +1,5 @@
 require 'builder'
+require 'action_view'
 
 module SitemapGenerator
   class LinkSet

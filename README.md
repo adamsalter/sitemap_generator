@@ -3,6 +3,8 @@ SitemapGenerator
 
 This plugin enables ['enterprise-class'][enterprise_class] Google Sitemaps to be easily generated for a Rails site as a rake task, using a simple 'Rails Routes'-like DSL.
 
+**Now supporting Rails 3 as of version 0.2.5!**
+
 Foreword
 -------
 
@@ -10,50 +12,22 @@ Unfortunately, Adam Salter passed away in 2009.  Those who knew him know what an
 
 [Karl Varga](http://github.com/kjvarga) has taken over development of SitemapGenerator.  The canonical repository is [http://github.com/kjvarga/sitemap_generator][canonical_repo]
 
-Raison d'être
--------
-
-Most of the Sitemap plugins out there seem to try to recreate the Sitemap links by iterating the Rails routes. In some cases this is possible, but for a great deal of cases it isn't. 
-
-a) There are probably quite a few routes in your routes file that don't need inclusion in the Sitemap. (AJAX routes I'm looking at you.)
-
-and
-
-b) How would you infer the correct series of links for the following route?
-
-    map.zipcode 'location/:state/:city/:zipcode', :controller => 'zipcode', :action => 'index'
-    
-Don't tell me it's trivial, because it isn't. It just looks trivial.
-
-So my idea is to have another file similar to 'routes.rb' called 'sitemap.rb', where you can define what goes into the Sitemap.
-
-Here's my solution:
-
-    Zipcode.find(:all, :include => :city).each do |z|
-      sitemap.add zipcode_path(:state => z.city.state, :city => z.city, :zipcode => z)
-    end
-
-Easy hey?
-
-Other Sitemap settings for the link, like `lastmod`, `priority`, `changefreq` and `host` are entered automatically, although you can override them if you need to.
-
-Other "difficult" Sitemap issues, solved by this plugin:
-
-- Support for more than 50,000 urls (using a Sitemap Index file)
-- Gzip of Sitemap files
-- Variable priority of links
-- Paging/sorting links (e.g. my_list?page=3)
-- SSL host links (e.g. https:)
-- Rails apps which are installed on a sub-path (e.g. example.com/blog_app/)
-
 Installation
 =======
 
-**As a gem**
+**Rails 3:**
+
+1. Add the gem to your <tt>Gemspec</tt>
+
+    <code>gem 'sitemap_generator'</code>
+
+2. `$ rake sitemap:install`
+    
+**Rails 2.x: As a gem**
 
 1. Add the gem as a dependency in your <tt>config/environment.rb</tt>
 
-    <code>config.gem 'sitemap_generator', :lib => false, :source => 'http://gemcutter.org'</code>
+    <code>config.gem 'sitemap_generator', :lib => false</code>
 
 2. `$ rake gems:install`
 
@@ -67,11 +41,9 @@ Installation
 
 4. `$ rake sitemap:install`
 
-**As a plugin**
+**Rails 2.x: As a plugin**
 
-1. Install plugin as normal
-
-    <code>$ ./script/plugin install git://github.com/kjvarga/sitemap_generator.git</code>
+1. <code>$ ./script/plugin install git://github.com/kjvarga/sitemap_generator.git</code>
 
 ----
 
@@ -134,12 +106,55 @@ Example 'config/sitemap.rb'
     file = File.join(Rails.root, 'vendor/plugins/cadability_client/config/sitemap.rb')
     eval(open(file).read, binding, file)
 
+Raison d'être
+-------
+
+Most of the Sitemap plugins out there seem to try to recreate the Sitemap links by iterating the Rails routes. In some cases this is possible, but for a great deal of cases it isn't. 
+
+a) There are probably quite a few routes in your routes file that don't need inclusion in the Sitemap. (AJAX routes I'm looking at you.)
+
+and
+
+b) How would you infer the correct series of links for the following route?
+
+    map.zipcode 'location/:state/:city/:zipcode', :controller => 'zipcode', :action => 'index'
+    
+Don't tell me it's trivial, because it isn't. It just looks trivial.
+
+So my idea is to have another file similar to 'routes.rb' called 'sitemap.rb', where you can define what goes into the Sitemap.
+
+Here's my solution:
+
+    Zipcode.find(:all, :include => :city).each do |z|
+      sitemap.add zipcode_path(:state => z.city.state, :city => z.city, :zipcode => z)
+    end
+
+Easy hey?
+
+Other Sitemap settings for the link, like `lastmod`, `priority`, `changefreq` and `host` are entered automatically, although you can override them if you need to.
+
+Other "difficult" Sitemap issues, solved by this plugin:
+
+- Support for more than 50,000 urls (using a Sitemap Index file)
+- Gzip of Sitemap files
+- Variable priority of links
+- Paging/sorting links (e.g. my_list?page=3)
+- SSL host links (e.g. https:)
+- Rails apps which are installed on a sub-path (e.g. example.com/blog_app/)
+
+Compatibility
+=======
+
+Tested and working on:
+
+- **Rails** 3.0.0, sitemap_generator version >= 0.2.5
+- **Rails** 1.x - 2.3.5 sitemap_generator version < 0.2.5
+- **Ruby** 1.8.7, 1.9.1
+
 Notes
 =======
 
-1) Tested/working on Rails 1.x.x <=> 2.x.x, no guarantees made for Rails 3.0.
-
-2) For large sitemaps it may be useful to split your generation into batches to avoid running out of memory. E.g.:
+1) For large sitemaps it may be useful to split your generation into batches to avoid running out of memory. E.g.:
 
     # add movies
     Movie.find_in_batches(:batch_size => 1000) do |movies|
@@ -148,7 +163,7 @@ Notes
       end
     end
 
-3) New Capistrano deploys will remove your Sitemap files, unless you run `rake sitemap:refresh`. The way around this is to create a cap task:
+2) New Capistrano deploys will remove your Sitemap files, unless you run `rake sitemap:refresh`. The way around this is to create a cap task:
 
     after "deploy:update_code", "deploy:copy_old_sitemap"
 
@@ -158,7 +173,7 @@ Notes
       end
     end
 
-4) If generation of your sitemap fails for some reason, the old sitemap will remain in public/.  This ensures that robots will always find a valid sitemap.  Running silently (`rake -s sitemap:refresh`) and with email forwarding setup you'll only get an email if your sitemap fails to build, and no notification when everything is fine - which will be most of the time.
+3) If generation of your sitemap fails for some reason, the old sitemap will remain in public/.  This ensures that robots will always find a valid sitemap.  Running silently (`rake -s sitemap:refresh`) and with email forwarding setup you'll only get an email if your sitemap fails to build, and no notification when everything is fine - which will be most of the time.
 
 Known Bugs
 ========

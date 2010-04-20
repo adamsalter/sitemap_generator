@@ -5,12 +5,12 @@
 
 Gem::Specification.new do |s|
   s.name = %q{sitemap_generator}
-  s.version = "0.2.4"
+  s.version = "0.2.5"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Adam Salter", "Karl Varga"]
-  s.date = %q{2010-04-01}
-  s.description = %q{Installs as a plugin or Gem to easily generate enterprise class Sitemaps readable by all search engines.  Automatically ping search engines to notify them of new sitemaps, including Google, Yahoo and Bing. Provides rake tasks to easily manage your sitemaps.  Won't clobber your old sitemaps if the new one fails to generate. Setup a cron schedule and never worry about your sitemaps again.}
+  s.date = %q{2010-04-19}
+  s.description = %q{A Rails 3-compatible gem to easily generate enterprise class Sitemaps readable by all search engines.  Automatically ping search engines to notify them of new sitemaps, including Google, Yahoo and Bing. Provides rake tasks to easily manage your sitemaps.  Won't clobber your old sitemaps if the new one fails to generate. Setup a cron schedule and never worry about your sitemaps again.}
   s.email = %q{kjvarga@gmail.com}
   s.extra_rdoc_files = [
     "README.md"
@@ -25,6 +25,8 @@ Gem::Specification.new do |s|
      "lib/sitemap_generator/link.rb",
      "lib/sitemap_generator/link_set.rb",
      "lib/sitemap_generator/mapper.rb",
+     "lib/sitemap_generator/rails_helper.rb",
+     "lib/sitemap_generator/railtie.rb",
      "lib/sitemap_generator/tasks.rb",
      "rails/install.rb",
      "rails/uninstall.rb",
@@ -36,7 +38,7 @@ Gem::Specification.new do |s|
   s.homepage = %q{http://github.com/kjvarga/sitemap_generator}
   s.rdoc_options = ["--charset=UTF-8"]
   s.require_paths = ["lib"]
-  s.rubygems_version = %q{1.3.5}
+  s.rubygems_version = %q{1.3.6}
   s.summary = %q{Easily generate enterprise class Sitemaps for your Rails site using a simple 'Rails Routes'-like DSL and a single Rake task}
 
   if s.respond_to? :specification_version then
