@@ -1,5 +1,5 @@
 require 'zlib'
-require 'sitemap_generator'
+#require 'sitemap_generator'
 
 namespace :sitemap do
   desc "Install a default config/sitemap.rb file"
@@ -32,7 +32,8 @@ namespace :sitemap do
       SitemapGenerator::Sitemap.class_eval do
         include ActionController::UrlWriter
       end
-    end    
+    end
     SitemapGenerator::Sitemap.create_files
   end
 end
+

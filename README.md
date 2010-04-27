@@ -22,7 +22,7 @@ Installation
     <code>gem 'sitemap_generator'</code>
 
 2. `$ rake sitemap:install`
-    
+
 **Rails 2.x: As a gem**
 
 1. Add the gem as a dependency in your <tt>config/environment.rb</tt>
@@ -56,7 +56,7 @@ Sitemaps with many urls (100,000+) take quite a long time to generate, so if you
 Optionally, you can add the following to your <code>public/robots.txt</code> file, so that robots can find the sitemap file.
 
     Sitemap: <hostname>/sitemap_index.xml.gz
-    
+
 The Sitemap URL in the robots file should be the complete URL to the Sitemap Index, such as <tt>http://www.example.org/sitemap_index.xml.gz</tt>
 
 
@@ -75,12 +75,12 @@ Example 'config/sitemap.rb'
       # Usage: sitemap.add path, options
       #        (default options are used if you don't specify them)
       #
-      # Defaults: :priority => 0.5, :changefreq => 'weekly', 
+      # Defaults: :priority => 0.5, :changefreq => 'weekly',
       #           :lastmod => Time.now, :host => default_host
 
-  
+
       # Examples:
-  
+
       # add '/articles'
       sitemap.add articles_path, :priority => 0.7, :changefreq => 'daily'
 
@@ -91,25 +91,30 @@ Example 'config/sitemap.rb'
 
       # add merchant path
       sitemap.add '/purchase', :priority => 0.7, :host => "https://www.example.com"
-  
+
+      # add all individual news with images
+      News.all.each do |n|
+        sitemap.add news_path(n), :lastmod => n.updated_at, :images=>n.images.collect{ |r| :loc=>r.image.url, :title=>r.image.name }
+      end
+
     end
 
     # Including Sitemaps from Rails Engines.
     #
-    # These Sitemaps should be almost identical to a regular Sitemap file except 
+    # These Sitemaps should be almost identical to a regular Sitemap file except
     # they needn't define their own SitemapGenerator::Sitemap.default_host since
     # they will undoubtedly share the host name of the application they belong to.
     #
     # As an example, say we have a Rails Engine in vendor/plugins/cadability_client
     # We can include its Sitemap here as follows:
-    # 
+    #
     file = File.join(Rails.root, 'vendor/plugins/cadability_client/config/sitemap.rb')
     eval(open(file).read, binding, file)
 
 Raison d'être
 -------
 
-Most of the Sitemap plugins out there seem to try to recreate the Sitemap links by iterating the Rails routes. In some cases this is possible, but for a great deal of cases it isn't. 
+Most of the Sitemap plugins out there seem to try to recreate the Sitemap links by iterating the Rails routes. In some cases this is possible, but for a great deal of cases it isn't.
 
 a) There are probably quite a few routes in your routes file that don't need inclusion in the Sitemap. (AJAX routes I'm looking at you.)
 
@@ -118,7 +123,7 @@ and
 b) How would you infer the correct series of links for the following route?
 
     map.zipcode 'location/:state/:city/:zipcode', :controller => 'zipcode', :action => 'index'
-    
+
 Don't tell me it's trivial, because it isn't. It just looks trivial.
 
 So my idea is to have another file similar to 'routes.rb' called 'sitemap.rb', where you can define what goes into the Sitemap.
@@ -206,3 +211,5 @@ Copyright (c) 2009 Adam @ [Codebright.net][cb], released under the MIT license
 [sitemap_generator_usage]:http://wiki.github.com/adamsalter/sitemap_generator/sitemapgenerator-usage "http://wiki.github.com/adamsalter/sitemap_generator/sitemapgenerator-usage"
 [boost_juice]:http://www.boostjuice.com.au/ "Mmmm, sweet, sweet Boost Juice."
 [cb]:http://codebright.net "http://codebright.net"
+[sitemap_images]:http://www.google.com/support/webmasters/bin/answer.py?answer=178636
+
