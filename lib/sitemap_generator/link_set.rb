@@ -184,6 +184,8 @@ module SitemapGenerator
       stop_time = Time.now
       puts "Sitemap stats: #{number_with_delimiter(SitemapGenerator::Sitemap.link_count)} links, " + ("%dm%02ds" % (stop_time - start_time).divmod(60)) if verbose
     end
+
+
   end
 end
 
