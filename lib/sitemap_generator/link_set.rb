@@ -60,13 +60,19 @@ module SitemapGenerator
 
     # Write links to sitemap file.
     def write_sitemap(file = upcoming_file)
+      slice_index = 0
       buffer = ""
       xml = Builder::XmlMarkup.new(:target => buffer)
       eval(File.read(SitemapGenerator.templates[:sitemap_xml]), binding)
       filename = File.join(Rails.root, "public", file)
       write_file(filename, buffer)
       show_progress("Sitemap", filename, buffer) if verbose
-      links.clear
+      if slice_index==0
+        links.clear
+      else
+        links.slice! slice_index, links.size
+      end
+
       sitemaps.push filename
     end
 
@@ -180,3 +186,4 @@ module SitemapGenerator
     end
   end
 end
+

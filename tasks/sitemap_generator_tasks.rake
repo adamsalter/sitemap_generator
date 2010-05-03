@@ -1,5 +1,9 @@
 require 'zlib'
-#require 'sitemap_generator'
+begin
+  require 'sitemap_generator'
+rescue LoadError, NameError
+  # Application should work without vlad
+end
 
 namespace :sitemap do
   desc "Install a default config/sitemap.rb file"
