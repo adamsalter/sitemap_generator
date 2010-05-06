@@ -63,7 +63,7 @@ module SitemapGenerator
       slice_index = 0
       buffer = ""
       xml = Builder::XmlMarkup.new(:target => buffer)
-      eval(File.read(SitemapGenerator.templates[:sitemap_xml]), binding)
+      eval(SitemapGenerator.templates.sitemap_xml, binding)      
       filename = File.join(Rails.root, "public", file)
       write_file(filename, buffer)
       show_progress("Sitemap", filename, buffer) if verbose
@@ -80,7 +80,7 @@ module SitemapGenerator
     def write_index
       buffer = ""
       xml = Builder::XmlMarkup.new(:target => buffer)
-      eval(File.read(SitemapGenerator.templates[:sitemap_index]), binding)
+      eval(SitemapGenerator.templates.sitemap_index, binding)      
       filename = File.join(Rails.root, "public", index_file)
       write_file(filename, buffer)
       show_progress("Sitemap Index", filename, buffer) if verbose
@@ -149,28 +149,6 @@ module SitemapGenerator
       puts "** #{title} too big! The uncompressed size exceeds 10Mb" if buffer.size > 10.megabytes
     end
 
-    # Copy templates/sitemap.rb to config if not there yet.
-    def install_sitemap_rb
-      if File.exist?(File.join(Rails.root, 'config/sitemap.rb'))
-        puts "already exists: config/sitemap.rb, file not copied"
-      else
-        FileUtils.cp(SitemapGenerator.templates[:sitemap_sample], File.join(Rails.root, 'config/sitemap.rb'))
-        puts "created: config/sitemap.rb"
-      end
-    end
-
-    # Remove config/sitemap.rb if exists.
-    def uninstall_sitemap_rb
-      if File.exist?(File.join(Rails.root, 'config/sitemap.rb'))
-        File.rm(File.join(Rails.root, 'config/sitemap.rb'))
-      end
-    end
-
-    # Clean sitemap files in output directory.
-    def clean_files
-      FileUtils.rm(Dir[File.join(Rails.root, 'public/sitemap*.xml.gz')])
-    end
-
     # Ping search engines passing sitemap location.
     def ping_search_engines
       super index_file
@@ -184,8 +162,5 @@ module SitemapGenerator
       stop_time = Time.now
       puts "Sitemap stats: #{number_with_delimiter(SitemapGenerator::Sitemap.link_count)} links, " + ("%dm%02ds" % (stop_time - start_time).divmod(60)) if verbose
     end
-
-
   end
 end
-

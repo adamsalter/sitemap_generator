@@ -3,6 +3,9 @@ require 'sitemap_generator/link'
 require 'sitemap_generator/rails_helper'
 require 'sitemap_generator/helper'
 require 'sitemap_generator/link_set'
+require 'sitemap_generator/helper'
+require 'sitemap_generator/templates'
+require 'sitemap_generator/utilities'
 
 require 'sitemap_generator/railtie' if SitemapGenerator::RailsHelper.rails3?
 
@@ -19,9 +22,5 @@ module SitemapGenerator
   end
 
   self.root = File.expand_path(File.join(File.dirname(__FILE__), '../'))
-  self.templates = {
-    :sitemap_index  => File.join(self.root, 'templates/sitemap_index.builder'),
-    :sitemap_xml    => File.join(self.root, 'templates/xml_sitemap.builder'),
-    :sitemap_sample => File.join(self.root, 'templates/sitemap.rb'),
-  }
+  self.templates = SitemapGenerator::Templates.new(self.root)
 end
