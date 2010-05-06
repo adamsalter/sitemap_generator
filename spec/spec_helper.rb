@@ -1,7 +1,7 @@
 ENV["RAILS_ENV"] ||= 'test'
 ENV['BUNDLE_GEMFILE'] = File.join(File.dirname(__FILE__), 'mock_rails3_gem', 'Gemfile')
 
-sitemap_rails = 
+sitemap_rails =
   case ENV["SITEMAP_RAILS"]
   when 'rails3'
     "mock_rails3_gem"

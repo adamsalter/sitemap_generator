@@ -10,12 +10,12 @@ SitemapGenerator::Sitemap.add_links do |sitemap|
   # Usage: sitemap.add path, options
   #        (default options are used if you don't specify)
   #
-  # Defaults: :priority => 0.5, :changefreq => 'weekly', 
+  # Defaults: :priority => 0.5, :changefreq => 'weekly',
   #           :lastmod => Time.now, :host => default_host
 
-  
+
   # Examples:
-  
+
   # add '/articles'
   sitemap.add articles_path, :priority => 0.7, :changefreq => 'daily'
 
@@ -26,17 +26,17 @@ SitemapGenerator::Sitemap.add_links do |sitemap|
 
   # add merchant path
   sitemap.add '/purchase', :priority => 0.7, :host => "https://www.example.com"
-  
+
 end
 
 # Including Sitemaps from Rails Engines.
 #
-# These Sitemaps should be almost identical to a regular Sitemap file except 
+# These Sitemaps should be almost identical to a regular Sitemap file except
 # they needn't define their own SitemapGenerator::Sitemap.default_host since
 # they will undoubtedly share the host name of the application they belong to.
 #
 # As an example, say we have a Rails Engine in vendor/plugins/cadability_client
 # We can include its Sitemap here as follows:
-# 
+#
 # file = File.join(Rails.root, 'vendor/plugins/cadability_client/config/sitemap.rb')
 # eval(open(file).read, binding, file)

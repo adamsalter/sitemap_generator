@@ -8,17 +8,17 @@ describe "Templates class" do
       SitemapGenerator.templates.send(name).should == File.read(File.join(SitemapGenerator.root, 'templates', file))
     end
   end
-  
+
   describe "templates" do
     before :each do
       SitemapGenerator.templates.sitemap_xml = nil
       File.stub!(:read).and_return('read file')
     end
-    
+
     it "should only be read once" do
       File.should_receive(:read).once
       SitemapGenerator.templates.sitemap_xml
       SitemapGenerator.templates.sitemap_xml
-    end    
+    end
   end
 end

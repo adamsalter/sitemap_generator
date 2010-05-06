@@ -63,7 +63,7 @@ module SitemapGenerator
       slice_index = 0
       buffer = ""
       xml = Builder::XmlMarkup.new(:target => buffer)
-      eval(SitemapGenerator.templates.sitemap_xml, binding)      
+      eval(SitemapGenerator.templates.sitemap_xml, binding)
       filename = File.join(Rails.root, "public", file)
       write_file(filename, buffer)
       show_progress("Sitemap", filename, buffer) if verbose
@@ -80,7 +80,7 @@ module SitemapGenerator
     def write_index
       buffer = ""
       xml = Builder::XmlMarkup.new(:target => buffer)
-      eval(SitemapGenerator.templates.sitemap_index, binding)      
+      eval(SitemapGenerator.templates.sitemap_index, binding)
       filename = File.join(Rails.root, "public", index_file)
       write_file(filename, buffer)
       show_progress("Sitemap Index", filename, buffer) if verbose
