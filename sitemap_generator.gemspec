@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Adam Salter", "Karl Varga"]
-  s.date = %q{2010-04-01}
+  s.date = %q{2010-05-06}
   s.description = %q{Installs as a plugin or Gem to easily generate enterprise class Sitemaps readable by all search engines.  Automatically ping search engines to notify them of new sitemaps, including Google, Yahoo and Bing. Provides rake tasks to easily manage your sitemaps.  Won't clobber your old sitemaps if the new one fails to generate. Setup a cron schedule and never worry about your sitemaps again.}
   s.email = %q{kjvarga@gmail.com}
   s.extra_rdoc_files = [
@@ -26,6 +26,8 @@ Gem::Specification.new do |s|
      "lib/sitemap_generator/link_set.rb",
      "lib/sitemap_generator/mapper.rb",
      "lib/sitemap_generator/tasks.rb",
+     "lib/sitemap_generator/templates.rb",
+     "lib/sitemap_generator/utilities.rb",
      "rails/install.rb",
      "rails/uninstall.rb",
      "tasks/sitemap_generator_tasks.rake",

@@ -11,7 +11,8 @@ module SitemapGenerator
       :sitemap_xml    =>  'xml_sitemap.builder',
       :sitemap_sample =>  'sitemap.rb',
     }
-    
+
+    # Dynamically define accessors for each key defined in <tt>FILES</tt>
     attr_accessor *FILES.keys
     FILES.keys.each do |name|
       eval <<-END
@@ -20,19 +21,23 @@ module SitemapGenerator
         end
       END
     end
-    
+
     def initialize(root = SitemapGenerator.root)
       @root = root
     end
-    
-    def template_path(file)
-      File.join(@root, 'templates', file)
+
+    # Return the full path to a template.
+    #
+    # <tt>file</tt> template symbol e.g. <tt>:sitemap_index</tt>
+    def template_path(template)
+      File.join(@root, 'templates', self.class::FILES[template])
     end
-    
+
     protected
-        
+
+    # Read the template file and return its contents.
     def read_template(template)
-      File.read(template_path(self.class::FILES[template]))
+      File.read(template_path(template))
     end
   end
 end

@@ -4,12 +4,12 @@ require 'sitemap_generator'
 namespace :sitemap do
   desc "Install a default config/sitemap.rb file"
   task :install do
-    SitemapGenerator::Sitemap.install_sitemap_rb
+    SitemapGenerator::Utilities.install_sitemap_rb
   end
 
   desc "Delete all Sitemap files in public/ directory"
   task :clean do
-    SitemapGenerator::Sitemap.clean_files
+    SitemapGenerator::Utilities.clean_files
   end
 
   desc "Create Sitemap XML files in public/ directory (rake -s for no output)"

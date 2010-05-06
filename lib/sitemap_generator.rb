@@ -3,6 +3,7 @@ require 'sitemap_generator/link'
 require 'sitemap_generator/link_set'
 require 'sitemap_generator/helper'
 require 'sitemap_generator/templates'
+require 'sitemap_generator/utilities'
 
 module SitemapGenerator
   silence_warnings do
@@ -10,7 +11,7 @@ module SitemapGenerator
     MAX_ENTRIES = 50_000
     Sitemap = LinkSet.new
   end
-  
+
   class << self
     attr_accessor :root, :templates
   end

@@ -61,7 +61,7 @@ module SitemapGenerator
     def write_sitemap(file = upcoming_file)
       buffer = ""
       xml = Builder::XmlMarkup.new(:target => buffer)
-      eval(File.read(SitemapGenerator.templates[:sitemap_xml]), binding)
+      eval(SitemapGenerator.templates.sitemap_xml, binding)
       filename = File.join(RAILS_ROOT, "public", file)
       write_file(filename, buffer)
       show_progress("Sitemap", filename, buffer) if verbose
@@ -73,7 +73,7 @@ module SitemapGenerator
     def write_index
       buffer = ""
       xml = Builder::XmlMarkup.new(:target => buffer)
-      eval(File.read(SitemapGenerator.templates[:sitemap_index]), binding)
+      eval(SitemapGenerator.templates.sitemap_index, binding)
       filename = File.join(RAILS_ROOT, "public", index_file)
       write_file(filename, buffer)
       show_progress("Sitemap Index", filename, buffer) if verbose
@@ -140,28 +140,6 @@ module SitemapGenerator
     def show_progress(title, filename, buffer)
       puts "+ #{filename}"
       puts "** #{title} too big! The uncompressed size exceeds 10Mb" if buffer.size > 10.megabytes
-    end
-
-    # Copy templates/sitemap.rb to config if not there yet.
-    def install_sitemap_rb
-      if File.exist?(File.join(RAILS_ROOT, 'config/sitemap.rb'))
-        puts "already exists: config/sitemap.rb, file not copied"
-      else
-        FileUtils.cp(SitemapGenerator.templates[:sitemap_sample], File.join(RAILS_ROOT, 'config/sitemap.rb'))
-        puts "created: config/sitemap.rb"
-      end
-    end
-
-    # Remove config/sitemap.rb if exists.
-    def uninstall_sitemap_rb
-      if File.exist?(File.join(RAILS_ROOT, 'config/sitemap.rb'))
-        File.rm(File.join(RAILS_ROOT, 'config/sitemap.rb'))
-      end
-    end
-
-    # Clean sitemap files in output directory.
-    def clean_files
-      FileUtils.rm(Dir[File.join(RAILS_ROOT, 'public/sitemap*.xml.gz')])
     end
 
     # Ping search engines passing sitemap location.
