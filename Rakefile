@@ -28,19 +28,19 @@ namespace :test do
   task :gem => ['test:prepare:gem', 'multi_spec']
   task :plugin => ['test:prepare:plugin', 'multi_spec']
   task :rails3 => ['test:prepare:rails3', 'multi_spec']
-  
+
   task :multi_spec do
     Rake::Task['spec'].invoke
     Rake::Task['spec'].reenable
   end
-  
+
   namespace :prepare do
     task :gem do
       ENV["SITEMAP_RAILS"] = 'gem'
       prepare_path(local_path('spec/mock_app_gem/vendor/gems/sitemap_generator-1.2.3'))
       rm_rf(local_path('spec/mock_app_gem/public/sitemap*'))
     end
-    
+
     task :plugin do
       ENV["SITEMAP_RAILS"] = 'plugin'
       prepare_path(local_path('spec/mock_app_plugin/vendor/plugins/sitemap_generator-1.2.3'))
@@ -51,11 +51,11 @@ namespace :test do
       ENV["SITEMAP_RAILS"] = 'rails3'
       rm_rf(local_path('spec/mock_rails3_gem/public/sitemap*'))
     end
-    
+
     def local_path(path)
       File.join(File.dirname(__FILE__), path)
     end
-    
+
     def prepare_path(path)
       rm_rf path
       mkdir_p path
@@ -64,8 +64,8 @@ namespace :test do
   end
 end
 
-desc "Run all tests both as a plugin and gem"
-task :test => ['test:plugin', 'test:gem']
+desc "Run tests as a gem install"
+task :test => ['test:gem']
 
 Spec::Rake::SpecTask.new(:spec) do |spec|
   spec.libs << 'lib' << 'spec'

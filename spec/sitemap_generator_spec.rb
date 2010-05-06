@@ -15,7 +15,7 @@ describe "SitemapGenerator" do
   end
   
   context "fresh install" do
-    before :all do
+    before :each do
       delete_sitemap_file_from_rails_app
       Rake::Task['sitemap:install'].invoke
     end
@@ -28,19 +28,19 @@ describe "SitemapGenerator" do
       sitemap_template = SitemapGenerator.templates.template_path(:sitemap_sample)
       files_should_be_identical(rails_path('config/sitemap.rb'), sitemap_template)
     end
-  
-    context "install multiple times" do
-      before :all do
-        copy_sitemap_file_to_rails_app
-        Rake::Task['sitemap:install'].invoke
-      end  
-        
-      it "should not overwrite config/sitemap.rb" do
-        sitemap_file = File.join(File.dirname(__FILE__), '/sitemap.file')
-        files_should_be_identical(sitemap_file, rails_path('/config/sitemap.rb'))
-      end
-    end
   end  
+  
+  context "install multiple times" do
+    before :each do
+      copy_sitemap_file_to_rails_app
+      Rake::Task['sitemap:install'].invoke
+    end  
+      
+    it "should not overwrite config/sitemap.rb" do
+      sitemap_file = File.join(File.dirname(__FILE__), '/sitemap.file')
+      files_should_be_identical(sitemap_file, rails_path('/config/sitemap.rb'))
+    end
+  end
   
   context "generate sitemap" do
     before :each do
