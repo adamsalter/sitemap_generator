@@ -10,9 +10,10 @@ module SitemapGenerator
   silence_warnings do
     VERSION = File.read(File.dirname(__FILE__) + "/../VERSION").strip
     MAX_ENTRIES = 50_000
+    MAX_IMAGES = 1_000
     Sitemap = LinkSet.new
   end
-  
+
   class << self
     attr_accessor :root, :templates
   end
@@ -22,5 +23,5 @@ module SitemapGenerator
     :sitemap_index  => File.join(self.root, 'templates/sitemap_index.builder'),
     :sitemap_xml    => File.join(self.root, 'templates/xml_sitemap.builder'),
     :sitemap_sample => File.join(self.root, 'templates/sitemap.rb'),
-  }  
+  }
 end
