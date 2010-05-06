@@ -1,6 +1,6 @@
+require 'sitemap_generator/mapper'
 require 'sitemap_generator/link'
 require 'sitemap_generator/link_set'
-require 'sitemap_generator/link_set/builder'
 require 'sitemap_generator/helper'
 require 'sitemap_generator/templates'
 
@@ -8,7 +8,7 @@ module SitemapGenerator
   silence_warnings do
     VERSION = File.read(File.dirname(__FILE__) + "/../VERSION").strip
     MAX_ENTRIES = 50_000
-    Sitemap = SitemapGenerator::LinkSet::Builder.new
+    Sitemap = LinkSet.new
   end
   
   class << self
