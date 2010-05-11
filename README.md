@@ -3,7 +3,18 @@ SitemapGenerator
 
 This plugin enables ['enterprise-class'][enterprise_class] Google Sitemaps to be easily generated for a Rails site as a rake task, using a simple 'Rails Routes'-like DSL.
 
-**Now supporting Rails 3 as of version 0.2.5!**
+Features
+-------
+
+- v0.2.6: **Support ['image sitemaps'][sitemap_images]**!
+- v0.2.5: **Support Rails 3**!
+
+- Adheres to the ['Sitemap protocol specification'][sitemap_protocol]
+- Handles millions of links
+- Automatic Gzip of Sitemap files
+- Set the priority of links, change frequency etc
+- You control which links are included
+- You set the host name, so it doesn't matter if your application is in a subdirectory
 
 Foreword
 -------
@@ -51,9 +62,14 @@ Installation creates a <tt>config/sitemap.rb</tt> file which will contain your l
 
 You can run <code>rake sitemap:refresh</code> as needed to create Sitemap files. This will also ping all the ['major'][sitemap_engines] search engines.  If you want to disable all non-essential output run the rake task with <code>rake -s sitemap:refresh</code>.
 
-Sitemaps with many urls (100,000+) take quite a long time to generate, so if you need to refresh your Sitemaps regularly you can set the rake task up as a cron job. Most cron agents will only send you an email if there is output from the cron task.
+To keep your Sitemaps up-to-date, setup a cron job.  Pass the <tt>-s</tt> option to the rake task to silence all but the most important output.  If you're using Whenever, then your schedule would look something like:
 
-Optionally, you can add the following to your <code>public/robots.txt</code> file, so that robots can find the sitemap file.
+    # config/schedule.rb
+    every 1.day, :at => '5:00 am' do
+      rake "-s sitemap:refresh"
+    end
+
+Optionally, you can add the following to your <code>public/robots.txt</code> file, so that robots can find the sitemap file:
 
     Sitemap: <hostname>/sitemap_index.xml.gz
 
@@ -138,22 +154,13 @@ Easy hey?
 
 Other Sitemap settings for the link, like `lastmod`, `priority`, `changefreq` and `host` are entered automatically, although you can override them if you need to.
 
-Other "difficult" Sitemap issues, solved by this plugin:
-
-- Support for more than 50,000 urls (using a Sitemap Index file)
-- Gzip of Sitemap files
-- Variable priority of links
-- Paging/sorting links (e.g. my_list?page=3)
-- SSL host links (e.g. https:)
-- Rails apps which are installed on a sub-path (e.g. example.com/blog_app/)
-
 Compatibility
 =======
 
 Tested and working on:
 
 - **Rails** 3.0.0, sitemap_generator version >= 0.2.5
-- **Rails** 1.x - 2.3.5 sitemap_generator version < 0.2.5
+- **Rails** 1.x - 2.3.5
 - **Ruby** 1.8.7, 1.9.1
 
 Notes
@@ -187,21 +194,26 @@ Known Bugs
 - There's no check on the size of a URL which [isn't supposed to exceed 2,048 bytes][sitemaps_xml].
 - Currently only supports one Sitemap Index file, which can contain 50,000 Sitemap files which can each contain 50,000 urls, so it _only_ supports up to 2,500,000,000 (2.5 billion) urls. I personally have no need of support for more urls, but plugin could be improved to support this.
 
-Wishlist
+Wishlist & Coming Soon
 ========
 
+- Support for generating sitemaps for sites with multiple domains.  Sitemaps are generated into subdirectories and we use a Rack middleware to rewrite requests for sitemaps to the correct subdirectory based on the request host.
+- I want to refactor the code because it has grown a lot.  Part of this refactoring will include implementing some more checks to make sure we adhere to standards as well as making sure that the sitemaps are being generated as efficiently as possible.
+
+I'd like to simplify adding links to a sitemap.  Right now it's all or nothing.  I'd like to break it up so you can add batches.
 - Auto coverage testing.  Generate a report of broken URLs by checking the status codes of each page in the sitemap.
 
 Thanks (in no particular order)
 ========
 
+- [Alexadre Bini](http://github.com/alexandrebini) for image sitemaps
 - [Dan Pickett](http://github.com/dpickett)
 - [Rob Biedenharn](http://github.com/rab)
 - [Richie Vos](http://github.com/jerryvos)
 - [Adrian Mugnolo](http://github.com/xymbol)
 
 
-Copyright (c) 2009 Adam @ [Codebright.net][cb], released under the MIT license
+Copyright (c) 2009 Karl Varga released under the MIT license
 
 [canonical_repo]:http://github.com/kjvarga/sitemap_generator
 [enterprise_class]:https://twitter.com/dhh/status/1631034662 "I use enterprise in the same sense the Phusion guys do - i.e. Enterprise Ruby. Please don't look down on my use of the word 'enterprise' to represent being a cut above. It doesn't mean you ever have to work for a company the size of IBM. Or constantly fight inertia, writing crappy software, adhering to change management practices and spending hours in meetings... Not that there's anything wrong with that - Wait, what?"
@@ -212,4 +224,4 @@ Copyright (c) 2009 Adam @ [Codebright.net][cb], released under the MIT license
 [boost_juice]:http://www.boostjuice.com.au/ "Mmmm, sweet, sweet Boost Juice."
 [cb]:http://codebright.net "http://codebright.net"
 [sitemap_images]:http://www.google.com/support/webmasters/bin/answer.py?answer=178636
-
+[sitemap_protocol]:http://sitemaps.org/protocol.php
