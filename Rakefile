@@ -8,8 +8,8 @@ begin
   require 'jeweler'
   Jeweler::Tasks.new do |gem|
     gem.name = "sitemap_generator"
-    gem.summary = %Q{Easily generate enterprise class Sitemaps for your Rails site using a simple 'Rails Routes'-like DSL and a single Rake task}
-    gem.description = %Q{A Rails 3-compatible gem to easily generate enterprise class Sitemaps readable by all search engines.  Automatically ping search engines to notify them of new sitemaps, including Google, Yahoo and Bing. Provides rake tasks to easily manage your sitemaps.  Won't clobber your old sitemaps if the new one fails to generate. Setup a cron schedule and never worry about your sitemaps again.}
+    gem.summary = %Q{Easily generate enterprise class Sitemaps for your Rails site using a familiar Rails Routes-like DSL}
+    gem.description = %Q{A Rails 3-compatible gem/plugin to generate enterprise-class Sitemaps using a familiar Rails Routes-like DSL.  Sitemaps are readable by all search engines and adhere to the Sitemap protocol specification.  Automatically pings search engines to notify them of new sitemaps (including Google, Yahoo and Bing).  Provides rake tasks to easily manage your sitemaps.  Supports image sitemaps and handles millions of links.}
     gem.email = "kjvarga@gmail.com"
     gem.homepage = "http://github.com/kjvarga/sitemap_generator"
     gem.authors = ["Adam Salter", "Karl Varga"]

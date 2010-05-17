@@ -1,7 +1,7 @@
 SitemapGenerator
 ================
 
-This plugin enables ['enterprise-class'][enterprise_class] Google Sitemaps to be easily generated for a Rails site as a rake task, using a simple 'Rails Routes'-like DSL.
+A Rails 3-compatible gem/plugin to generate ['enterprise-class'][enterprise_class] Sitemaps using a familiar Rails Routes-like DSL.  Sitemaps are readable by all search engines and adhere to the ['Sitemap protocol specification'][sitemap_protocol].  Automatically pings search engines to notify them of new sitemaps (including Google, Yahoo and Bing).  Provides rake tasks to easily manage your sitemaps.  Supports image sitemaps and handles millions of links.
 
 Features
 -------
@@ -12,6 +12,8 @@ Features
 - Adheres to the ['Sitemap protocol specification'][sitemap_protocol]
 - Handles millions of links
 - Automatic Gzip of Sitemap files
+- Automatic ping of search engines to notify them of new sitemaps: Google, Yahoo, Bing, Ask, SitemapWriter
+- Won't clobber your old sitemaps if the new one fails to generate
 - Set the priority of links, change frequency etc
 - You control which links are included
 - You set the host name, so it doesn't matter if your application is in a subdirectory
@@ -60,7 +62,7 @@ Installation
 
 Installation creates a <tt>config/sitemap.rb</tt> file which will contain your logic for generating the Sitemap files.  If you want to create this file manually run <code>rake sitemap:install</code>.
 
-You can run <code>rake sitemap:refresh</code> as needed to create Sitemap files. This will also ping all the ['major'][sitemap_engines] search engines.  If you want to disable all non-essential output run the rake task with <code>rake -s sitemap:refresh</code>.
+You can run <code>rake sitemap:refresh</code> as needed to create Sitemap files. This will also ping these ['major search engines'][sitemap_engines]: Google, Yahoo, Bing, Ask, SitemapWriter.  If you want to disable all non-essential output run the rake task with <code>rake -s sitemap:refresh</code>.
 
 To keep your Sitemaps up-to-date, setup a cron job.  Pass the <tt>-s</tt> option to the rake task to silence all but the most important output.  If you're using Whenever, then your schedule would look something like:
 
