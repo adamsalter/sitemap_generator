@@ -22,6 +22,28 @@ rescue LoadError
   puts "Jeweler (or a dependency) not available. Install it with: gem install jeweler"
 end
 
+#
+# Helper methods
+#
+module Helpers
+  extend self
+
+  # Return a full local path to path fragment <tt>path</tt>
+  def local_path(path)
+    File.join(File.dirname(__FILE__), path)
+  end
+
+  # Copy all of the local files into <tt>path</tt> after completely cleaning it
+  def prepare_path(path)
+    rm_rf path
+    mkdir_p path
+    cp_r(FileList["[A-Z]*", "{bin,lib,rails,templates,tasks}"], path)
+  end
+end
+
+#
+# Tasks
+#
 task :default => :test
 
 namespace :test do
@@ -37,29 +59,19 @@ namespace :test do
   namespace :prepare do
     task :gem do
       ENV["SITEMAP_RAILS"] = 'gem'
-      prepare_path(local_path('spec/mock_app_gem/vendor/gems/sitemap_generator-1.2.3'))
-      rm_rf(local_path('spec/mock_app_gem/public/sitemap*'))
+      Helpers.prepare_path(Helpers.local_path('spec/mock_app_gem/vendor/gems/sitemap_generator-1.2.3'))
+      rm_rf(Helpers.local_path('spec/mock_app_gem/public/sitemap*'))
     end
 
     task :plugin do
       ENV["SITEMAP_RAILS"] = 'plugin'
-      prepare_path(local_path('spec/mock_app_plugin/vendor/plugins/sitemap_generator-1.2.3'))
-      rm_rf(local_path('spec/mock_app_plugin/public/sitemap*'))
+      Helpers.prepare_path(Helpers.local_path('spec/mock_app_plugin/vendor/plugins/sitemap_generator-1.2.3'))
+      rm_rf(Helpers.local_path('spec/mock_app_plugin/public/sitemap*'))
     end
 
     task :rails3 do
       ENV["SITEMAP_RAILS"] = 'rails3'
-      rm_rf(local_path('spec/mock_rails3_gem/public/sitemap*'))
-    end
-
-    def local_path(path)
-      File.join(File.dirname(__FILE__), path)
-    end
-
-    def prepare_path(path)
-      rm_rf path
-      mkdir_p path
-      cp_r(FileList["[A-Z]*", "{bin,lib,rails,templates,tasks}"], path)
+      rm_rf(Helpers.local_path('spec/mock_rails3_gem/public/sitemap*'))
     end
   end
 end

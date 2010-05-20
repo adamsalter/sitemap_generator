@@ -3,10 +3,10 @@ require 'spec_helper'
 describe "SitemapGenerator" do
 
   context "clean task" do
-    before :all do
+    before :each do
       copy_sitemap_file_to_rails_app
       FileUtils.touch(rails_path('/public/sitemap_index.xml.gz'))
-      Rake::Task['sitemap:clean'].invoke
+      Helpers.invoke_task('sitemap:clean')
     end
 
     it "should delete the sitemaps" do
@@ -17,7 +17,7 @@ describe "SitemapGenerator" do
   context "fresh install" do
     before :each do
       delete_sitemap_file_from_rails_app
-      Rake::Task['sitemap:install'].invoke
+      Helpers.invoke_task('sitemap:install')
     end
 
     it "should create config/sitemap.rb" do
@@ -33,7 +33,7 @@ describe "SitemapGenerator" do
   context "install multiple times" do
     before :each do
       copy_sitemap_file_to_rails_app
-      Rake::Task['sitemap:install'].invoke
+      Helpers.invoke_task('sitemap:install')
     end
 
     it "should not overwrite config/sitemap.rb" do
@@ -44,7 +44,7 @@ describe "SitemapGenerator" do
 
   context "generate sitemap" do
     before :each do
-      Rake::Task['sitemap:refresh:no_ping'].invoke
+      Helpers.invoke_task('sitemap:refresh:no_ping')
     end
 
     it "should create sitemaps" do
