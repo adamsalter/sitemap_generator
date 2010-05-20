@@ -11,14 +11,14 @@ describe "Templates class" do
 
   describe "templates" do
     before :each do
-      SitemapGenerator.templates.sitemap_xml = nil
+      SitemapGenerator.templates.sitemap_sample = nil
       File.stub!(:read).and_return('read file')
     end
 
     it "should only be read once" do
       File.should_receive(:read).once
-      SitemapGenerator.templates.sitemap_xml
-      SitemapGenerator.templates.sitemap_xml
+      SitemapGenerator.templates.sitemap_sample
+      SitemapGenerator.templates.sitemap_sample
     end
   end
 end

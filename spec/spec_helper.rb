@@ -40,6 +40,7 @@ module Helpers
   #
   # <tt>task</tt> task symbol/string
   def invoke_task(task)
+    Rake.send(:verbose, false)
     Rake::Task[task.to_s].invoke
     Rake::Task[task.to_s].reenable
   end

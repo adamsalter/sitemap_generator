@@ -1,166 +1,173 @@
 require 'builder'
 require 'action_view'
 
+# A LinkSet provisions a bunch of links to sitemap files.  It also writes the index file
+# which lists all the sitemap files written.
 module SitemapGenerator
   class LinkSet
-    include SitemapGenerator::Helper
-    include ActionView::Helpers::NumberHelper
+    include ActionView::Helpers::NumberHelper  # for number_with_delimiter
 
-    attr_accessor :default_host, :yahoo_app_id, :links
-    attr_accessor :sitemaps
-    attr_accessor :max_entries
-    attr_accessor :link_count
+    attr_accessor :default_host, :public_path, :sitemaps_path
+    attr_accessor :sitemap, :sitemaps, :sitemap_index
+    attr_accessor :verbose, :yahoo_app_id
 
-    alias :sitemap_files :sitemaps
+    # Evaluate the sitemap config file and write all sitemaps.
+    #
+    # This should be refactored so that we can have multiple instances
+    # of LinkSet.
+    def create
+      require 'sitemap_generator/interpreter'
 
-    # Create new link set instance.
-    def initialize
-      self.links       = []
-      self.sitemaps    = []
-      self.max_entries = SitemapGenerator::MAX_ENTRIES
-      self.link_count  = 0
+      start_time = Time.now
+      SitemapGenerator::Interpreter.run
+      finalize!
+      end_time = Time.now
+
+      puts "\nSitemap stats: #{number_with_delimiter(self.link_count)} links / #{self.sitemaps.size} files / " + ("%dm%02ds" % (end_time - start_time).divmod(60)) if verbose
     end
 
-    # Add default links to sitemap files.
-    def add_default_links
-      links.push Link.generate('/', :lastmod => Time.now, :changefreq => 'always', :priority => 1.0)
-      links.push Link.generate("/#{index_file}", :lastmod => Time.now, :changefreq => 'always', :priority => 1.0)
-      self.link_count += 2
+    # <tt>public_path</tt> (optional) full path to the directory to write sitemaps in.
+    #   Defaults to your Rails <tt>public/</tt> directory.
+    #
+    # <tt>sitemaps_path</tt> (optional) path fragment within public to write sitemaps
+    #   to e.g. 'en/'.  Sitemaps are written to <tt>public_path</tt> + <tt>sitemaps_path</tt>
+    #
+    # <tt>default_host</tt> hostname including protocol to use in all sitemap links
+    #   e.g. http://en.google.ca
+    def initialize(public_path = nil, sitemaps_path = nil, default_host = nil)
+      public_path = File.join(::Rails.root, 'public/') if public_path.nil?
+      self.default_host = default_host
+      self.public_path = public_path
+      self.sitemaps_path = sitemaps_path
+
+      # Completed sitemaps
+      self.sitemaps = []
     end
 
-    # Add links to sitemap files passing a block.
+    def link_count
+      self.sitemaps.map(&:link_count).inject(:+)
+    end
+
+    # Called within the user's eval'ed sitemap config file.  Add links to sitemap files
+    # passing a block.
+    #
+    # TODO: Refactor.  The call chain is confusing and convoluted here.
     def add_links
       raise ArgumentError, "Default hostname not set" if default_host.blank?
-      add_default_links if first_link?
+
+      # I'd rather have these calls in <tt>create</tt> but we have to wait
+      # for <tt>default_host</tt> to be set by the user's sitemap config
+      new_sitemap
+      add_default_links
+
       yield Mapper.new(self)
     end
 
-    # Add links from mapper to sitemap files.
+    # Called from Mapper.
+    #
+    # Add a link to the current sitemap.
     def add_link(link)
-      write_upcoming if enough_links?
-      links.push link
-      self.link_count += 1
+      unless self.sitemap << link
+        new_sitemap
+        self.sitemap << link
+      end
     end
 
-    # Write links to sitemap file.
-    def write
-      write_pending
-    end
-
-    # Write links to upcoming sitemap file.
-    def write_upcoming
-      write_sitemap(upcoming_file)
-    end
-
-    # Write pending links to sitemap, write index file if needed.
-    def write_pending
-      write_upcoming
-      write_index
-    end
-
-    # Write links to sitemap file.
-    def write_sitemap(file = upcoming_file)
-      slice_index = 0
-      buffer = ""
-      xml = Builder::XmlMarkup.new(:target => buffer)
-      eval(SitemapGenerator.templates.sitemap_xml, binding)
-      filename = File.join(Rails.root, "public", file)
-      write_file(filename, buffer)
-      show_progress("Sitemap", filename, buffer) if verbose
-      if slice_index==0
-        links.clear
-      else
-        links.slice! slice_index, links.size
+    # Add the current sitemap to the <tt>sitemaps</tt> Array and
+    # start a new sitemap.
+    #
+    # If the current sitemap is nil or empty it is not added.
+    def new_sitemap
+      unless self.sitemap_index
+        self.sitemap_index = SitemapGenerator::Builder::SitemapIndexFile.new(public_path, sitemap_index_path, default_host)
       end
 
-      sitemaps.push filename
-    end
+      unless self.sitemap
+        self.sitemap = SitemapGenerator::Builder::SitemapFile.new(public_path, new_sitemap_path, default_host)
+      end
 
-    # Write sitemap links to sitemap index file.
-    def write_index
-      buffer = ""
-      xml = Builder::XmlMarkup.new(:target => buffer)
-      eval(SitemapGenerator.templates.sitemap_index, binding)
-      filename = File.join(Rails.root, "public", index_file)
-      write_file(filename, buffer)
-      show_progress("Sitemap Index", filename, buffer) if verbose
-      links.clear
-      sitemaps.clear
-    end
+      # Mark the sitemap as complete and add it to the sitemap index
+      unless self.sitemap.empty?
+        self.sitemap.finalize!
+        self.sitemap_index << Link.generate(self.sitemap)
+        self.sitemaps << self.sitemap
+        show_progress(self.sitemap) if verbose
 
-    # Return sitemap or sitemap index main name.
-    def index_file
-      "sitemap_index.xml.gz"
-    end
-
-    # Return upcoming sitemap name with index.
-    def upcoming_file
-      "sitemap#{upcoming_index}.xml.gz" unless enough_sitemaps?
-    end
-
-    # Return upcoming sitemap index, first is 1.
-    def upcoming_index
-      sitemaps.length + 1 unless enough_sitemaps?
-    end
-
-    # Return true if upcoming is first sitemap.
-    def first_sitemap?
-      sitemaps.empty?
-    end
-
-    # Return true if sitemap index needed.
-    def multiple_sitemaps?
-      !first_sitemap?
-    end
-
-    # Return true if more sitemaps can be added.
-    def more_sitemaps?
-      sitemaps.length < max_entries
-    end
-
-    # Return true if no sitemaps can be added.
-    def enough_sitemaps?
-      !more_sitemaps?
-    end
-
-    # Return true if this is the first link added.
-    def first_link?
-      links.empty? && first_sitemap?
-    end
-
-    # Return true if more links can be added.
-    def more_links?
-      links.length < max_entries
-    end
-
-    # Return true if no further links can be added.
-    def enough_links?
-      !more_links?
-    end
-
-    # Commit buffer to gzipped file.
-    def write_file(name, buffer)
-      Zlib::GzipWriter.open(name) { |gz| gz.write buffer }
+        self.sitemap = SitemapGenerator::Builder::SitemapFile.new(public_path, new_sitemap_path, default_host)
+      end
     end
 
     # Report progress line.
-    def show_progress(title, filename, buffer)
-      puts "+ #{filename}"
-      puts "** #{title} too big! The uncompressed size exceeds 10Mb" if buffer.size > 10.megabytes
+    def show_progress(sitemap)
+      uncompressed_size = number_to_human_size(sitemap.filesize)
+      compressed_size =   number_to_human_size(File.size?(sitemap.full_path))
+      puts "+ #{sitemap.sitemap_path}   #{sitemap.link_count} links / #{uncompressed_size} / #{compressed_size} gzipped"
     end
 
-    # Ping search engines passing sitemap location.
+    # Finalize all sitemap files
+    def finalize!
+      new_sitemap
+      self.sitemap_index.finalize!
+    end
+
+    # Ping search engines.
+    #
+    # @see http://en.wikipedia.org/wiki/Sitemap_index
     def ping_search_engines
-      super index_file
+      require 'open-uri'
+
+      sitemap_index_url = CGI.escape(self.sitemap_index.full_url)
+      search_engines = {
+        :google         => "http://www.google.com/webmasters/sitemaps/ping?sitemap=#{sitemap_index_url}",
+        :yahoo          => "http://search.yahooapis.com/SiteExplorerService/V1/ping?sitemap=#{sitemap_index_url}&appid=#{yahoo_app_id}",
+        :ask            => "http://submissions.ask.com/ping?sitemap=#{sitemap_index_url}",
+        :bing           => "http://www.bing.com/webmaster/ping.aspx?siteMap=#{sitemap_index_url}",
+        :sitemap_writer => "http://www.sitemapwriter.com/notify.php?crawler=all&url=#{sitemap_index_url}"
+      }
+
+      puts "\n" if verbose
+      search_engines.each do |engine, link|
+        next if engine == :yahoo && !self.yahoo_app_id
+        begin
+          open(link)
+          puts "Successful ping of #{engine.to_s.titleize}" if verbose
+        rescue Timeout::Error, StandardError => e
+          puts "Ping failed for #{engine.to_s.titleize}: #{e.inspect} (URL #{link})" if verbose
+        end
+      end
+
+      if !self.yahoo_app_id && verbose
+        puts "\n"
+        puts <<-END.gsub(/^\s+/, '')
+          To ping Yahoo you require a Yahoo AppID.  Add it to your config/sitemap.rb with:
+
+          SitemapGenerator::Sitemap.yahoo_app_id = "my_app_id"
+
+          For more information see http://developer.yahoo.com/search/siteexplorer/V1/updateNotification.html
+        END
+      end
     end
 
-    # Create sitemap files in output directory.
-    def create_files(verbose = true)
-      start_time = Time.now
-      load_sitemap_rb
-      write
-      stop_time = Time.now
-      puts "Sitemap stats: #{number_with_delimiter(SitemapGenerator::Sitemap.link_count)} links, " + ("%dm%02ds" % (stop_time - start_time).divmod(60)) if verbose
+    protected
+
+    def add_default_links
+      self.sitemap << Link.generate('/', :lastmod => Time.now, :changefreq => 'always', :priority => 1.0)
+      self.sitemap << Link.generate(self.sitemap_index, :lastmod => Time.now, :changefreq => 'always', :priority => 1.0)
+    end
+
+    # Return the current sitemap filename with index.
+    #
+    # The index depends on the length of the <tt>sitemaps</tt> array.
+    def new_sitemap_path
+      File.join(self.sitemaps_path || '', "sitemap#{self.sitemaps.length + 1}.xml.gz")
+    end
+
+    # Return the current sitemap index filename.
+    #
+    # At the moment we only support one index file which can link to
+    # up to 50,000 sitemap files.
+    def sitemap_index_path
+      File.join(self.sitemaps_path || '', 'sitemap_index.xml.gz')
     end
   end
 end

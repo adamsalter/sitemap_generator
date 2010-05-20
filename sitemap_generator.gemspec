@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Adam Salter", "Karl Varga"]
-  s.date = %q{2010-05-17}
+  s.date = %q{2010-05-21}
   s.description = %q{A Rails 3-compatible gem/plugin to generate enterprise-class Sitemaps using a familiar Rails Routes-like DSL.  Sitemaps are readable by all search engines and adhere to the Sitemap protocol specification.  Automatically pings search engines to notify them of new sitemaps (including Google, Yahoo and Bing).  Provides rake tasks to easily manage your sitemaps.  Supports image sitemaps and handles millions of links.}
   s.email = %q{kjvarga@gmail.com}
   s.extra_rdoc_files = [
@@ -21,11 +21,14 @@ Gem::Specification.new do |s|
      "Rakefile",
      "VERSION",
      "lib/sitemap_generator.rb",
-     "lib/sitemap_generator/helper.rb",
+     "lib/sitemap_generator/builder.rb",
+     "lib/sitemap_generator/builder/helper.rb",
+     "lib/sitemap_generator/builder/sitemap_file.rb",
+     "lib/sitemap_generator/builder/sitemap_index_file.rb",
+     "lib/sitemap_generator/interpreter.rb",
      "lib/sitemap_generator/link.rb",
      "lib/sitemap_generator/link_set.rb",
      "lib/sitemap_generator/mapper.rb",
-     "lib/sitemap_generator/rails_helper.rb",
      "lib/sitemap_generator/railtie.rb",
      "lib/sitemap_generator/tasks.rb",
      "lib/sitemap_generator/templates.rb",
@@ -33,9 +36,7 @@ Gem::Specification.new do |s|
      "rails/install.rb",
      "rails/uninstall.rb",
      "tasks/sitemap_generator_tasks.rake",
-     "templates/sitemap.rb",
-     "templates/sitemap_index.builder",
-     "templates/xml_sitemap.builder"
+     "templates/sitemap.rb"
   ]
   s.homepage = %q{http://github.com/kjvarga/sitemap_generator}
   s.rdoc_options = ["--charset=UTF-8"]

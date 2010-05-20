@@ -7,8 +7,6 @@ module SitemapGenerator
   # Define an accessor method for each template file.
   class Templates
     FILES = {
-      :sitemap_index  =>  'sitemap_index.builder',
-      :sitemap_xml    =>  'xml_sitemap.builder',
       :sitemap_sample =>  'sitemap.rb',
     }
 
@@ -28,7 +26,7 @@ module SitemapGenerator
 
     # Return the full path to a template.
     #
-    # <tt>file</tt> template symbol e.g. <tt>:sitemap_index</tt>
+    # <tt>file</tt> template symbol e.g. <tt>:sitemap_sample</tt>
     def template_path(template)
       File.join(@root, 'templates', self.class::FILES[template])
     end
