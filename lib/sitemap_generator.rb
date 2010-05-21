@@ -6,6 +6,8 @@ require 'sitemap_generator/templates'
 require 'sitemap_generator/utilities'
 require 'sitemap_generator/railtie' if SitemapGenerator::Utilities.rails3?
 
+require 'active_support/core_ext/numeric'
+
 module SitemapGenerator
   silence_warnings do
     VERSION = File.read(File.dirname(__FILE__) + "/../VERSION").strip

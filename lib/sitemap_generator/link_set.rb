@@ -18,6 +18,8 @@ module SitemapGenerator
     def create
       require 'sitemap_generator/interpreter'
 
+      self.public_path = File.join(::Rails.root, 'public/') if self.public_path.nil?
+
       start_time = Time.now
       SitemapGenerator::Interpreter.run
       finalize!
@@ -35,7 +37,6 @@ module SitemapGenerator
     # <tt>default_host</tt> hostname including protocol to use in all sitemap links
     #   e.g. http://en.google.ca
     def initialize(public_path = nil, sitemaps_path = nil, default_host = nil)
-      public_path = File.join(::Rails.root, 'public/') if public_path.nil?
       self.default_host = default_host
       self.public_path = public_path
       self.sitemaps_path = sitemaps_path
