@@ -13,7 +13,7 @@ module SitemapGenerator
 
       # Return XML as a String
       def build_xml(builder, link)
-        builder.url do
+        builder.sitemap do
           builder.loc        link[:loc]
           builder.lastmod    w3c_date(link[:lastmod])   if link[:lastmod]
         end
