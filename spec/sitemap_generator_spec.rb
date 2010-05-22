@@ -55,6 +55,14 @@ describe "SitemapGenerator" do
     it "should have 14 links" do
       SitemapGenerator::Sitemap.link_count.should == 14
     end
+
+    it "index XML should validate" do
+      gzipped_xml_file_should_validate_against_schema rails_path('/public/sitemap_index.xml.gz'), 'siteindex'
+    end
+
+    it "sitemap XML should validate" do
+      gzipped_xml_file_should_validate_against_schema rails_path('/public/sitemap1.xml.gz'), 'sitemap'
+    end
   end
 
   protected
