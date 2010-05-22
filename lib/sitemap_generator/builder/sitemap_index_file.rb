@@ -5,8 +5,17 @@ module SitemapGenerator
       def initialize(*args)
         super(*args)
 
-        @ml_content = ''     # XML urlset content
-        @xml_wrapper_start = %q[<?xml version="1.0" encoding="UTF-8"?><sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">]
+        @xml_content = '' # XML urlset content
+        @xml_wrapper_start = <<-HTML
+          <?xml version="1.0" encoding="UTF-8"?>
+            <sitemapindex
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
+                http://www.sitemaps.org/schemas/sitemap/0.9/siteindex.xsd"
+              xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+            >
+        HTML
+        @xml_wrapper_start.gsub!(/\s+/, ' ').gsub!(/ *> */, '>')
         @xml_wrapper_end   = %q[</sitemapindex>]
         self.filesize = @xml_wrapper_start.bytesize + @xml_wrapper_end.bytesize
       end
