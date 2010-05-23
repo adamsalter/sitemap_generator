@@ -46,7 +46,7 @@ module SitemapGenerator
     end
 
     def link_count
-      self.sitemaps.map(&:link_count).inject(:+)
+      self.sitemaps.inject(0) { |link_count_sum, sitemap| link_count_sum + sitemap.link_count }
     end
 
     # Called within the user's eval'ed sitemap config file.  Add links to sitemap files
