@@ -15,7 +15,7 @@ module SitemapGenerator
               xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
             >
         HTML
-        @xml_wrapper_start.gsub!(/\s+/, ' ').gsub!(/ *> */, '>')
+        @xml_wrapper_start.gsub!(/\s+/, ' ').gsub!(/ *> */, '>').strip!
         @xml_wrapper_end   = %q[</sitemapindex>]
         self.filesize = @xml_wrapper_start.bytesize + @xml_wrapper_end.bytesize
       end
