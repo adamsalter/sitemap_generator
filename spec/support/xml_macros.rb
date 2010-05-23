@@ -19,4 +19,18 @@ module XmlMacros
     
   end
   
+  def gzipped_xml_file_should_have_minimal_whitespace(xml_gz_filename)
+    Zlib::GzipReader.open(xml_gz_filename) do |xml_file|
+      xml_data_should_have_minimal_whitespace xml_file.read
+    end
+  end
+  
+  def xml_data_should_have_minimal_whitespace(xml_data)
+    xml_data.should_not match /^\s/
+    xml_data.should_not match /\s$/
+    xml_data.should_not match /\s\s+/
+    xml_data.should_not match /\s[<>]/
+    xml_data.should_not match /[<>]\s/
+  end
+  
 end

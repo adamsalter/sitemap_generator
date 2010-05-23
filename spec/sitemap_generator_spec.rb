@@ -63,6 +63,14 @@ describe "SitemapGenerator" do
     it "sitemap XML should validate" do
       gzipped_xml_file_should_validate_against_schema rails_path('/public/sitemap1.xml.gz'), 'sitemap'
     end
+
+    it "index XML should not have excess whitespace" do
+      gzipped_xml_file_should_have_minimal_whitespace rails_path('/public/sitemap_index.xml.gz')
+    end
+
+    it "sitemap XML should not have excess whitespace" do
+      gzipped_xml_file_should_have_minimal_whitespace rails_path('/public/sitemap1.xml.gz')
+    end
   end
 
   protected
