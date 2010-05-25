@@ -212,7 +212,7 @@ Thanks (in no particular order)
 - [Rob Biedenharn](http://github.com/rab)
 - [Richie Vos](http://github.com/jerryvos)
 - [Adrian Mugnolo](http://github.com/xymbol)
-
+- [Jason Weathered](http://github.com/jasoncodes)
 
 Copyright (c) 2009 Karl Varga released under the MIT license
 
