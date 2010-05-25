@@ -78,6 +78,14 @@ namespace :test do
   end
 end
 
+desc "Release a new patch version"
+task :release_new_version do
+  Rake::Task['version:bump:patch'].invoke
+  Rake::Task['github:release'].invoke
+  Rake::Task['git:release'].invoke
+  Rake::Task['gemcutter:release'].invoke
+end
+
 desc "Run tests as a gem install"
 task :test => ['test:gem']
 
