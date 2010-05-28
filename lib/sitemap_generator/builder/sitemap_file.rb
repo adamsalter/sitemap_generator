@@ -109,7 +109,7 @@ module SitemapGenerator
       def finalize!
         return if self.frozen?
 
-        open(self.full_path, 'w') do |file|
+        open(self.full_path, 'wb') do |file|
           gz = Zlib::GzipWriter.new(file)
           gz.write @xml_wrapper_start
           gz.write @xml_content

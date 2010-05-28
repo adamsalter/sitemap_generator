@@ -49,6 +49,9 @@ end
 task :default => :test
 
 namespace :test do
+  #desc "Test as a gem, plugin and Rails 3 gem"
+  #task :all => ['test:gem', 'test:plugin']
+
   task :gem => ['test:prepare:gem', 'multi_spec']
   task :plugin => ['test:prepare:plugin', 'multi_spec']
   task :rails3 => ['test:prepare:rails3', 'multi_spec']
