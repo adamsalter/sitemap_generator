@@ -1,22 +1,20 @@
 SitemapGenerator
 ================
 
-A Rails 3-compatible gem/plugin to generate ['enterprise-class'][enterprise_class] Sitemaps using a familiar Rails Routes-like DSL.  Sitemaps are readable by all search engines and adhere to the ['Sitemap protocol specification'][sitemap_protocol].  Automatically pings search engines to notify them of new sitemaps (including Google, Yahoo and Bing).  Provides rake tasks to easily manage your sitemaps.  Supports image sitemaps and handles millions of links.
+SitemapGenerator is a Rails gem that makes it easy to generate ['enterprise-class'][enterprise_class] Sitemaps readable by all search engines.  Generated Sitemaps adhere to the ['Sitemap protocol specification'][sitemap_protocol].  When you generate new Sitemaps, SitemapGenerator can automatically ping the major search engines (including Google, Yahoo and Bing) to notify them.  SitemapGenerator includes rake tasks to easily manage your sitemaps.
 
 Features
 -------
 
-- v0.2.6: **Support ['image sitemaps'][sitemap_images]**!
-- v0.2.5: **Support Rails 3**!
+- v0.2.6: ['Google Image Sitemap'][sitemap_images] support
+- v0.2.5: Rails 3 support (beta)
 
 - Adheres to the ['Sitemap protocol specification'][sitemap_protocol]
 - Handles millions of links
 - Automatic Gzip of Sitemap files
 - Automatic ping of search engines to notify them of new sitemaps: Google, Yahoo, Bing, Ask, SitemapWriter
-- Won't clobber your old sitemaps if the new one fails to generate
-- Set the priority of links, change frequency etc
-- You control which links are included
-- You set the host name, so it doesn't matter if your application is in a subdirectory
+- Leaves your old sitemaps in place if a new one fails to generate
+- Allows you to set the hostname for the links in your Sitemap
 
 Foreword
 -------
@@ -163,7 +161,7 @@ Tested and working on:
 
 - **Rails** 3.0.0, sitemap_generator version >= 0.2.5
 - **Rails** 1.x - 2.3.5
-- **Ruby** 1.8.7, 1.9.1
+- **Ruby** 1.8.6, 1.8.7, 1.9.1
 
 Notes
 =======
@@ -213,6 +211,7 @@ Thanks (in no particular order)
 - [Richie Vos](http://github.com/jerryvos)
 - [Adrian Mugnolo](http://github.com/xymbol)
 - [Jason Weathered](http://github.com/jasoncodes)
+- [Andy Stewart](http://github.com/airblade)
 
 Copyright (c) 2009 Karl Varga released under the MIT license
 
