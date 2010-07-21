@@ -17,7 +17,7 @@ module SitemapGenerator
         HTML
         @xml_wrapper_start.gsub!(/\s+/, ' ').gsub!(/ *> */, '>').strip!
         @xml_wrapper_end   = %q[</sitemapindex>]
-        self.filesize = @xml_wrapper_start.bytesize + @xml_wrapper_end.bytesize
+        self.filesize = bytesize(@xml_wrapper_start) + bytesize(@xml_wrapper_end)
       end
 
       # Return XML as a String

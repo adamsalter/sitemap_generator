@@ -36,7 +36,7 @@ module SitemapGenerator
         HTML
         @xml_wrapper_start.gsub!(/\s+/, ' ').gsub!(/ *> */, '>').strip!
         @xml_wrapper_end   = %q[</urlset>]
-        self.filesize = @xml_wrapper_start.bytesize + @xml_wrapper_end.bytesize
+        self.filesize = bytesize(@xml_wrapper_start) + bytesize(@xml_wrapper_end)
       end
 
       def lastmod
@@ -67,13 +67,13 @@ module SitemapGenerator
       # If a link cannot be added, the file is too large or the link limit has been reached.
       def add_link(link)
         xml = build_xml(::Builder::XmlMarkup.new, link)
-        unless file_can_fit?(xml.bytesize)
+        unless file_can_fit?(bytesize(xml))
           self.finalize!
           return false
         end
 
         @xml_content << xml
-        self.filesize += xml.bytesize
+        self.filesize += bytesize(xml)
         self.link_count += 1
         true
       end
@@ -118,6 +118,11 @@ module SitemapGenerator
         end
         @xml_content = @xml_wrapper_start = @xml_wrapper_end = ''
         self.freeze
+      end
+
+      # Return the bytesize length of the string
+      def bytesize(string)
+        string.respond_to?(:bytesize) ? string.bytesize : string.length
       end
     end
   end
