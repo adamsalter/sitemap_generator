@@ -1,17 +1,26 @@
-begin
+environment = begin
+
+  # Try to require the library.  If we are installed as a gem, this should work.
+  # We don't need to load the environment.
   require 'sitemap_generator'
-rescue LoadError, NameError
-  # Application should work without vlad
+  []
+
+rescue LoadError
+
+  # We must be installed as a plugin.  Make sure the environment is loaded
+  # when running all rake tasks.
+  [:environment]
+
 end
 
 namespace :sitemap do
   desc "Install a default config/sitemap.rb file"
-  task :install do
+  task :install => environment do
     SitemapGenerator::Utilities.install_sitemap_rb(verbose)
   end
 
   desc "Delete all Sitemap files in public/ directory"
-  task :clean do
+  task :clean => environment do
     SitemapGenerator::Utilities.clean_files
   end
 
@@ -28,4 +37,3 @@ namespace :sitemap do
     SitemapGenerator::Sitemap.create
   end
 end
-
