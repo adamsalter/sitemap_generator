@@ -114,6 +114,13 @@ Example 'config/sitemap.rb'
       end
 
     end
+    
+    # Create a new sitemap with specific name
+    SitemapGenerator::Sitemap.add_links :name=>"neighborhoods" do |sitemap|
+      Neighborhood.all.each do |r|
+        sitemap.add neighborhood_path(r.permalink)
+      end
+    end
 
     # Including Sitemaps from Rails Engines.
     #
