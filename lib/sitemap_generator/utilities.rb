@@ -26,29 +26,11 @@ module SitemapGenerator
       FileUtils.rm(Dir[File.join(RAILS_ROOT, 'public/sitemap*.xml.gz')])
     end
 
-    # Returns whether this environment is using ActionPack
-    # version 3.0.0 or greater.
+    # Returns a boolean indicating whether this environment is Rails 3
     #
     # @return [Boolean]
     def self.rails3?
-      # The ActionPack module is always loaded automatically in Rails >= 3
-      return false unless defined?(ActionPack) && defined?(ActionPack::VERSION)
-
-      version =
-        if defined?(ActionPack::VERSION::MAJOR)
-          ActionPack::VERSION::MAJOR
-        else
-          # Rails 1.2
-          ActionPack::VERSION::Major
-        end
-
-      # 3.0.0.beta1 acts more like ActionPack 2
-      # for purposes of this method
-      # (checking whether block helpers require = or -).
-      # This extra check can be removed when beta2 is out.
-      version >= 3 &&
-        !(defined?(ActionPack::VERSION::TINY) &&
-          ActionPack::VERSION::TINY == "0.beta")
+      Rails.version.to_f >= 3
     end
   end
 end
