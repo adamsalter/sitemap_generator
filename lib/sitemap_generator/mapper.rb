@@ -2,15 +2,15 @@ module SitemapGenerator
   # Generator instances are used to build links.
   # The object passed to the add_links block in config/sitemap.rb is a Generator instance.
   class Mapper
-    attr_accessor :set, :options
+    attr_accessor :set
 
-    def initialize(set, options={})
+    def initialize(set)
       @set = set
-      @options = options
     end
 
-    def add(loc, link = {})
-      set.add_link Link.generate(loc, link), options
+    def add(loc, options = {})
+      set.add_link Link.generate(loc, options)
     end
   end
 end
+

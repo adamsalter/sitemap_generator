@@ -9,7 +9,7 @@ module SitemapGenerator
 
     attr_accessor :default_host, :public_path, :sitemaps_path
     attr_accessor :sitemap, :sitemaps, :sitemap_index
-    attr_accessor :verbose, :yahoo_app_id, :named_sitemaps
+    attr_accessor :verbose, :yahoo_app_id
 
     # Evaluate the sitemap config file and write all sitemaps.
     #
@@ -43,7 +43,6 @@ module SitemapGenerator
 
       # Completed sitemaps
       self.sitemaps = []
-      self.named_sitemaps = []
     end
 
     def link_count
@@ -54,23 +53,23 @@ module SitemapGenerator
     # passing a block.
     #
     # TODO: Refactor.  The call chain is confusing and convoluted here.
-    def add_links(options={})
+    def add_links
       raise ArgumentError, "Default hostname not set" if default_host.blank?
 
       # I'd rather have these calls in <tt>create</tt> but we have to wait
       # for <tt>default_host</tt> to be set by the user's sitemap config
-      new_sitemap(options)
+      new_sitemap
       add_default_links
 
-      yield Mapper.new(self, options)
+      yield Mapper.new(self)
     end
 
     # Called from Mapper.
     #
     # Add a link to the current sitemap.
-    def add_link(link, options={})
+    def add_link(link)
       unless self.sitemap << link
-        new_sitemap options
+        new_sitemap
         self.sitemap << link
       end
     end
@@ -79,13 +78,13 @@ module SitemapGenerator
     # start a new sitemap.
     #
     # If the current sitemap is nil or empty it is not added.
-    def new_sitemap(options={})
+    def new_sitemap
       unless self.sitemap_index
         self.sitemap_index = SitemapGenerator::Builder::SitemapIndexFile.new(public_path, sitemap_index_path, default_host)
       end
 
       unless self.sitemap
-        self.sitemap = SitemapGenerator::Builder::SitemapFile.new(public_path, new_sitemap_path(options), default_host)
+        self.sitemap = SitemapGenerator::Builder::SitemapFile.new(public_path, new_sitemap_path, default_host)
       end
 
       # Mark the sitemap as complete and add it to the sitemap index
@@ -95,7 +94,7 @@ module SitemapGenerator
         self.sitemaps << self.sitemap
         show_progress(self.sitemap) if verbose
 
-        self.sitemap = SitemapGenerator::Builder::SitemapFile.new(public_path, new_sitemap_path(options), default_host)
+        self.sitemap = SitemapGenerator::Builder::SitemapFile.new(public_path, new_sitemap_path, default_host)
       end
     end
 
@@ -160,23 +159,8 @@ module SitemapGenerator
     # Return the current sitemap filename with index.
     #
     # The index depends on the length of the <tt>sitemaps</tt> array.
-    def new_sitemap_path(options={})
-      base = self.sitemaps_path || ''
-
-      if options[:name]
-        count = 0
-        sitemap_name = File.join(base, "sitemap-#{options[:name]}.xml.gz")
-        sitemaps.each do |s|
-          if s.sitemap_path == sitemap_name
-            count = count+1
-            sitemap_name = File.join(base, "sitemap-#{options[:name]}-#{count}.xml.gz")
-          end
-        end
-        named_sitemaps << sitemap
-      else
-        sitemap_name = File.join(base, "sitemap-#{self.sitemaps.length - named_sitemaps.length + 1}.xml.gz")
-      end
-      sitemap_name
+    def new_sitemap_path
+      File.join(self.sitemaps_path || '', "sitemap#{self.sitemaps.length + 1}.xml.gz")
     end
 
     # Return the current sitemap index filename.
