@@ -4,6 +4,14 @@ require 'zlib'
 
 module SitemapGenerator
   module Builder
+    #
+    # General Usage:
+    #
+    #   sitemap = SitemapFile.new('public/', 'sitemap.xml', 'http://example.com')
+    #       <- creates a new sitemap file in directory public/
+    #   sitemap.add_link({ ... })    <- add a link to the sitemap
+    #   sitemap.finalize!            <- write and close the sitemap file
+    #
     class SitemapFile
       include SitemapGenerator::Builder::Helper
 
@@ -104,14 +112,13 @@ module SitemapGenerator
             video = link[:video]
             builder.video :video do
               # required elements
-              builder.video :thumbnail_loc, video[:thumbnail_loc]
-              builder.video :title, video[:title]
-              builder.video :description, video[:description]
-
               builder.video :content_loc, video[:content_loc]           if video[:content_loc]
               if video[:player_loc]
                 builder.video :player_loc, video[:player_loc], :allow_embed => (video[:allow_embed] ? 'yes' : 'no'), :autoplay => video[:autoplay]
               end
+              builder.video :thumbnail_loc, video[:thumbnail_loc]
+              builder.video :title, video[:title]
+              builder.video :description, video[:description]
 
               builder.video :rating, video[:rating]                     if video[:rating]
               builder.video :view_count, video[:view_count]             if video[:view_count]
@@ -121,7 +128,8 @@ module SitemapGenerator
               builder.video :family_friendly, (video[:family_friendly] ? 'yes' : 'no')  if video[:family_friendly]
               builder.video :duration, video[:duration]                 if video[:duration]
               video[:tags].each {|tag| builder.video :tag, tag }        if video[:tags]
-              video[:categories].each {|category| builder.video :category, category} if video[:categories]
+              builder.video :tag, video[:tag]                           if video[:tag]
+              builder.video :category, video[:category]                 if video[:category]
             end
           end
         end

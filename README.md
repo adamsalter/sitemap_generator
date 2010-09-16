@@ -1,29 +1,37 @@
 SitemapGenerator
 ================
 
-SitemapGenerator is a Rails gem that makes it easy to generate ['enterprise-class'][enterprise_class] Sitemaps readable by all search engines.  Generated Sitemaps adhere to the ['Sitemap protocol specification'][sitemap_protocol].  When you generate new Sitemaps, SitemapGenerator can automatically ping the major search engines (including Google, Yahoo and Bing) to notify them.  SitemapGenerator includes rake tasks to easily manage your sitemaps.
+SitemapGenerator generates Sitemaps for your Rails application.  The Sitemaps adhere to the [Sitemap 0.9 protocol][sitemap_protocol] specification.  You specify the contents of your Sitemap using a configuration file, à la Rails Routes.  A set of rake tasks is included to help you manage your Sitemaps.
 
 Features
 -------
 
-- v0.2.6: ['Google Image Sitemap'][sitemap_images] support
-- v0.2.5: Rails 3 support (beta)
-
-- Adheres to the ['Sitemap protocol specification'][sitemap_protocol]
+- Supports [Video sitemaps][sitemap_video] and [Image sitemaps][sitemap_images]
+- Rails3 compatible (beta)
+- Adheres to the [Sitemap 0.9 protocol][sitemap_protocol]
 - Handles millions of links
-- Automatic Gzip of Sitemap files
-- Automatic ping of search engines to notify them of new sitemaps: Google, Yahoo, Bing, Ask, SitemapWriter
-- Leaves your old sitemaps in place if a new one fails to generate
-- Allows you to set the hostname for the links in your Sitemap
+- Compresses Sitemaps using GZip
+- Notifies Search Engines (Google, Yahoo, Bing, Ask, SitemapWriter) of new sitemaps
+- Ensures your old Sitemaps stay in place if the new Sitemap fails to generate
+- You set the hostname (and protocol) of the links in your Sitemap
+
+Changelog
+-------
+
+- v1.1.0: [Video sitemap][sitemap_video] support
+- v0.2.6: [Image Sitemap][sitemap_images] support
+- v0.2.5: Rails 3 support (beta)
 
 Foreword
 -------
 
-Unfortunately, Adam Salter passed away in 2009.  Those who knew him know what an amazing guy he was, and what an excellent Rails programmer he was.  His passing is a great loss to the Rails community.
+Adam Salter first created SitemapGenerator while we were working together in Sydney, Australia.  Unfortunately, he passed away in 2009.  Since then I have taken over development of SitemapGenerator.
 
-[Karl Varga](http://github.com/kjvarga) has taken over development of SitemapGenerator.  The canonical repository is [http://github.com/kjvarga/sitemap_generator][canonical_repo]
+Those who knew him know what an amazing guy he was, and what an excellent Rails programmer he was.  His passing is a great loss to the Rails community.
 
-Installation
+The canonical repository is now: [http://github.com/kjvarga/sitemap_generator][canonical_repo]
+
+Install
 =======
 
 **Rails 3:**
@@ -56,31 +64,55 @@ Installation
 
 1. <code>$ ./script/plugin install git://github.com/kjvarga/sitemap_generator.git</code>
 
-----
+Usage
+======
 
-Installation creates a <tt>config/sitemap.rb</tt> file which will contain your logic for generating the Sitemap files.  If you want to create this file manually run <code>rake sitemap:install</code>.
+<code>rake sitemap:install</code> creates a <tt>config/sitemap.rb</tt> file which will contain your logic for generating the Sitemap files.
 
-You can run <code>rake sitemap:refresh</code> as needed to create Sitemap files. This will also ping these ['major search engines'][sitemap_engines]: Google, Yahoo, Bing, Ask, SitemapWriter.  If you want to disable all non-essential output run the rake task with <code>rake -s sitemap:refresh</code>.
+Once you have configured your sitemap in <tt>config/sitemap.rb</tt> run <code>rake sitemap:refresh</code> as needed to create/rebuild your Sitemap files.  Sitemaps are generated into the <tt>public/</tt> folder and are named <tt>sitemap_index.xml.gz</tt>, <tt>sitemap1.xml.gz</tt>, <tt>sitemap2.xml.gz</tt>, etc.
 
-To keep your Sitemaps up-to-date, setup a cron job.  Pass the <tt>-s</tt> option to the rake task to silence all but the most important output.  If you're using Whenever, then your schedule would look something like:
+Using <code>rake sitemap:refresh</code> will notify major search engines to let them know that a new Sitemap is available (Google, Yahoo, Bing, Ask, SitemapWriter).  To generate new Sitemaps without notifying search engines (for example when running in a local environment) use <code>rake sitemap:refresh:no_ping</code>.
+
+To ping Yahoo you will need to set your Yahoo AppID in <tt>config/sitemap.rb</tt>.  For example: <code>SitemapGenerator::Sitemap.yahoo_app_id = "my_app_id"</code>
+
+To disable all non-essential output (only errors will be displayed) run the rake tasks with the <code>-s</code> option.  For example <code>rake -s sitemap:refresh</code>.
+
+Cron
+-----
+
+To keep your Sitemaps up-to-date, setup a cron job.  Make sure to pass the <code>-s</code> option to silence rake.  That way you will only get email when the sitemap build fails.
+
+If you're using Whenever, your schedule would look something like the following:
 
     # config/schedule.rb
     every 1.day, :at => '5:00 am' do
       rake "-s sitemap:refresh"
     end
 
-Optionally, you can add the following to your <code>public/robots.txt</code> file, so that robots can find the sitemap file:
+Robots.txt
+----------
 
-    Sitemap: <hostname>/sitemap_index.xml.gz
+You should add the Sitemap index file to <code>public/robots.txt</code> to help search engines find your Sitemaps.  The URL should be the complete URL to the Sitemap index file.  For example:
 
-The Sitemap URL in the robots file should be the complete URL to the Sitemap Index, such as <tt>http://www.example.org/sitemap_index.xml.gz</tt>
+    Sitemap: http://www.example.org/sitemap_index.xml.gz
 
+Image and Video Sitemaps
+-----------
 
-Example 'config/sitemap.rb'
-==========
+Images can be added to a sitemap URL by passing an <tt>:images</tt> array to <tt>add()</tt>.  Each item in the array must be a Hash containing tags defined by the [Image Sitemap][image_tags] specification.  For example:
+
+    sitemap.add('/index.html', :images => [{ :loc => 'http://www.example.com/image.png', :title => 'Image' }])
+
+A video can be added to a sitemap URL by passing a <tt>:video</tt> Hash to <tt>add()</tt>.  The Hash can contain tags defined by the [Video Sitemap specification][video_tags].  To associate more than one <tt>tag</tt> with a video, pass the tags as an array with the key <tt>:tags</tt>.
+
+    sitemap.add('/index.html', :video => { :thumbnail_loc => 'http://www.example.com/video1_thumbnail.png', :title => 'Title', :description => 'Description', :content_loc => 'http://www.example.com/cool_video.mpg', :tags => %w[one two three], :category => 'Category' })
+
+Example <code>config/sitemap.rb</code>
+---------
 
     # Set the host name for URL creation
     SitemapGenerator::Sitemap.default_host = "http://www.example.com"
+    SitemapGenerator::Sitemap.yahoo_app_id = nil # Set to your Yahoo AppID to ping Yahoo
 
     SitemapGenerator::Sitemap.add_links do |sitemap|
       # Put links creation logic here.
@@ -94,25 +126,21 @@ Example 'config/sitemap.rb'
       # Defaults: :priority => 0.5, :changefreq => 'weekly',
       #           :lastmod => Time.now, :host => default_host
 
-
-      # Examples:
-
       # add '/articles'
       sitemap.add articles_path, :priority => 0.7, :changefreq => 'daily'
 
-      # add all individual articles
-      Article.find(:all).each do |a|
+      # add all articles
+      Article.all.each do |a|
         sitemap.add article_path(a), :lastmod => a.updated_at
       end
 
-      # add merchant path
-      sitemap.add '/purchase', :priority => 0.7, :host => "https://www.example.com"
-
-      # add all individual news with images
-      News.all.each do |n|
-        sitemap.add news_path(n), :lastmod => n.updated_at, :images=>n.images.collect{ |r| :loc=>r.image.url, :title=>r.image.name }
+      # add news page with images
+      News.all.each do |news|
+        images = news.images.collect do |image|
+          { :loc => image.url, :title => image.name }
+        end
+        sitemap.add news_path(news), :images => images
       end
-
     end
 
     # Including Sitemaps from Rails Engines.
@@ -159,9 +187,9 @@ Compatibility
 
 Tested and working on:
 
-- **Rails** 3.0.0, sitemap_generator version >= 0.2.5
-- **Rails** 1.x - 2.3.5
-- **Ruby** 1.8.6, 1.8.7, 1.9.1
+- **Rails** 3.0.0
+- **Rails** 1.x - 2.3.8
+- **Ruby** 1.8.6, 1.8.7, 1.8.7 Enterprise Edition, 1.9.1
 
 Notes
 =======
@@ -185,8 +213,6 @@ Notes
       end
     end
 
-3) If generation of your sitemap fails for some reason, the old sitemap will remain in public/.  This ensures that robots will always find a valid sitemap.  Running silently (`rake -s sitemap:refresh`) and with email forwarding setup you'll only get an email if your sitemap fails to build, and no notification when everything is fine - which will be most of the time.
-
 Known Bugs
 ========
 
@@ -196,15 +222,16 @@ Known Bugs
 Wishlist & Coming Soon
 ========
 
-- Support for generating sitemaps for sites with multiple domains.  Sitemaps are generated into subdirectories and we use a Rack middleware to rewrite requests for sitemaps to the correct subdirectory based on the request host.
-- I want to refactor the code because it has grown a lot.  Part of this refactoring will include implementing some more checks to make sure we adhere to standards as well as making sure that the sitemaps are being generated as efficiently as possible.
-
-I'd like to simplify adding links to a sitemap.  Right now it's all or nothing.  I'd like to break it up so you can add batches.
+- Ultimately I'd like to make this gem framework agnostic.  It is better suited to being run as a command-line tool as opposed to Ruby-specific Rake tasks.
+- Add rake tasks/options to validate the generated sitemaps.
+- Support News, Mobile, Geo and other types of sitemaps
+- Support for generating sitemaps for sites with multiple domains.  Sitemaps can be generated into subdirectories and we can use Rack middleware to rewrite requests for sitemaps to the correct subdirectory based on the request host.
 - Auto coverage testing.  Generate a report of broken URLs by checking the status codes of each page in the sitemap.
 
 Thanks (in no particular order)
 ========
 
+- [Alex Soto](http://github.com/apsoto) for video sitemaps
 - [Alexadre Bini](http://github.com/alexandrebini) for image sitemaps
 - [Dan Pickett](http://github.com/dpickett)
 - [Rob Biedenharn](http://github.com/rab)
@@ -217,11 +244,11 @@ Copyright (c) 2009 Karl Varga released under the MIT license
 
 [canonical_repo]:http://github.com/kjvarga/sitemap_generator
 [enterprise_class]:https://twitter.com/dhh/status/1631034662 "I use enterprise in the same sense the Phusion guys do - i.e. Enterprise Ruby. Please don't look down on my use of the word 'enterprise' to represent being a cut above. It doesn't mean you ever have to work for a company the size of IBM. Or constantly fight inertia, writing crappy software, adhering to change management practices and spending hours in meetings... Not that there's anything wrong with that - Wait, what?"
-[sitemap_engines]:http://en.wikipedia.org/wiki/Sitemap_index "http://en.wikipedia.org/wiki/Sitemap_index"
 [sitemaps_org]:http://www.sitemaps.org/protocol.php "http://www.sitemaps.org/protocol.php"
 [sitemaps_xml]:http://www.sitemaps.org/protocol.php#xmlTagDefinitions "XML Tag Definitions"
 [sitemap_generator_usage]:http://wiki.github.com/adamsalter/sitemap_generator/sitemapgenerator-usage "http://wiki.github.com/adamsalter/sitemap_generator/sitemapgenerator-usage"
-[boost_juice]:http://www.boostjuice.com.au/ "Mmmm, sweet, sweet Boost Juice."
-[cb]:http://codebright.net "http://codebright.net"
 [sitemap_images]:http://www.google.com/support/webmasters/bin/answer.py?answer=178636
+[sitemap_video]:http://www.google.com/support/webmasters/bin/topic.py?topic=10079
 [sitemap_protocol]:http://sitemaps.org/protocol.php
+[video_tags]:http://www.google.com/support/webmasters/bin/answer.py?hl=en&answer=80472#4
+[image_tags]:http://www.google.com/support/webmasters/bin/answer.py?hl=en&answer=178636
