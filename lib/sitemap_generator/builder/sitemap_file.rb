@@ -130,6 +130,7 @@ module SitemapGenerator
               video[:tags].each {|tag| builder.video :tag, tag }        if video[:tags]
               builder.video :tag, video[:tag]                           if video[:tag]
               builder.video :category, video[:category]                 if video[:category]
+              builder.video :gallery_loc, video[:gallery_loc]           if video[:gallery_loc]
             end
           end
         end
