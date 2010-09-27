@@ -282,6 +282,28 @@
           </xsd:simpleContent>
         </xsd:complexType>
       </xsd:element>
+      <xsd:element name="gallery_loc" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            A link to the gallery (collection of videos) in which this video appears.
+            Only one video:gallery_loc tag can be listed for each video. The value
+            of the optional attribute title indicates the title of the gallery.
+          </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType>
+          <xsd:simpleContent>
+            <xsd:extension base="xsd:anyURI">
+              <xsd:attribute name="title" type="xsd:string">
+                <xsd:annotation>
+                  <xsd:documentation>
+                    Optional title of the gallery
+                  </xsd:documentation>
+                </xsd:annotation>
+              </xsd:attribute>
+            </xsd:extension>
+          </xsd:simpleContent>
+        </xsd:complexType>
+      </xsd:element>      
     </xsd:sequence>
   </xsd:complexType>
 </xsd:element>

@@ -54,9 +54,9 @@ describe "SitemapGenerator" do
     video.xpath("video:tag").size.should == 3
     video.xpath("video:category").size.should == 1
 
-    # google's documentation and published schema don't match so skipping validation for now so I can add
-    # the gallery_loc element
-    #xml_fragment_should_validate_against_schema(video, 'http://www.google.com/schemas/sitemap-video/1.1', 'sitemap-video')
+    # Google's documentation and published schema don't match some valid elements may
+    # not validate.
+    xml_fragment_should_validate_against_schema(video, 'http://www.google.com/schemas/sitemap-video/1.1', 'sitemap-video')
     
     player_loc_node = video.at_xpath("video:player_loc")
     player_loc_node.should_not be_nil
