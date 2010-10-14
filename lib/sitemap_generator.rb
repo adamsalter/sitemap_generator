@@ -1,6 +1,4 @@
 require 'sitemap_generator/builder'
-require 'sitemap_generator/mapper'
-require 'sitemap_generator/link'
 require 'sitemap_generator/link_set'
 require 'sitemap_generator/templates'
 require 'sitemap_generator/utilities'
@@ -9,8 +7,9 @@ require 'sitemap_generator/railtie' if SitemapGenerator::Utilities.rails3?
 require 'active_support/core_ext/numeric'
 
 module SitemapGenerator
-  class SitemapFull < StandardError; end
-  class SitemapFinalized < StandardError; end
+  class SitemapError <StandardError; end
+  class SitemapFullError < SitemapError; end
+  class SitemapFinalizedError < SitemapError; end
   
   silence_warnings do
     VERSION = File.read(File.dirname(__FILE__) + "/../VERSION").strip

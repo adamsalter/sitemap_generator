@@ -7,10 +7,9 @@ module SitemapGenerator
     # General Usage:
     #
     #   sitemap = SitemapFile.new('public/', 'sitemap.xml', 'http://example.com')
-    #       <- creates a new sitemap file in directory public/
-    #   sitemap.add_link({ ... })    <- add a link to the sitemap
-    #   sitemap.finalize!            <- write and close the sitemap file and protect it
-    #       from further modification
+    #   sitemap.add('/', { ... })    <- add a link to the sitemap
+    #   sitemap.finalize!            <- creates a new sitemap file in directory public/
+    #       and freezes the object to protect it from further modification
     #
     class SitemapFile
       attr_accessor :sitemap_path, :public_path, :filesize, :link_count, :hostname
@@ -80,7 +79,7 @@ module SitemapGenerator
       #   sitemap_url - a SitemapUrl instance
       #   sitemap, options - a Sitemap instance and options hash
       #   path, options - a path for the URL and options hash
-      def add_link(link, options={})
+      def add(link, options={})
         xml = if link.is_a?(SitemapGenerator::Builder::SitemapUrl)
           link.to_xml
         else
@@ -99,7 +98,7 @@ module SitemapGenerator
         self.link_count += 1
         true
       end
-      alias_method :<<, :add_link
+      alias_method :<<, :add
 
       # Write out the Sitemap file and freeze this object.
       #

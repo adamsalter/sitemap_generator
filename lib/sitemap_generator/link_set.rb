@@ -8,7 +8,7 @@ module SitemapGenerator
     include ActionView::Helpers::NumberHelper  # for number_with_delimiter
 
     attr_accessor :default_host, :public_path, :sitemaps_path
-    attr_accessor :sitemap, :sitemaps, :sitemap_index
+    attr_accessor :sitemap, :sitemap_index
     attr_accessor :verbose, :yahoo_app_id
 
     # Evaluate the sitemap config file and write all sitemaps.
@@ -50,11 +50,10 @@ module SitemapGenerator
       self.default_host = default_host
       self.public_path = public_path
       self.sitemaps_path = sitemaps_path
-      self.sitemaps = [] # Completed sitemaps
     end
 
     def link_count
-      self.sitemaps.inject(0) { |link_count_sum, sitemap| link_count_sum + sitemap.link_count }
+      self.sitemap_index.sitemaps.inject(0) { |link_count_sum, sitemap| link_count_sum + sitemap.link_count }
     end
 
     # Entry point for users.
@@ -68,27 +67,24 @@ module SitemapGenerator
 
       # Set default host on the sitemap objects and seed the sitemap with the default links
       self.sitemap.hostname = self.sitemap_index.hostname = default_host
-      self.sitemap.add_link('/', :lastmod => Time.now, :changefreq => 'always', :priority => 1.0)
-      self.sitemap.add_link(self.sitemap_index, :lastmod => Time.now, :changefreq => 'always', :priority => 1.0)
+      self.sitemap.add('/', :lastmod => Time.now, :changefreq => 'always', :priority => 1.0)
+      self.sitemap.add(self.sitemap_index, :lastmod => Time.now, :changefreq => 'always', :priority => 1.0)
 
-      yield Mapper.new(self)
+      yield self
     end
 
     # Add a link to a Sitemap.  If a new Sitemap is required, one will be created for
     # you.
-    #
-    # Called from Mapper.
-    def add_link(link)
+    def add(link, options={})
       begin
-        self.sitemap << link
-      rescue SitemapGenerator::SitemapFull
-        self.sitemap_index << self.sitemap
-        puts self.sitemap.summary if verbose
+        self.sitemap.add(link, options)
+      rescue SitemapGenerator::SitemapError => e
+        if e.is_a?(SitemapGenerator::SitemapFullError)
+          self.sitemap_index << self.sitemap
+          puts self.sitemap.summary if verbose
+        end
         self.sitemap = SitemapGenerator::Builder::SitemapFile.new(public_path, new_sitemap_path, default_host)
-        self.sitemap << link
-      rescue SitemapGenerator::SitemapFinalized
-        self.sitemap = SitemapGenerator::Builder::SitemapFile.new(public_path, new_sitemap_path, default_host)
-        self.sitemap << link
+        self.sitemap.add(link, options)
       end
     end
 
@@ -136,7 +132,7 @@ module SitemapGenerator
     #
     # The index depends on the length of the <tt>sitemaps</tt> array.
     def new_sitemap_path
-      File.join(self.sitemaps_path || '', "sitemap#{self.sitemaps.length + 1}.xml.gz")
+      File.join(self.sitemaps_path || '', "sitemap#{self.sitemap_index.sitemaps.length + 1}.xml.gz")
     end
 
     # Return the current sitemap index filename.
