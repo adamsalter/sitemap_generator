@@ -49,12 +49,16 @@ end
 #
 task :default => :test
 
+desc "Run specs"
 namespace :test do
   #desc "Test as a gem, plugin and Rails 3 gem"
   #task :all => ['test:gem', 'test:plugin']
 
+  desc "Run specs on a gem install"
   task :gem => ['test:prepare:gem', 'multi_spec']
+  desc "Run specs on a plugin install"
   task :plugin => ['test:prepare:plugin', 'multi_spec']
+  desc "Run specs on a rails3 install"
   task :rails3 => ['test:prepare:rails3', 'multi_spec']
 
   task :multi_spec do
@@ -63,18 +67,21 @@ namespace :test do
   end
 
   namespace :prepare do
+    desc "Prepare the gem install for testing"
     task :gem do
       ENV["SITEMAP_RAILS"] = 'gem'
       Helpers.prepare_path(Helpers.local_path('spec/mock_app_gem/vendor/gems/sitemap_generator-1.2.3'))
       rm_rf(Helpers.local_path('spec/mock_app_gem/public/sitemap*'))
     end
 
+    desc "Prepare the plugin install for testing"
     task :plugin do
       ENV["SITEMAP_RAILS"] = 'plugin'
       Helpers.prepare_path(Helpers.local_path('spec/mock_app_plugin/vendor/plugins/sitemap_generator-1.2.3'))
       rm_rf(Helpers.local_path('spec/mock_app_plugin/public/sitemap*'))
     end
 
+    desc "Prepare the rails3 install for testing"
     task :rails3 do
       ENV["SITEMAP_RAILS"] = 'rails3'
       rm_rf(Helpers.local_path('spec/mock_rails3_gem/public/sitemap*'))
