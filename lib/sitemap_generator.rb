@@ -9,6 +9,9 @@ require 'sitemap_generator/railtie' if SitemapGenerator::Utilities.rails3?
 require 'active_support/core_ext/numeric'
 
 module SitemapGenerator
+  class SitemapFull < StandardError; end
+  class SitemapFinalized < StandardError; end
+  
   silence_warnings do
     VERSION = File.read(File.dirname(__FILE__) + "/../VERSION").strip
     MAX_SITEMAP_FILES    = 50_000        # max sitemap links per index file

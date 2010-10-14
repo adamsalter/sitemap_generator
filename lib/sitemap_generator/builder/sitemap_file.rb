@@ -10,7 +10,8 @@ module SitemapGenerator
     #   sitemap = SitemapFile.new('public/', 'sitemap.xml', 'http://example.com')
     #       <- creates a new sitemap file in directory public/
     #   sitemap.add_link({ ... })    <- add a link to the sitemap
-    #   sitemap.finalize!            <- write and close the sitemap file
+    #   sitemap.finalize!            <- write and close the sitemap file and protect it
+    #       from further modification
     #
     class SitemapFile
       include SitemapGenerator::Builder::Helper
@@ -25,7 +26,7 @@ module SitemapGenerator
       #
       # <tt>hostname</tt> hostname including protocol to use in all links
       #   e.g. http://en.google.ca
-      def initialize(public_path, sitemap_path, hostname)
+      def initialize(public_path, sitemap_path, hostname='http://example.com')
         self.sitemap_path = sitemap_path
         self.public_path = public_path
         self.hostname = hostname
@@ -70,17 +71,25 @@ module SitemapGenerator
         (self.filesize + bytes) < SitemapGenerator::MAX_SITEMAP_FILESIZE && self.link_count < SitemapGenerator::MAX_SITEMAP_LINKS
       end
 
-      # Add a link to the sitemap file and return a boolean indicating whether the
-      # link was added.
+      # Add a link to the sitemap file.
       #
-      # If a link cannot be added, the file is too large or the link limit has been reached.
+      # If a link cannot be added, for example if the file is too large or the link
+      # limit has been reached, a SitemapGenerator::SitemapFull exception is raised.
+      #
+      # If the Sitemap has already been finalized a SitemapGenerator::SitemapFinalized
+      # exception is raised.
+      #
+      # Once a Sitemap is full it is finalized (written out) and can no longer be modified.
       def add_link(link)
         xml = build_xml(::Builder::XmlMarkup.new, link)
-        unless file_can_fit?(bytesize(xml))
+        if self.finalized?
+          raise SitemapGenerator::SitemapFinalized
+        elsif !file_can_fit?(bytesize(xml))
           self.finalize!
-          return false
+          raise SitemapGenerator::SitemapFull
         end
 
+        # Add the XML
         @xml_content << xml
         self.filesize += bytesize(xml)
         self.link_count += 1
@@ -137,12 +146,15 @@ module SitemapGenerator
         builder << ''
       end
 
-      # Insert the content into the XML "wrapper" and write and close the file.
+      # Write out the Sitemap file and freeze this object.
       #
       # All the xml content in the instance is cleared, but attributes like
       # <tt>filesize</tt> are still available.
+      #
+      # A SitemapGenerator::SitemapFinalized exception is raised if the Sitemap
+      # has already been finalized
       def finalize!
-        return if self.frozen?
+        raise SitemapGenerator::SitemapFinalized if self.finalized?
 
         open(self.full_path, 'wb') do |file|
           gz = Zlib::GzipWriter.new(file)
@@ -155,7 +167,20 @@ module SitemapGenerator
         self.freeze
       end
 
-      # Return the bytesize length of the string
+      def finalized?
+        return self.frozen?
+      end
+
+      # Output a summary line
+      def summary
+        uncompressed_size = number_to_human_size(filesize)
+        compressed_size =   number_to_human_size(File.size?(full_path))
+        puts "+ #{self.sitemap_path}   #{self.link_count} links / #{uncompressed_size} / #{compressed_size} gzipped"
+      end
+      
+      protected
+      
+      # Return the bytesize length of the string.  Ruby 1.8.6 compatible.
       def bytesize(string)
         string.respond_to?(:bytesize) ? string.bytesize : string.length
       end

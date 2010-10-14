@@ -13,21 +13,31 @@ module SitemapGenerator
 
     # Evaluate the sitemap config file and write all sitemaps.
     #
-    # This should be refactored so that we can have multiple instances
+    # The Sitemap Interpreter includes the URL helpers and API methods
+    # that the block argument to `add_links` is evaluted within.
+    #
+    # TODO: Refactor so that we can have multiple instances
     # of LinkSet.
     def create
       require 'sitemap_generator/interpreter'
 
       self.public_path = File.join(::Rails.root, 'public/') if self.public_path.nil?
 
+      # Default host is not set yet.  Set it on these objects in `add_links`
+      self.sitemap_index = SitemapGenerator::Builder::SitemapIndexFile.new(public_path, sitemap_index_path)
+      self.sitemap = SitemapGenerator::Builder::SitemapFile.new(public_path, new_sitemap_path)
+
       start_time = Time.now
       SitemapGenerator::Interpreter.run
-      finalize!
+      self.sitemap_index.finalize!
+      self.sitemap.finalize! unless self.sitemap.finalized?
       end_time = Time.now
 
       puts "\nSitemap stats: #{number_with_delimiter(self.link_count)} links / #{self.sitemaps.size} files / " + ("%dm%02ds" % (end_time - start_time).divmod(60)) if verbose
     end
 
+    # Constructor
+    #
     # <tt>public_path</tt> (optional) full path to the directory to write sitemaps in.
     #   Defaults to your Rails <tt>public/</tt> directory.
     #
@@ -49,6 +59,8 @@ module SitemapGenerator
       self.sitemaps.inject(0) { |link_count_sum, sitemap| link_count_sum + sitemap.link_count }
     end
 
+    # Entry point for users.
+    #
     # Called within the user's eval'ed sitemap config file.  Add links to sitemap files
     # passing a block.
     #
@@ -56,59 +68,32 @@ module SitemapGenerator
     def add_links
       raise ArgumentError, "Default hostname not set" if default_host.blank?
 
-      # I'd rather have these calls in <tt>create</tt> but we have to wait
-      # for <tt>default_host</tt> to be set by the user's sitemap config
-      new_sitemap
-      add_default_links
+      # Set default host on the sitemap objects and seed the sitemap with the default links
+      self.sitemap.hostname = self.sitemap_index.hostname = default_host
+      self.sitemap << Link.generate('/', :lastmod => Time.now, :changefreq => 'always', :priority => 1.0)
+      self.sitemap << Link.generate(self.sitemap_index, :lastmod => Time.now, :changefreq => 'always', :priority => 1.0)
 
       yield Mapper.new(self)
     end
 
+    # Add a link to a Sitemap.  If a new Sitemap is required, one will be created for
+    # you.
+    #
     # Called from Mapper.
-    #
-    # Add a link to the current sitemap.
     def add_link(link)
-      unless self.sitemap << link
-        new_sitemap
+      begin
         self.sitemap << link
-      end
-    end
-
-    # Add the current sitemap to the <tt>sitemaps</tt> Array and
-    # start a new sitemap.
-    #
-    # If the current sitemap is nil or empty it is not added.
-    def new_sitemap
-      unless self.sitemap_index
-        self.sitemap_index = SitemapGenerator::Builder::SitemapIndexFile.new(public_path, sitemap_index_path, default_host)
-      end
-
-      unless self.sitemap
-        self.sitemap = SitemapGenerator::Builder::SitemapFile.new(public_path, new_sitemap_path, default_host)
-      end
-
-      # Mark the sitemap as complete and add it to the sitemap index
-      unless self.sitemap.empty?
-        self.sitemap.finalize!
+      rescue SitemapGenerator::SitemapFull
         self.sitemap_index << Link.generate(self.sitemap)
         self.sitemaps << self.sitemap
-        show_progress(self.sitemap) if verbose
+        self.sitemap.summary if verbose
 
         self.sitemap = SitemapGenerator::Builder::SitemapFile.new(public_path, new_sitemap_path, default_host)
+        self.sitemap << link
+      rescue SitemapGenerator::SitemapFinalized
+        self.sitemap = SitemapGenerator::Builder::SitemapFile.new(public_path, new_sitemap_path, default_host)
+        self.sitemap << link
       end
-    end
-
-    # Report progress line.
-    def show_progress(sitemap)
-      uncompressed_size = number_to_human_size(sitemap.filesize)
-      compressed_size =   number_to_human_size(File.size?(sitemap.full_path))
-      puts "+ #{sitemap.sitemap_path}   #{sitemap.link_count} links / #{uncompressed_size} / #{compressed_size} gzipped"
-    end
-
-    # Finalize all sitemap files
-    def finalize!
-      new_sitemap
-      self.sitemap_index.finalize!
     end
 
     # Ping search engines.
@@ -150,11 +135,6 @@ module SitemapGenerator
     end
 
     protected
-
-    def add_default_links
-      self.sitemap << Link.generate('/', :lastmod => Time.now, :changefreq => 'always', :priority => 1.0)
-      self.sitemap << Link.generate(self.sitemap_index, :lastmod => Time.now, :changefreq => 'always', :priority => 1.0)
-    end
 
     # Return the current sitemap filename with index.
     #
