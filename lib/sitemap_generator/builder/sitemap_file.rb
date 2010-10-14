@@ -1,4 +1,3 @@
-require 'sitemap_generator/builder/helper'
 require 'builder'
 require 'zlib'
 
@@ -14,8 +13,6 @@ module SitemapGenerator
     #       from further modification
     #
     class SitemapFile
-      include SitemapGenerator::Builder::Helper
-
       attr_accessor :sitemap_path, :public_path, :filesize, :link_count, :hostname
 
       # <tt>public_path</tt> full path of the directory to write sitemaps in.
@@ -79,13 +76,20 @@ module SitemapGenerator
       # If the Sitemap has already been finalized a SitemapGenerator::SitemapFinalized
       # exception is raised.
       #
-      # Once a Sitemap is full it is finalized (written out) and can no longer be modified.
-      def add_link(link)
-        xml = build_xml(::Builder::XmlMarkup.new, link)
+      # Call with:
+      #   sitemap_url - a SitemapUrl instance
+      #   sitemap, options - a Sitemap instance and options hash
+      #   path, options - a path for the URL and options hash
+      def add_link(link, options={})
+        xml = if link.is_a?(SitemapGenerator::Builder::SitemapUrl)
+          link.to_xml
+        else
+          SitemapGenerator::Builder::SitemapUrl.new(link, options).to_xml
+        end
+
         if self.finalized?
           raise SitemapGenerator::SitemapFinalized
         elsif !file_can_fit?(bytesize(xml))
-          self.finalize!
           raise SitemapGenerator::SitemapFull
         end
 
@@ -96,55 +100,6 @@ module SitemapGenerator
         true
       end
       alias_method :<<, :add_link
-
-      # Return XML as a String
-      def build_xml(builder, link)
-        builder.url do
-          builder.loc        link[:loc]
-          builder.lastmod    w3c_date(link[:lastmod])   if link[:lastmod]
-          builder.changefreq link[:changefreq]          if link[:changefreq]
-          builder.priority   link[:priority]            if link[:priority]
-
-          unless link[:images].blank?
-            link[:images].each do |image|
-              builder.image:image do
-                builder.image :loc, image[:loc]
-                builder.image :caption, image[:caption]             if image[:caption]
-                builder.image :geo_location, image[:geo_location]   if image[:geo_location]
-                builder.image :title, image[:title]                 if image[:title]
-                builder.image :license, image[:license]             if image[:license]
-              end
-            end
-          end
-
-          unless link[:video].blank?
-            video = link[:video]
-            builder.video :video do
-              # required elements
-              builder.video :content_loc, video[:content_loc]           if video[:content_loc]
-              if video[:player_loc]
-                builder.video :player_loc, video[:player_loc], :allow_embed => (video[:allow_embed] ? 'yes' : 'no'), :autoplay => video[:autoplay]
-              end
-              builder.video :thumbnail_loc, video[:thumbnail_loc]
-              builder.video :title, video[:title]
-              builder.video :description, video[:description]
-
-              builder.video :rating, video[:rating]                     if video[:rating]
-              builder.video :view_count, video[:view_count]             if video[:view_count]
-              builder.video :publication_date, video[:publication_date] if video[:publication_date]
-              builder.video :expiration_date, video[:expiration_date]   if video[:expiration_date]
-              builder.video :duration, video[:duration]                 if video[:duration]
-              builder.video :family_friendly, (video[:family_friendly] ? 'yes' : 'no')  if video[:family_friendly]
-              builder.video :duration, video[:duration]                 if video[:duration]
-              video[:tags].each {|tag| builder.video :tag, tag }        if video[:tags]
-              builder.video :tag, video[:tag]                           if video[:tag]
-              builder.video :category, video[:category]                 if video[:category]
-              builder.video :gallery_loc, video[:gallery_loc]           if video[:gallery_loc]
-            end
-          end
-        end
-        builder << ''
-      end
 
       # Write out the Sitemap file and freeze this object.
       #
@@ -171,15 +126,15 @@ module SitemapGenerator
         return self.frozen?
       end
 
-      # Output a summary line
+      # Return a summary string
       def summary
         uncompressed_size = number_to_human_size(filesize)
         compressed_size =   number_to_human_size(File.size?(full_path))
-        puts "+ #{self.sitemap_path}   #{self.link_count} links / #{uncompressed_size} / #{compressed_size} gzipped"
+        "+ #{self.sitemap_path}   #{self.link_count} links / #{uncompressed_size} / #{compressed_size} gzipped"
       end
-      
+
       protected
-      
+
       # Return the bytesize length of the string.  Ruby 1.8.6 compatible.
       def bytesize(string)
         string.respond_to?(:bytesize) ? string.bytesize : string.length

@@ -23,17 +23,17 @@ module SitemapGenerator
 
       self.public_path = File.join(::Rails.root, 'public/') if self.public_path.nil?
 
-      # Default host is not set yet.  Set it on these objects in `add_links`
+      # Default host is not set yet.  Set it on these objects when `add_links` is called
       self.sitemap_index = SitemapGenerator::Builder::SitemapIndexFile.new(public_path, sitemap_index_path)
       self.sitemap = SitemapGenerator::Builder::SitemapFile.new(public_path, new_sitemap_path)
 
       start_time = Time.now
       SitemapGenerator::Interpreter.run
+      self.sitemap_index << self.sitemap unless self.sitemap.finalized?
       self.sitemap_index.finalize!
-      self.sitemap.finalize! unless self.sitemap.finalized?
       end_time = Time.now
 
-      puts "\nSitemap stats: #{number_with_delimiter(self.link_count)} links / #{self.sitemaps.size} files / " + ("%dm%02ds" % (end_time - start_time).divmod(60)) if verbose
+      puts self.sitemap_index.summary(start_time, end_time) if verbose
     end
 
     # Constructor
@@ -50,9 +50,7 @@ module SitemapGenerator
       self.default_host = default_host
       self.public_path = public_path
       self.sitemaps_path = sitemaps_path
-
-      # Completed sitemaps
-      self.sitemaps = []
+      self.sitemaps = [] # Completed sitemaps
     end
 
     def link_count
@@ -70,8 +68,8 @@ module SitemapGenerator
 
       # Set default host on the sitemap objects and seed the sitemap with the default links
       self.sitemap.hostname = self.sitemap_index.hostname = default_host
-      self.sitemap << Link.generate('/', :lastmod => Time.now, :changefreq => 'always', :priority => 1.0)
-      self.sitemap << Link.generate(self.sitemap_index, :lastmod => Time.now, :changefreq => 'always', :priority => 1.0)
+      self.sitemap.add_link('/', :lastmod => Time.now, :changefreq => 'always', :priority => 1.0)
+      self.sitemap.add_link(self.sitemap_index, :lastmod => Time.now, :changefreq => 'always', :priority => 1.0)
 
       yield Mapper.new(self)
     end
@@ -84,10 +82,8 @@ module SitemapGenerator
       begin
         self.sitemap << link
       rescue SitemapGenerator::SitemapFull
-        self.sitemap_index << Link.generate(self.sitemap)
-        self.sitemaps << self.sitemap
-        self.sitemap.summary if verbose
-
+        self.sitemap_index << self.sitemap
+        puts self.sitemap.summary if verbose
         self.sitemap = SitemapGenerator::Builder::SitemapFile.new(public_path, new_sitemap_path, default_host)
         self.sitemap << link
       rescue SitemapGenerator::SitemapFinalized

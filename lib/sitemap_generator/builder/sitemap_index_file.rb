@@ -2,6 +2,8 @@ module SitemapGenerator
   module Builder
     class SitemapIndexFile < SitemapFile
 
+      attr_accessor :sitemaps
+
       def initialize(*args)
         super(*args)
 
@@ -20,13 +22,19 @@ module SitemapGenerator
         self.filesize = bytesize(@xml_wrapper_start) + bytesize(@xml_wrapper_end)
       end
 
-      # Return XML as a String
-      def build_xml(builder, link)
-        builder.sitemap do
-          builder.loc        link[:loc]
-          builder.lastmod    w3c_date(link[:lastmod])   if link[:lastmod]
+      # Output a summary line
+      def summary(start_time=nil, end_time=nil)
+        puts "\nSitemap stats: #{number_with_delimiter(self.link_count)} links / #{self.sitemaps.size} files / "
+        put ("%dm%02ds" % (end_time - start_time).divmod(60)) if start_time && end_time
+      end
+
+      # Finalize sitemaps as they are added to the index
+      def add_link(link, options={})
+        if link.is_a?(SitemapFile)
+          self.sitemaps << link
+          link.finalize!
         end
-        builder << ''
+        super(SitemapGenerator::Builder::SitemapIndexUrl.new(link, options))
       end
     end
   end

@@ -2,7 +2,7 @@ module SitemapGenerator
   module Link
     extend self
 
-    # Return a Hash of options suitable to pass to a SitemapGenerator::Builder::SitemapFile instance.
+    # Return a Hash of options suitable to pass to SitemapGenerator::Builder::SitemapFile#add_link.
     def generate(path, options = {})
       if path.is_a?(SitemapGenerator::Builder::SitemapFile)
         options.reverse_merge!(:host => path.hostname, :lastmod => path.lastmod)
