@@ -1,9 +1,6 @@
-require 'action_view'
-
 module SitemapGenerator
   module Builder
     class SitemapIndexFile < SitemapFile
-      include ActionView::Helpers::NumberHelper  # for number_with_delimiter
       attr_accessor :sitemaps
 
       def initialize(*args)
@@ -25,20 +22,26 @@ module SitemapGenerator
         self.filesize = bytesize(@xml_wrapper_start) + bytesize(@xml_wrapper_end)
       end
 
-      # Return a summary line
-      def summary(start_time=nil, end_time=nil)
-        str = "\nSitemap stats: #{number_with_delimiter(self.link_count)} links / #{self.sitemaps.size} files / "
-        str += ("%dm%02ds" % (end_time - start_time).divmod(60)) if start_time && end_time
-        str
-      end
-
       # Finalize sitemaps as they are added to the index
       def add(link, options={})
+        debugger
         if link.is_a?(SitemapFile)
           self.sitemaps << link
           link.finalize!
         end
         super(SitemapGenerator::Builder::SitemapIndexUrl.new(link, options))
+      end
+
+      # Return the total number of links in all sitemaps reference by this index file
+      def total_link_count
+        self.sitemaps.inject(0) { |link_count_sum, sitemap| link_count_sum + sitemap.link_count }
+      end
+
+      # Return a summary string
+      def summary
+        uncompressed_size = number_to_human_size(filesize)
+        compressed_size =   number_to_human_size(File.size?(full_path))
+        "+ #{'%-21s' % self.sitemap_path} #{'%10s' % self.link_count} sitemaps / #{'%10s' % uncompressed_size} / #{'%10s' % compressed_size} gzipped"
       end
     end
   end

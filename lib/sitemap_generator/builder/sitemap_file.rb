@@ -1,5 +1,6 @@
 require 'builder'
 require 'zlib'
+require 'action_view'
 
 module SitemapGenerator
   module Builder
@@ -12,6 +13,7 @@ module SitemapGenerator
     #       and freezes the object to protect it from further modification
     #
     class SitemapFile
+      include ActionView::Helpers::NumberHelper
       attr_accessor :sitemap_path, :public_path, :filesize, :link_count, :hostname
 
       # <tt>public_path</tt> full path of the directory to write sitemaps in.
@@ -129,7 +131,7 @@ module SitemapGenerator
       def summary
         uncompressed_size = number_to_human_size(filesize)
         compressed_size =   number_to_human_size(File.size?(full_path))
-        "+ #{self.sitemap_path}   #{self.link_count} links / #{uncompressed_size} / #{compressed_size} gzipped"
+        "+ #{'%-21s' % self.sitemap_path} #{'%14s' % self.link_count} urls / #{'%10s' % uncompressed_size} / #{'%10s' % compressed_size} gzipped"
       end
 
       protected
