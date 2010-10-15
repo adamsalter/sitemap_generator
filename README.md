@@ -7,7 +7,7 @@ Features
 -------
 
 - Supports [Video sitemaps][sitemap_video] and [Image sitemaps][sitemap_images]
-- Rails3 compatible (beta)
+- Rails 2.x and 3.x compatible
 - Adheres to the [Sitemap 0.9 protocol][sitemap_protocol]
 - Handles millions of links
 - Compresses Sitemaps using GZip
@@ -18,9 +18,10 @@ Features
 Changelog
 -------
 
+- v1.2.0: Verified working with Rails 3 stable release
 - v1.1.0: [Video sitemap][sitemap_video] support
 - v0.2.6: [Image Sitemap][sitemap_images] support
-- v0.2.5: Rails 3 support (beta)
+- v0.2.5: Rails 3 prerelease support (beta)
 
 Foreword
 -------
@@ -34,13 +35,15 @@ The canonical repository is now: [http://github.com/kjvarga/sitemap_generator][c
 Install
 =======
 
-**Rails 3:**
+**Rails 3.x:**
 
 1. Add the gem to your <tt>Gemspec</tt>
 
     <code>gem 'sitemap_generator'</code>
 
 2. `$ rake sitemap:install`
+
+You don't need to include the tasks in your `Rakefile` because the tasks are loaded for you.
 
 **Rails 2.x: As a gem**
 
