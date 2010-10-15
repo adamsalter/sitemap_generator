@@ -100,7 +100,6 @@ module SitemapGenerator
         self.link_count += 1
         true
       end
-      alias_method :<<, :add
 
       # Write out the Sitemap file and freeze this object.
       #
@@ -131,7 +130,7 @@ module SitemapGenerator
       def summary
         uncompressed_size = number_to_human_size(filesize)
         compressed_size =   number_to_human_size(File.size?(full_path))
-        "+ #{'%-21s' % self.sitemap_path} #{'%14s' % self.link_count} urls / #{'%10s' % uncompressed_size} / #{'%10s' % compressed_size} gzipped"
+        "+ #{'%-21s' % self.sitemap_path} #{'%13s' % self.link_count} links / #{'%10s' % uncompressed_size} / #{'%10s' % compressed_size} gzipped"
       end
 
       protected

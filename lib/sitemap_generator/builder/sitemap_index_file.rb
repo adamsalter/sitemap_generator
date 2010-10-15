@@ -24,7 +24,6 @@ module SitemapGenerator
 
       # Finalize sitemaps as they are added to the index
       def add(link, options={})
-        debugger
         if link.is_a?(SitemapFile)
           self.sitemaps << link
           link.finalize!

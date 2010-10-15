@@ -30,7 +30,7 @@ module SitemapGenerator
       start_time = Time.now
       SitemapGenerator::Interpreter.run
       unless self.sitemap.finalized?
-        self.sitemap_index << self.sitemap
+        self.sitemap_index.add(self.sitemap)
         puts self.sitemap.summary if verbose
       end
       self.sitemap_index.finalize!
@@ -38,7 +38,7 @@ module SitemapGenerator
       
       if verbose
         puts self.sitemap_index.summary 
-        puts "\nSitemap stats: #{number_with_delimiter(self.sitemap_index.total_link_count)} links / #{self.sitemap_index.sitemaps.size} files / " +
+        puts "\nSitemap stats: #{number_with_delimiter(self.sitemap_index.total_link_count)} links / #{self.sitemap_index.sitemaps.size} sitemaps / " +
               ("%dm%02ds" % (end_time - start_time).divmod(60))
       end
     end
@@ -83,7 +83,7 @@ module SitemapGenerator
         self.sitemap.add(link, options)
       rescue SitemapGenerator::SitemapError => e
         if e.is_a?(SitemapGenerator::SitemapFullError)
-          self.sitemap_index << self.sitemap
+          self.sitemap_index.add(self.sitemap)
           puts self.sitemap.summary if verbose
         end
         self.sitemap = SitemapGenerator::Builder::SitemapFile.new(public_path, new_sitemap_path, default_host)
