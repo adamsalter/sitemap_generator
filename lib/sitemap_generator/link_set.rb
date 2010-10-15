@@ -129,6 +129,10 @@ module SitemapGenerator
       end
     end
 
+    def link_count
+      self.sitemap_index.total_link_count
+    end
+    
     protected
 
     # Return the current sitemap filename with index.

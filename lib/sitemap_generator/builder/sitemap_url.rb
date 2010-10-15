@@ -1,4 +1,5 @@
 require 'builder'
+require 'uri'
 
 module SitemapGenerator
   module Builder

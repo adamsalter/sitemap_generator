@@ -15,9 +15,8 @@ describe "SitemapGenerator" do
     tags = %w{tag1 tag2 tag3}
     category = 'cat1'
     
-    sitemap_generator = SitemapGenerator::Builder::SitemapFile.new(File.join(::Rails.root, '/public/'), 'sitemap.xml.gz', 'http://example.com')
-    video_link = {
-      :loc => loc,
+    video_xml_fragment = SitemapGenerator::Builder::SitemapUrl.new('cool_video.html', {
+      :host => 'http://www.example.com',
       :video => {
         :thumbnail_loc => thumbnail_loc,
         :title => title,
@@ -30,17 +29,10 @@ describe "SitemapGenerator" do
         :tags => tags,
         :category => category
       }
-    }
+    }).to_xml
 
-    # generate the video sitemap xml fragment
-    video_xml_fragment = sitemap_generator.build_xml(::Builder::XmlMarkup.new, video_link)
-
-    # validate the xml generated
-    #video_xml_fragment.should_not be_nil
-    doc = Nokogiri::XML.parse("<root xmlns:video='http://www.google.com/schemas/sitemap-video/1.1'>#{video_xml_fragment}</root>")
-    
-    
     # Check that the options were parsed correctly
+    doc = Nokogiri::XML.parse("<root xmlns:video='http://www.google.com/schemas/sitemap-video/1.1'>#{video_xml_fragment}</root>")
     url = doc.at_xpath("//url")
     url.should_not be_nil
     url.at_xpath("loc").text.should == loc
