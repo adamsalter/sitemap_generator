@@ -72,7 +72,7 @@ module SitemapGenerator
       # Add a link to the sitemap file.
       #
       # If a link cannot be added, for example if the file is too large or the link
-      # limit has been reached, a SitemapGenerator::SitemapFull exception is raised.
+      # limit has been reached, a SitemapGenerator::SitemapFullError exception is raised.
       #
       # If the Sitemap has already been finalized a SitemapGenerator::SitemapFinalized
       # exception is raised.
@@ -91,7 +91,7 @@ module SitemapGenerator
         if self.finalized?
           raise SitemapGenerator::SitemapFinalized
         elsif !file_can_fit?(bytesize(xml))
-          raise SitemapGenerator::SitemapFull
+          raise SitemapGenerator::SitemapFullError
         end
 
         # Add the XML
