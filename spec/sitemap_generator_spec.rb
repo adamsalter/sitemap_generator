@@ -44,12 +44,20 @@ describe "SitemapGenerator" do
 
   context "generate sitemap" do
     before :each do
-      Helpers.invoke_task('sitemap:refresh:no_ping')
+      old_max_links = SitemapGenerator::MAX_SITEMAP_LINKS
+      begin
+        SitemapGenerator::MAX_SITEMAP_LINKS = 10
+        Helpers.invoke_task('sitemap:refresh:no_ping')
+      ensure
+        SitemapGenerator::MAX_SITEMAP_LINKS = old_max_links
+      end
     end
 
     it "should create sitemaps" do
       file_should_exist(rails_path('/public/sitemap_index.xml.gz'))
       file_should_exist(rails_path('/public/sitemap1.xml.gz'))
+      file_should_exist(rails_path('/public/sitemap2.xml.gz'))
+      file_should_not_exist(rails_path('/public/sitemap3.xml.gz'))
     end
 
     it "should have 14 links" do
@@ -62,6 +70,7 @@ describe "SitemapGenerator" do
 
     it "sitemap XML should validate" do
       gzipped_xml_file_should_validate_against_schema rails_path('/public/sitemap1.xml.gz'), 'sitemap'
+      gzipped_xml_file_should_validate_against_schema rails_path('/public/sitemap2.xml.gz'), 'sitemap'
     end
 
     it "index XML should not have excess whitespace" do
