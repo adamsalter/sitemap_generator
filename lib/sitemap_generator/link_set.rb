@@ -7,7 +7,7 @@ module SitemapGenerator
   class LinkSet
     include ActionView::Helpers::NumberHelper  # for number_with_delimiter
 
-    attr_accessor :default_host, :public_path, :sitemaps_path
+    attr_reader :default_host, :public_path, :sitemaps_path
     attr_accessor :sitemap, :sitemap_index
     attr_accessor :verbose, :yahoo_app_id
 
@@ -18,26 +18,25 @@ module SitemapGenerator
     #
     # TODO: Refactor so that we can have multiple instances
     # of LinkSet.
-    def create
+    def create(&block)
       require 'sitemap_generator/interpreter'
 
-      self.public_path = File.join(::Rails.root, 'public/') if self.public_path.nil?
-
-      # Default host is not set yet.  Set it on these objects when `add_links` is called
-      self.sitemap_index = SitemapGenerator::Builder::SitemapIndexFile.new(public_path, sitemap_index_path)
-      self.sitemap = SitemapGenerator::Builder::SitemapFile.new(public_path, new_sitemap_path)
-
       start_time = Time.now
-      SitemapGenerator::Interpreter.run
+      if self.sitemap_index.finalized?
+        self.sitemap_index = SitemapGenerator::Builder::SitemapIndexFile.new(@public_path, sitemap_index_path)
+        self.sitemap = SitemapGenerator::Builder::SitemapFile.new(@public_path, new_sitemap_path)
+      end
+
+      SitemapGenerator::Interpreter.new(self, &block)
       unless self.sitemap.finalized?
         self.sitemap_index.add(self.sitemap)
         puts self.sitemap.summary if verbose
       end
       self.sitemap_index.finalize!
       end_time = Time.now
-      
+
       if verbose
-        puts self.sitemap_index.summary 
+        puts self.sitemap_index.summary
         puts "\nSitemap stats: #{number_with_delimiter(self.sitemap_index.total_link_count)} links / #{self.sitemap_index.sitemaps.size} sitemaps / " +
               ("%dm%02ds" % (end_time - start_time).divmod(60))
       end
@@ -54,9 +53,15 @@ module SitemapGenerator
     # <tt>default_host</tt> hostname including protocol to use in all sitemap links
     #   e.g. http://en.google.ca
     def initialize(public_path = nil, sitemaps_path = nil, default_host = nil)
-      self.default_host = default_host
-      self.public_path = public_path
-      self.sitemaps_path = sitemaps_path
+      @default_host = default_host
+      @public_path = public_path
+      @sitemaps_path = sitemaps_path
+
+      @public_path = File.join(::Rails.root, 'public/') if @public_path.nil?
+
+      # Default host is not set yet.  Set it on these objects when `add_links` is called
+      self.sitemap_index = SitemapGenerator::Builder::SitemapIndexFile.new(@public_path, sitemap_index_path)
+      self.sitemap = SitemapGenerator::Builder::SitemapFile.new(@public_path, new_sitemap_path)
     end
 
     # Entry point for users.
@@ -132,7 +137,25 @@ module SitemapGenerator
     def link_count
       self.sitemap_index.total_link_count
     end
-    
+
+    def default_host=(value)
+      @default_host = value
+      self.sitemap_index.hostname = value unless self.sitemap_index.finalized?
+      self.sitemap.hostname = value unless self.sitemap.finalized?
+    end
+
+    def public_path=(value)
+      @public_path = value
+      self.sitemap_index.public_path = value unless self.sitemap_index.finalized?
+      self.sitemap.public_path = value unless self.sitemap.finalized?
+    end
+
+    def sitemaps_path=(value)
+      @sitemaps_path = value
+      self.sitemap_index.sitemap_path = sitemap_index_path unless self.sitemap_index.finalized?
+      self.sitemap.sitemap_path = new_sitemap_path unless self.sitemap.finalized?
+    end
+
     protected
 
     # Return the current sitemap filename with index.

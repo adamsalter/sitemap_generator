@@ -1,6 +1,7 @@
 require 'builder'
 require 'zlib'
-require 'action_view'
+require 'action_view' # for number_to_human_size
+require 'fileutils'
 
 module SitemapGenerator
   module Builder
@@ -110,6 +111,14 @@ module SitemapGenerator
       # has already been finalized
       def finalize!
         raise SitemapGenerator::SitemapFinalized if self.finalized?
+
+        # Ensure that the directory exists
+        dir = File.dirname(self.full_path)
+        if !File.exists?(dir)
+          FileUtils.mkdir_p(dir)
+        elsif !File.directory?(dir)
+          raise SitemapError.new("#{dir} should be a directory!")
+        end
 
         open(self.full_path, 'wb') do |file|
           gz = Zlib::GzipWriter.new(file)

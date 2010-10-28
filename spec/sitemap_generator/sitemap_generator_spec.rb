@@ -37,7 +37,7 @@ describe "SitemapGenerator" do
     end
 
     it "should not overwrite config/sitemap.rb" do
-      sitemap_file = File.join(File.dirname(__FILE__), '/sitemap.file')
+      sitemap_file = File.join(SitemapGenerator.root, 'spec/sitemap.file')
       files_should_be_identical(sitemap_file, rails_path('/config/sitemap.rb'))
     end
   end
@@ -82,6 +82,42 @@ describe "SitemapGenerator" do
     end
   end
 
+  context "sitemap path" do
+    before :each do
+      ::SitemapGenerator::Sitemap.default_host = 'http://test.local'
+      FileUtils.rm_r(rails_path('/public/sitemaps'))
+    end
+
+    it "should support setting a sitemap path" do
+      directory_should_not_exist(rails_path('/public/sitemaps/'))
+
+      sm = ::SitemapGenerator::Sitemap
+      sm.sitemaps_path = '/sitemaps'
+      sm.create do
+        add '/'
+        add '/another'
+      end
+
+      file_should_exist(rails_path('/public/sitemaps/sitemap_index.xml.gz'))
+      file_should_exist(rails_path('/public/sitemaps/sitemap1.xml.gz'))
+    end
+
+    it "should support setting a sitemap path" do
+      directory_should_not_exist(rails_path('/public/sitemaps/deep/directory'))
+
+      sm = ::SitemapGenerator::Sitemap
+      sm.sitemaps_path = '/sitemaps/deep/directory/'
+      sm.create do
+        add '/'
+        add '/another'
+        add '/yet-another'
+      end
+
+      file_should_exist(rails_path('/public/sitemaps/deep/directory/sitemap_index.xml.gz'))
+      file_should_exist(rails_path('/public/sitemaps/deep/directory/sitemap1.xml.gz'))
+    end
+  end
+
   protected
 
   #
@@ -93,7 +129,7 @@ describe "SitemapGenerator" do
   end
 
   def copy_sitemap_file_to_rails_app
-    FileUtils.cp(File.join(File.dirname(__FILE__), '/sitemap.file'), File.join(::Rails.root, '/config/sitemap.rb'))
+    FileUtils.cp(File.join(SitemapGenerator.root, 'spec/sitemap.file'), File.join(::Rails.root, '/config/sitemap.rb'))
   end
 
   def delete_sitemap_file_from_rails_app

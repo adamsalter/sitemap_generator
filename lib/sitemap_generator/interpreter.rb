@@ -11,18 +11,30 @@ module SitemapGenerator
       include ActionController::UrlWriter
     end
 
-    def initialize(sitemap_config_file=nil)
-      sitemap_config_file ||= File.join(::Rails.root, 'config/sitemap.rb')
-      eval(open(sitemap_config_file).read)
+    # Call with a block to evaluate a dynamic config.  The only method exposed for you is
+    # `add` to add a link to the sitemap object attached to this interpreter.
+    #
+    # @param sitemap a sitemap object
+    # @param sitemap_config_file full path to the config file (default is config/sitemap.rb)
+    def initialize(sitemap, sitemap_config_file=nil, &block)
+      @sitemap = sitemap
+      if block_given?
+        instance_eval(&block)
+      else
+        sitemap_config_file ||= File.join(::Rails.root, 'config/sitemap.rb')
+        config = open(sitemap_config_file).read
+        eval(config)
+      end
     end
 
-    # KJV do we need this?  We should be using path_* helpers.
-    # def self.default_url_options(options = nil)
-    #   { :host => SitemapGenerator::Sitemap.default_host }
-    # end
+    def add(*args)
+      @sitemap.add(*args)
+    end
 
+    # Evaluate the sitemap config file in this namespace which includes the
+    # URL helpers.
     def self.run
-      new
+      new(SitemapGenerator::Sitemap)
     end
   end
 end
