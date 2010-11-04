@@ -85,7 +85,7 @@ describe "SitemapGenerator" do
   context "sitemap path" do
     before :each do
       ::SitemapGenerator::Sitemap.default_host = 'http://test.local'
-      FileUtils.rm_r(rails_path('/public/sitemaps'))
+      FileUtils.rm_rf(rails_path('/public/sitemaps'))
     end
 
     it "should support setting a sitemap path" do
