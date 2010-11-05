@@ -57,7 +57,9 @@ module SitemapGenerator
       @public_path = public_path
       @sitemaps_path = sitemaps_path
 
-      @public_path = File.join(::Rails.root, 'public/') if @public_path.nil?
+      if @public_path.nil?
+        @public_path = File.join(::Rails.root, 'public/') rescue 'public/'
+      end
 
       # Default host is not set yet.  Set it on these objects when `add_links` is called
       self.sitemap_index = SitemapGenerator::Builder::SitemapIndexFile.new(@public_path, sitemap_index_path)

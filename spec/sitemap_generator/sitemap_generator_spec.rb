@@ -102,7 +102,7 @@ describe "SitemapGenerator" do
       file_should_exist(rails_path('/public/sitemaps/sitemap1.xml.gz'))
     end
 
-    it "should support setting a sitemap path" do
+    it "should support setting a deeply nested sitemap path" do
       directory_should_not_exist(rails_path('/public/sitemaps/deep/directory'))
 
       sm = ::SitemapGenerator::Sitemap
@@ -118,6 +118,22 @@ describe "SitemapGenerator" do
     end
   end
 
+  context "dependency" do
+    before :each do
+      @rails = Rails
+      Object.send(:remove_const, :Rails)
+    end
+
+    after :each do
+      Object::Rails = @rails
+    end
+    
+    it "should work outside of Rails" do
+      defined?(Rails).should be_nil
+      lambda { ::SitemapGenerator::LinkSet.new }.should_not raise_exception
+    end
+  end
+  
   protected
 
   #
