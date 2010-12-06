@@ -21,8 +21,8 @@ module SitemapGenerator
       if block_given?
         instance_eval(&block)
       else
-        sitemap_config_file ||= ::Rails.root + 'config/sitemap.rb'
-        eval File.read(sitemap_config_file), nil, sitemap_config_file.to_s
+        sitemap_config_file ||= File.join(::Rails.root, 'config/sitemap.rb')
+        eval(File.read(sitemap_config_file), nil, sitemap_config_file.to_s)
       end
     end
 

@@ -118,19 +118,21 @@ describe "SitemapGenerator" do
     end
   end
 
-  context "dependency" do
-    before :each do
-      @rails = Rails
-      Object.send(:remove_const, :Rails)
-    end
+  context "external dependencies" do
+    context "rails" do
+      before :each do
+        @rails = Rails
+        Object.send(:remove_const, :Rails)
+      end
 
-    after :each do
-      Object::Rails = @rails
-    end
+      after :each do
+        Object::Rails = @rails
+      end
     
-    it "should work outside of Rails" do
-      defined?(Rails).should be_nil
-      lambda { ::SitemapGenerator::LinkSet.new }.should_not raise_exception
+      it "should work outside of Rails" do
+        defined?(Rails).should be_nil
+        lambda { ::SitemapGenerator::LinkSet.new }.should_not raise_exception
+      end
     end
   end
   
