@@ -70,7 +70,6 @@ namespace :test do
     desc "Prepare the gem install for testing"
     task :gem do
       ENV["SITEMAP_RAILS"] = 'gem'
-      Helpers.prepare_path(Helpers.local_path('spec/mock_app_gem/vendor/gems/sitemap_generator-1.2.3'))
       rm_rf(Helpers.local_path('spec/mock_app_gem/public/sitemap*'))
     end
 
