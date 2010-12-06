@@ -1,5 +1,6 @@
 ENV["RAILS_ENV"] ||= 'test'
-ENV['BUNDLE_GEMFILE'] = File.join(File.dirname(__FILE__), 'mock_rails3_gem', 'Gemfile')
+# TODO Fix Rails 3
+#ENV['BUNDLE_GEMFILE'] = File.join(File.dirname(__FILE__), 'mock_rails3_gem', 'Gemfile')
 
 sitemap_rails =
   case ENV["SITEMAP_RAILS"]
@@ -30,6 +31,7 @@ end
 Dir[File.expand_path(File.join(File.dirname(__FILE__),'support','**','*.rb'))].each {|f| require f}
 
 Spec::Runner.configure do |config|
+  config.mock_with :mocha
   config.include(FileMacros)
   config.include(XmlMacros)
 end
