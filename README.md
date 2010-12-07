@@ -18,6 +18,7 @@ Features
 Changelog
 -------
 
+- v1.3.0: Support setting the sitemaps path
 - v1.2.0: Verified working with Rails 3 stable release
 - v1.1.0: [Video sitemap][sitemap_video] support
 - v0.2.6: [Image Sitemap][sitemap_images] support
@@ -70,9 +71,9 @@ You don't need to include the tasks in your `Rakefile` because the tasks are loa
 Usage
 ======
 
-<code>rake sitemap:install</code> creates a <tt>config/sitemap.rb</tt> file which will contain your logic for generating the Sitemap files.
+<code>rake sitemap:install</code> creates a <tt>config/sitemap.rb</tt> file which contains your logic for generating the Sitemap files.
 
-Once you have configured your sitemap in <tt>config/sitemap.rb</tt> run <code>rake sitemap:refresh</code> as needed to create/rebuild your Sitemap files.  Sitemaps are generated into the <tt>public/</tt> folder and are named <tt>sitemap_index.xml.gz</tt>, <tt>sitemap1.xml.gz</tt>, <tt>sitemap2.xml.gz</tt>, etc.
+Once you have configured your sitemap in <tt>config/sitemap.rb</tt> (see Configuration below) run <code>rake sitemap:refresh</code> as needed to create/rebuild your Sitemap files.  Sitemaps are generated into the <tt>public/</tt> folder and are named <tt>sitemap_index.xml.gz</tt>, <tt>sitemap1.xml.gz</tt>, <tt>sitemap2.xml.gz</tt>, etc.
 
 Using <code>rake sitemap:refresh</code> will notify major search engines to let them know that a new Sitemap is available (Google, Yahoo, Bing, Ask, SitemapWriter).  To generate new Sitemaps without notifying search engines (for example when running in a local environment) use <code>rake sitemap:refresh:no_ping</code>.
 
@@ -99,21 +100,100 @@ You should add the Sitemap index file to <code>public/robots.txt</code> to help 
 
     Sitemap: http://www.example.org/sitemap_index.xml.gz
 
-Image and Video Sitemaps
+Image Sitemaps
 -----------
 
 Images can be added to a sitemap URL by passing an <tt>:images</tt> array to <tt>add()</tt>.  Each item in the array must be a Hash containing tags defined by the [Image Sitemap][image_tags] specification.  For example:
 
     sitemap.add('/index.html', :images => [{ :loc => 'http://www.example.com/image.png', :title => 'Image' }])
 
+Supported image options include:
+
+* `loc` Required, location of the image
+* `caption`
+* `geo_location`
+* `title`
+* `license`
+
+Video Sitemaps
+-----------
+
 A video can be added to a sitemap URL by passing a <tt>:video</tt> Hash to <tt>add()</tt>.  The Hash can contain tags defined by the [Video Sitemap specification][video_tags].  To associate more than one <tt>tag</tt> with a video, pass the tags as an array with the key <tt>:tags</tt>.
 
     sitemap.add('/index.html', :video => { :thumbnail_loc => 'http://www.example.com/video1_thumbnail.png', :title => 'Title', :description => 'Description', :content_loc => 'http://www.example.com/cool_video.mpg', :tags => %w[one two three], :category => 'Category' })
 
-Example <code>config/sitemap.rb</code>
+Supported video options include:
+
+* `thumbnail_loc` Required
+* `title` Required
+* `description` Required
+* `content_loc` Depends.  At least one of `player_loc` or `content_loc` is required
+* `player_loc` Depends. At least one of `player_loc` or `content_loc` is required
+* `expiration_date` Recommended
+* `duration` Recommended
+* `rating`
+* `view_count`
+* `publication_date`
+* `family_friendly`
+* `tags` A list of tags if more than one tag.
+* `tag` A single tag.  See `tags`
+* `category`
+* `gallery_loc`
+    
+Configuration
+======
+
+The sitemap configuration file can be found in <tt>config/sitemap.rb</tt>.  When you run a rake task to refresh your sitemaps this file is evaluated.  It contains all your configuration settings, as well as your sitemap definition.
+
+Sitemap Links
+----------
+
+The Root Path <tt>/</tt> and Sitemap Index file are automatically added to your sitemap.  Links are added to the Sitemap output in the order they are specified.  Add links to your sitemap by calling <tt>add_links</tt>, passing a black which receives the sitemap object.  Then call <tt>add(path, options)</tt> on the sitemap to add a link.
+
+For Example:
+
+    SitemapGenerator::Sitemap.add_links do |sitemap|
+      sitemap.add '/reports'
+    end
+
+The Rails URL helpers are automatically included for you if Rails is detected.  So in your call to <tt>add</tt> you can use them to generate paths for your active records, e.g.:
+
+    Article.find_each do |article|
+      sitemap.add article_path(article), :lastmod => article.updated_at
+    end
+
+For large sitemaps it is advisable to iterate through your Active Records in batches to avoid loading all records into memory at once.  As of Rails 2.3.2 you can use <tt>ActiveRecord::Base#find_each</tt> or <tt>ActiveRecord::Base#find_in_batches</tt> to do batched finds, which can significantly improve sitemap performance.
+
+Valid [options to <tt>add</tt>](http://sitemaps.org/protocol.php#xmlTagDefinitions) are:
+
+* `priority`  The priority of this URL relative to other URLs on your site. Valid values range from 0.0 to 1.0.  Default _0.5_
+* `changefreq`  One of: always, hourly, daily, weekly, monthly, yearly, never. Default _weekly_
+* `lastmod` Time instance. The date of last modification.  Default `Time.now`
+* `host` Optional host for the link's URL.  Defaults to `default_host`
+    
+Sitemaps Path
+----------
+
+By default sitemaps are generated into <tt>public/</tt>.  You can customize the location for your generated sitemaps by setting <tt>sitemaps_path</tt> to a path relative to your public directory.  The directory will be created for you if it does not already exist.
+
+For example:
+
+    SitemapGenerator::Sitemap.sitemaps_path = 'sitemaps/'
+
+Will generate sitemaps into the `public/sitemaps/` directory.  If you want your sitemaps to be findable by robots, you need to specify the location of your sitemap index file in your <tt>public/robots.txt</tt>.
+
+Sitemaps Host
+----------
+
+You must set the <tt>default_host</tt> that is to be used when adding links to your sitemap.  The hostname should match the host that the sitemaps are going to be served from.  For example:
+
+    SitemapGenerator::Sitemap.default_host = "http://www.example.com"
+
+The hostname must include the full protocol.
+
+Example Configuration File
 ---------
 
-    # Set the host name for URL creation
     SitemapGenerator::Sitemap.default_host = "http://www.example.com"
     SitemapGenerator::Sitemap.yahoo_app_id = nil # Set to your Yahoo AppID to ping Yahoo
 
@@ -145,18 +225,6 @@ Example <code>config/sitemap.rb</code>
         sitemap.add news_path(news), :images => images
       end
     end
-
-    # Including Sitemaps from Rails Engines.
-    #
-    # These Sitemaps should be almost identical to a regular Sitemap file except
-    # they needn't define their own SitemapGenerator::Sitemap.default_host since
-    # they will undoubtedly share the host name of the application they belong to.
-    #
-    # As an example, say we have a Rails Engine in vendor/plugins/cadability_client
-    # We can include its Sitemap here as follows:
-    #
-    file = File.join(Rails.root, 'vendor/plugins/cadability_client/config/sitemap.rb')
-    eval(open(file).read, binding, file)
 
 Raison d'être
 -------
@@ -197,16 +265,7 @@ Tested and working on:
 Notes
 =======
 
-1) For large sitemaps it may be useful to split your generation into batches to avoid running out of memory. E.g.:
-
-    # add movies
-    Movie.find_in_batches(:batch_size => 1000) do |movies|
-      movies.each do |movie|
-        sitemap.add "/movies/show/#{movie.to_param}", :lastmod => movie.updated_at, :changefreq => 'weekly'
-      end
-    end
-
-2) New Capistrano deploys will remove your Sitemap files, unless you run `rake sitemap:refresh`. The way around this is to create a cap task:
+1) New Capistrano deploys will remove your Sitemap files, unless you run `rake sitemap:refresh`. The way around this is to create a cap task to copy the sitemaps from the previous deploy:
 
     after "deploy:update_code", "deploy:copy_old_sitemap"
 
@@ -225,11 +284,8 @@ Known Bugs
 Wishlist & Coming Soon
 ========
 
-- Ultimately I'd like to make this gem framework agnostic.  It is better suited to being run as a command-line tool as opposed to Ruby-specific Rake tasks.
-- Add rake tasks/options to validate the generated sitemaps.
-- Support News, Mobile, Geo and other types of sitemaps
-- Support for generating sitemaps for sites with multiple domains.  Sitemaps can be generated into subdirectories and we can use Rack middleware to rewrite requests for sitemaps to the correct subdirectory based on the request host.
-- Auto coverage testing.  Generate a report of broken URLs by checking the status codes of each page in the sitemap.
+- Support for read-only filesystems
+- Support for plain Ruby and Merb sitemaps
 
 Thanks (in no particular order)
 ========

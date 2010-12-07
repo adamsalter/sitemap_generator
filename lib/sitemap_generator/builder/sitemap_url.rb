@@ -64,7 +64,6 @@ module SitemapGenerator
               builder.video :view_count, video[:view_count]             if video[:view_count]
               builder.video :publication_date, video[:publication_date] if video[:publication_date]
               builder.video :expiration_date, video[:expiration_date]   if video[:expiration_date]
-              builder.video :duration, video[:duration]                 if video[:duration]
               builder.video :family_friendly, (video[:family_friendly] ? 'yes' : 'no')  if video[:family_friendly]
               builder.video :duration, video[:duration]                 if video[:duration]
               video[:tags].each {|tag| builder.video :tag, tag }        if video[:tags]
