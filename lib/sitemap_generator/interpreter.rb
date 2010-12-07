@@ -1,3 +1,5 @@
+require 'sitemap_generator'
+
 module SitemapGenerator
 
   # Evaluate a sitemap config file within the context of a class that includes the

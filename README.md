@@ -36,37 +36,37 @@ The canonical repository is now: [http://github.com/kjvarga/sitemap_generator][c
 Install
 =======
 
-**Rails 3.x:**
+**Rails 3:**
 
-1. Add the gem to your <tt>Gemspec</tt>
+1. Add the gem to your `Gemfile`
 
-    <code>gem 'sitemap_generator'</code>
+      gem 'sitemap_generator'
 
 2. `$ rake sitemap:install`
 
 You don't need to include the tasks in your `Rakefile` because the tasks are loaded for you.
 
-**Rails 2.x: As a gem**
+**Pre Rails 3: As a gem**
 
 1. Add the gem as a dependency in your <tt>config/environment.rb</tt>
 
-    <code>config.gem 'sitemap_generator', :lib => false</code>
+      config.gem 'sitemap_generator', :lib => false
 
 2. `$ rake gems:install`
 
-3. Add the following to your <tt>RAILS_ROOT/Rakefile</tt>
+3. Add the following to your `Rakefile`
 
-    <pre>begin
-      require 'sitemap_generator/tasks'
-    rescue Exception => e
-      puts "Warning, couldn't load gem tasks: #{e.message}! Skipping..."
-    end</pre>
+      begin
+        require 'sitemap_generator/tasks'
+      rescue Exception => e
+        puts "Warning, couldn't load gem tasks: #{e.message}! Skipping..."
+      end
 
 4. `$ rake sitemap:install`
 
-**Rails 2.x: As a plugin**
+**Pre Rails 3: As a plugin**
 
-1. <code>$ ./script/plugin install git://github.com/kjvarga/sitemap_generator.git</code>
+1. `$ ./script/plugin install git://github.com/kjvarga/sitemap_generator.git`
 
 Usage
 ======

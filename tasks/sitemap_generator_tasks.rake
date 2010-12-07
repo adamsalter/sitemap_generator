@@ -1,26 +1,18 @@
-environment = begin
-
-  # Try to require the library.  If we are installed as a gem, this should work.
-  # We don't need to load the environment.
-  require 'sitemap_generator'
-  []
-
-rescue LoadError
-
-  # We must be installed as a plugin.  Make sure the environment is loaded
-  # when running all rake tasks.
-  [:environment]
-
-end
-
 namespace :sitemap do
+  # Require sitemap_generator at runtime.  If we don't do this the ActionView helpers are included
+  # before the Rails environment can be loaded by other Rake tasks, which causes problems 
+  # for those tasks when rendering using ActionView.
+  task :require do
+    require 'sitemap_generator'
+  end
+
   desc "Install a default config/sitemap.rb file"
-  task :install => environment do
+  task :install => ['sitemap:require'] do
     SitemapGenerator::Utilities.install_sitemap_rb(verbose)
   end
 
   desc "Delete all Sitemap files in public/ directory"
-  task :clean => environment do
+  task :clean => ['sitemap:require'] do
     SitemapGenerator::Utilities.clean_files
   end
 
@@ -32,7 +24,9 @@ namespace :sitemap do
   desc "Create Sitemap XML files (don't ping search engines)"
   task 'refresh:no_ping' => ['sitemap:create']
 
-  task :create => [:environment] do
+  # Require sitemap_generator to handle the case that we are installed as a gem and are set to not
+  # automatically be required.  If the library has already been required, this is harmless.
+  task :create => [:environment, 'sitemap:require'] do
     SitemapGenerator::Sitemap.verbose = verbose
     SitemapGenerator::Sitemap.create
   end
