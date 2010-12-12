@@ -15,6 +15,7 @@ module SitemapGenerator
     #
     class SitemapFile
       include ActionView::Helpers::NumberHelper
+      include ActionView::Helpers::TextHelper   # Rails 2.2.2 fails with missing 'pluralize' otherwise
       attr_accessor :sitemap_path, :public_path, :filesize, :link_count, :hostname
 
       # <tt>public_path</tt> full path of the directory to write sitemaps in.
