@@ -31,6 +31,8 @@ module SitemapGenerator
     # @return [Boolean]
     def self.rails3?
       Rails.version.to_f >= 3
+    rescue
+      false  # Rails.version defined in 2.1.0
     end
   end
 end
