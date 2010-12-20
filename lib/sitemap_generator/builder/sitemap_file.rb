@@ -76,7 +76,7 @@ module SitemapGenerator
       # If a link cannot be added, for example if the file is too large or the link
       # limit has been reached, a SitemapGenerator::SitemapFullError exception is raised.
       #
-      # If the Sitemap has already been finalized a SitemapGenerator::SitemapFinalized
+      # If the Sitemap has already been finalized a SitemapGenerator::SitemapFinalizedError
       # exception is raised.
       #
       # Call with:
@@ -91,7 +91,7 @@ module SitemapGenerator
         end
 
         if self.finalized?
-          raise SitemapGenerator::SitemapFinalized
+          raise SitemapGenerator::SitemapFinalizedError
         elsif !file_can_fit?(bytesize(xml))
           raise SitemapGenerator::SitemapFullError
         end
@@ -108,10 +108,10 @@ module SitemapGenerator
       # All the xml content in the instance is cleared, but attributes like
       # <tt>filesize</tt> are still available.
       #
-      # A SitemapGenerator::SitemapFinalized exception is raised if the Sitemap
+      # A SitemapGenerator::SitemapFinalizedError exception is raised if the Sitemap
       # has already been finalized
       def finalize!
-        raise SitemapGenerator::SitemapFinalized if self.finalized?
+        raise SitemapGenerator::SitemapFinalizedError if self.finalized?
 
         # Ensure that the directory exists
         dir = File.dirname(self.full_path)
