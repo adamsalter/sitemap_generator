@@ -1,7 +1,3 @@
-ENV["RAILS_ENV"] ||= 'test'
-# TODO Fix Rails 3
-#ENV['BUNDLE_GEMFILE'] = File.join(File.dirname(__FILE__), 'mock_rails3_gem', 'Gemfile')
-
 sitemap_rails =
   case ENV["SITEMAP_RAILS"]
   when 'rails3'
@@ -12,19 +8,11 @@ sitemap_rails =
     "mock_app_gem"
   end
 
+ENV["RAILS_ENV"] ||= 'test'
+ENV['BUNDLE_GEMFILE'] = File.join(File.dirname(__FILE__), sitemap_rails, 'Gemfile')
+
 # Load the app's Rakefile so we know everything is being loaded correctly
 load(File.join(File.dirname(__FILE__), sitemap_rails, 'Rakefile'))
-
-require 'rubygems'
-begin
-  case RUBY_VERSION
-  when '1.9.1'
-    require 'ruby-debug19'
-  else
-    require 'ruby-debug'
-  end
-rescue Exception => e
-end
 
 # Requires supporting files with custom matchers and macros, etc,
 # in ./support/ and its subdirectories.

@@ -1,4 +1,3 @@
-require 'builder'
 require 'zlib'
 require 'action_view' # for number_to_human_size
 require 'fileutils'

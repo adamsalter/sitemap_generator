@@ -1,8 +1,9 @@
+require "rubygems"
+require "bundler/setup"
 require 'rake'
 require 'rake/rdoctask'
-require 'rubygems'
-gem 'rspec', '1.3.0'
 require 'spec/rake/spectask'
+require 'sitemap_generator/tasks'
 
 begin
   require 'jeweler'
@@ -18,6 +19,9 @@ begin
     gem.add_development_dependency "rspec"
     gem.add_development_dependency "nokogiri"
     gem.add_development_dependency "sqlite3-ruby"
+    gem.add_development_dependency "jeweler"
+    gem.add_development_dependency "github"
+    gem.add_development_dependency "git"
   end
   Jeweler::GemcutterTasks.new
 rescue LoadError
