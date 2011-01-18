@@ -14,6 +14,8 @@ describe "SitemapGenerator" do
     description = 'An new perspective in cool video technology'
     tags = %w{tag1 tag2 tag3}
     category = 'cat1'
+    uploader = 'sokrates'
+    uploader_info = 'http://sokrates.example.com'
     
     video_xml_fragment = SitemapGenerator::Builder::SitemapUrl.new('cool_video.html', {
       :host => 'http://www.example.com',
@@ -27,7 +29,9 @@ describe "SitemapGenerator" do
         :allow_embed => allow_embed,
         :autoplay => autoplay,
         :tags => tags,
-        :category => category
+        :category => category,
+        :uploader => uploader,
+        :uploader_info => uploader_info
       }
     }).to_xml
 
@@ -55,5 +59,8 @@ describe "SitemapGenerator" do
     player_loc_node.text.should == player_loc
     player_loc_node.attribute('allow_embed').text.should == (allow_embed ? 'yes' : 'no')
     player_loc_node.attribute('autoplay').text.should == autoplay
+    
+    video.xpath("video:uploader").text.should == uploader
+    video.xpath("video:uploader").attribute("info").text.should == uploader_info
   end
 end

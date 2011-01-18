@@ -50,9 +50,48 @@
   </xsd:restriction>
 </xsd:simpleType>
 
+<xsd:simpleType name="tNonNegativeDecimal">
+  <xsd:restriction base="xsd:decimal">
+    <xsd:minInclusive value="0"/>
+  </xsd:restriction>
+</xsd:simpleType>
+
 <xsd:element name="video">
   <xsd:complexType>
     <xsd:sequence>
+      <xsd:element name="thumbnail_loc" type="xsd:anyURI">
+        <xsd:annotation>
+          <xsd:documentation>
+            A URL pointing to the URL for the video thumbnail image file. We can
+            accept most image sizes/types but recommend your thumbs are at least
+            120x90 pixels in .jpg, .png, or. gif formats.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="title">
+        <xsd:annotation>
+          <xsd:documentation>
+            The title of the video.
+          </xsd:documentation>
+        </xsd:annotation>
+        <xsd:simpleType>
+          <xsd:restriction base="xsd:string">
+            <xsd:maxLength value="100"/>
+          </xsd:restriction>
+        </xsd:simpleType>
+      </xsd:element>
+      <xsd:element name="description">
+        <xsd:annotation>
+          <xsd:documentation>
+            The description of the video.
+          </xsd:documentation>
+        </xsd:annotation>
+        <xsd:simpleType>
+          <xsd:restriction base="xsd:string">
+            <xsd:maxLength value="2048"/>
+          </xsd:restriction>
+        </xsd:simpleType>
+      </xsd:element>
       <xsd:element name="content_loc" minOccurs="0" type="xsd:anyURI">
         <xsd:annotation>
           <xsd:documentation>
@@ -109,37 +148,37 @@
           </xsd:simpleContent>
         </xsd:complexType>
       </xsd:element>
-      <xsd:element name="thumbnail_loc" type="xsd:anyURI">
+      <xsd:element name="duration" minOccurs="0">
         <xsd:annotation>
           <xsd:documentation>
-            A URL pointing to the URL for the video thumbnail image file. We can
-            accept most image sizes/types but recommend your thumbs are at least
-            120x90 pixels in .jpg, .png, or. gif formats.
-          </xsd:documentation>
-        </xsd:annotation>
-      </xsd:element>
-      <xsd:element name="title">
-        <xsd:annotation>
-          <xsd:documentation>
-            The title of the video.
+            The duration of the video in seconds.
           </xsd:documentation>
         </xsd:annotation>
         <xsd:simpleType>
-          <xsd:restriction base="xsd:string">
-            <xsd:maxLength value="100"/>
+          <xsd:restriction base="xsd:nonNegativeInteger">
+            <xsd:maxInclusive value="28800"/>
           </xsd:restriction>
         </xsd:simpleType>
       </xsd:element>
-      <xsd:element name="description">
+      <xsd:element name="expiration_date" minOccurs="0">
         <xsd:annotation>
           <xsd:documentation>
-            The description of the video.
+            The date after which the video will no longer be available, in
+            W3C format. Acceptable values are complete date (YYYY-MM-DD) and
+            complete date plus hours, minutes and seconds, and timezone
+            (YYYY-MM-DDThh:mm:ss+TZD). For example, 2007-07-16T19:20:30+08:00.
+            Don't supply this information if your video does not expire.
           </xsd:documentation>
         </xsd:annotation>
         <xsd:simpleType>
-          <xsd:restriction base="xsd:string">
-            <xsd:maxLength value="2048"/>
-          </xsd:restriction>
+          <xsd:union>
+            <xsd:simpleType>
+              <xsd:restriction base="xsd:date"/>
+            </xsd:simpleType>
+            <xsd:simpleType>
+              <xsd:restriction base="xsd:dateTime"/>
+            </xsd:simpleType>
+          </xsd:union>
         </xsd:simpleType>
       </xsd:element>
       <xsd:element name="rating" minOccurs="0">
@@ -154,6 +193,43 @@
             <xsd:maxInclusive value="5"/>
           </xsd:restriction>
         </xsd:simpleType>
+      </xsd:element>
+      <xsd:element name="content_segment_loc"
+          minOccurs="0"
+          maxOccurs="unbounded">
+        <xsd:annotation>
+          <xsd:documentation>
+            Use &lt;video:content_segment_loc&gt; only in conjunction with
+            &lt;video:player_loc&gt;.
+
+            If you publish your video as a series of raw videos (for example, if
+            you submit a full movie as a continuous series of shorter clips),
+            you can use the &lt;video:content_segment_loc&gt; to supply us with
+            a series of URLs, in the order in which they should be concatenated
+            to recreate the video in its entirety. Each URL should point to a
+            .mpg, .mpeg, .mp4, .m4v, .mov, .wmv, .asf, .avi, .ra, .ram, .rm,
+            .flv, or other video file format. It should not point to any Flash
+            content.
+          </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType>
+          <xsd:simpleContent>
+            <xsd:extension base="xsd:anyURI">
+              <xsd:attribute name="duration">
+                <xsd:annotation>
+                  <xsd:documentation>
+                    The duration of the clip in seconds.
+                  </xsd:documentation>
+                </xsd:annotation>
+                <xsd:simpleType>
+                  <xsd:restriction base="xsd:nonNegativeInteger">
+                    <xsd:maxInclusive value="28800"/>
+                  </xsd:restriction>
+                </xsd:simpleType>
+              </xsd:attribute>
+            </xsd:extension>
+          </xsd:simpleContent>
+        </xsd:complexType>
       </xsd:element>
       <xsd:element name="view_count"
           minOccurs="0"
@@ -184,27 +260,6 @@
           </xsd:union>
         </xsd:simpleType>
       </xsd:element>
-      <xsd:element name="expiration_date" minOccurs="0">
-        <xsd:annotation>
-          <xsd:documentation>
-            The date after which the video will no longer be available, in
-            W3C format. Acceptable values are complete date (YYYY-MM-DD) and
-            complete date plus hours, minutes and seconds, and timezone
-            (YYYY-MM-DDThh:mm:ss+TZD). For example, 2007-07-16T19:20:30+08:00.
-            Don't supply this information if your video does not expire.
-          </xsd:documentation>
-        </xsd:annotation>
-        <xsd:simpleType>
-          <xsd:union>
-            <xsd:simpleType>
-              <xsd:restriction base="xsd:date"/>
-            </xsd:simpleType>
-            <xsd:simpleType>
-              <xsd:restriction base="xsd:dateTime"/>
-            </xsd:simpleType>
-          </xsd:union>
-        </xsd:simpleType>
-      </xsd:element>
       <xsd:element name="tag" type="xsd:string" minOccurs="0" maxOccurs="32">
         <xsd:annotation>
           <xsd:documentation>
@@ -222,9 +277,8 @@
         <xsd:annotation>
           <xsd:documentation>
             The video's category. For example, cooking. In general, categories
-            are broad groupings of content by subject. Usually a video will
-            belong to a single category. For example, a site about cooking could
-            have categories for Broiling, Baking, and Grilling.
+            are broad groupings of content by subject. For example, a site about
+            cooking could have categories for Broiling, Baking, and Grilling.
           </xsd:documentation>
         </xsd:annotation>
         <xsd:simpleType>
@@ -240,18 +294,6 @@
             video should be available only to users with SafeSearch turned off.
           </xsd:documentation>
         </xsd:annotation>
-      </xsd:element>
-      <xsd:element name="duration" minOccurs="0">
-        <xsd:annotation>
-          <xsd:documentation>
-            The duration of the video in seconds.
-          </xsd:documentation>
-        </xsd:annotation>
-        <xsd:simpleType>
-          <xsd:restriction base="xsd:nonNegativeInteger">
-            <xsd:maxInclusive value="28800"/>
-          </xsd:restriction>
-        </xsd:simpleType>
       </xsd:element>
       <xsd:element name="restriction" minOccurs="0">
         <xsd:annotation>
@@ -285,9 +327,8 @@
       <xsd:element name="gallery_loc" minOccurs="0">
         <xsd:annotation>
           <xsd:documentation>
-            A link to the gallery (collection of videos) in which this video appears.
-            Only one video:gallery_loc tag can be listed for each video. The value
-            of the optional attribute title indicates the title of the gallery.
+            A link to the gallery (collection of videos) in which this video
+            appears.
           </xsd:documentation>
         </xsd:annotation>
         <xsd:complexType>
@@ -296,14 +337,71 @@
               <xsd:attribute name="title" type="xsd:string">
                 <xsd:annotation>
                   <xsd:documentation>
-                    Optional title of the gallery
+                    The title of the gallery.
                   </xsd:documentation>
                 </xsd:annotation>
               </xsd:attribute>
             </xsd:extension>
           </xsd:simpleContent>
         </xsd:complexType>
-      </xsd:element>      
+      </xsd:element>
+      <xsd:element name="price" minOccurs="0" maxOccurs="unbounded">
+        <xsd:annotation>
+          <xsd:documentation>
+            The price to download or view the video. More than one
+            &lt;video:price&gt; element can be listed (for example, in order to
+            specify various currencies).
+          </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType>
+          <xsd:simpleContent>
+            <xsd:extension base="tNonNegativeDecimal">
+              <xsd:attribute name="currency" use="required">
+                <xsd:annotation>
+                  <xsd:documentation>
+                    The currency in ISO 4217 format.
+                  </xsd:documentation>
+                </xsd:annotation>
+                <xsd:simpleType>
+                  <xsd:restriction base="xsd:string">
+                    <xsd:pattern value="[A-Z]{3}"/>
+                  </xsd:restriction>
+                </xsd:simpleType>
+              </xsd:attribute>
+            </xsd:extension>
+          </xsd:simpleContent>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="requires_subscription" minOccurs="0" type="tYesNo">
+        <xsd:annotation>
+          <xsd:documentation>
+            Indicates whether a subscription (either paid or free) is required
+            to view the video.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="uploader" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            A name or handle of the video’s uploader.
+          </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType>
+          <xsd:simpleContent>
+            <xsd:extension base="xsd:string">
+              <xsd:attribute name="info" type="xsd:anyURI">
+                <xsd:annotation>
+                  <xsd:documentation>
+                    The URL of a webpage with additional information about this
+                    uploader. This URL must be on the same domain as the
+                    &lt;loc&gt; tag.
+                  </xsd:documentation>
+                </xsd:annotation>
+              </xsd:attribute>
+            </xsd:extension>
+          </xsd:simpleContent>
+        </xsd:complexType>
+      </xsd:element>
     </xsd:sequence>
   </xsd:complexType>
 </xsd:element>

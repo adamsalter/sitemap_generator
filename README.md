@@ -139,6 +139,7 @@ Supported video options include:
 * `tag` A single tag.  See `tags`
 * `category`
 * `gallery_loc`
+* `uploader` (use `uploader_info` to set the info attribute)
     
 Configuration
 ======
