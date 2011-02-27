@@ -14,7 +14,7 @@ module SitemapGenerator
           path = path.sitemap_path
         end
 
-        options.assert_valid_keys(:priority, :changefreq, :lastmod, :host, :images, :video)
+        options.assert_valid_keys(:priority, :changefreq, :lastmod, :host, :images, :video, :geo)
         options.reverse_merge!(:priority => 0.5, :changefreq => 'weekly', :lastmod => Time.now, :host => Sitemap.default_host, :images => [])
         self.merge!(
           :path => path,
@@ -24,7 +24,8 @@ module SitemapGenerator
           :host => options[:host],
           :loc => URI.join(options[:host], path).to_s,
           :images => prepare_images(options[:images], options[:host]),
-          :video => options[:video]
+          :video => options[:video],
+          :geo => options[:geo]
         )
       end
 
@@ -74,6 +75,13 @@ module SitemapGenerator
               if video[:uploader]
                 builder.video :uploader, video[:uploader], video[:uploader_info] ? { :info => video[:uploader_info] } : {}
               end
+            end
+          end
+
+          unless self[:geo].blank?
+            geo = self[:geo]
+            builder.geo :geo do
+              builder.geo :format, geo[:format] if geo[:format]
             end
           end
         end

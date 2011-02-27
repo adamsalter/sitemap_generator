@@ -6,7 +6,7 @@ SitemapGenerator generates Sitemaps for your Rails application.  The Sitemaps ad
 Features
 -------
 
-- Supports [Video sitemaps][sitemap_video] and [Image sitemaps][sitemap_images]
+- Supports [Video sitemaps][sitemap_video], [Image sitemaps][sitemap_images], and [Geo sitemaps][geo_tags]
 - Rails 2.x and 3.x compatible
 - Adheres to the [Sitemap 0.9 protocol][sitemap_protocol]
 - Handles millions of links
@@ -18,6 +18,7 @@ Features
 Changelog
 -------
 
+- v1.4.0: [Geo sitemap][geo_tags] support, support for generate multiple sitemap sets with different filenames
 - v1.3.0: Support setting the sitemaps path
 - v1.2.0: Verified working with Rails 3 stable release
 - v1.1.0: [Video sitemap][sitemap_video] support
@@ -140,6 +141,17 @@ Supported video options include:
 * `category`
 * `gallery_loc`
 * `uploader` (use `uploader_info` to set the info attribute)
+
+Geo Sitemaps
+-----------
+
+Page with geo data can be added by passing a <tt>:geo</tt> Hash to <tt>add()</tt>.  The Hash only supports one tag of <tt>:format</tt>.  Google provides an [example of a geo sitemap link here][geo_tags].  Note that the sitemap does not actually contain your KML or GeoRSS.  It merely links to a page that has this content.
+
+    sitemap.add('/stores/1234.xml', :geo => { :format => 'kml' })
+
+Supported geo options include:
+
+* `format` Required, either 'kml' or 'georss'
     
 Configuration
 ======
@@ -192,6 +204,15 @@ You must set the <tt>default_host</tt> that is to be used when adding links to y
 
 The hostname must include the full protocol.
 
+Sitemap Filenames
+----------
+
+By default sitemaps have the name <tt>sitemap1.xml.gz</tt>, <tt>sitemap2.xml.gz</tt>, etc with the sitemap index having name <tt>sitemap_index.xml.gz</tt>.
+
+If you want to change the <tt>sitemap</tt> portion of the name you can set it as shown below.  The surrounding structure of numbers, extensions, and _index will stay the same.  For example:
+
+    SitemapGenerator::Sitemap.filename = "geo_sitemap"
+
 Example Configuration File
 ---------
 
@@ -226,6 +247,42 @@ Example Configuration File
         sitemap.add news_path(news), :images => images
       end
     end
+
+Generating Multiple Sets Of Sitemaps
+----------
+
+To generate multiple sets of sitemaps you can create multiple configuration files.  Each should contain a different <tt>SitemapGenerator::Sitemap.filename</tt> to avoid overwriting the previous set. (Of course you can keep the default name of 'sitemap' in one of them.)  You can then build each set with a separate rake task.  For example:
+
+    rake sitemap:refresh
+    rake sitemap:refresh CONFIG_FILE="config/geo_sitemap.rb"
+    
+The first one uses the default config file at <tt>config/sitemap.rb</tt>.  Your first config file might look like this:
+
+    # config/sitemap.rb
+    SitemapGenerator::Sitemap.default_host = "http://www.example.com"
+    SitemapGenerator::Sitemap.add_links do |sitemap|
+      Store.each do |store
+        sitemap.add store_path(store)
+      end
+    end
+
+And the second:
+
+    # config/geo_sitemap.rb
+    SitemapGenerator::Sitemap.filename = "geo_sitemap"
+    SitemapGenerator::Sitemap.default_host = "http://www.example.com"
+    SitemapGenerator::Sitemap.add_links do |sitemap|
+      Store.each do |store
+        sitemap.add "stores/#{store.id}.xml", :geo => { :format => 'kml' }
+      end
+    end
+
+After running both rake tasks you'll have the following files in your <tt>public</tt> directory (or wherever you set the sitemaps_path):
+
+    geo_sitemap_index.xml.gz
+    geo_sitemap1.xml.gz
+    sitemap_index.xml.gz
+    sitemap1.xml.gz
 
 Raison d'être
 -------
@@ -299,6 +356,7 @@ Thanks (in no particular order)
 - [Adrian Mugnolo](http://github.com/xymbol)
 - [Jason Weathered](http://github.com/jasoncodes)
 - [Andy Stewart](http://github.com/airblade)
+- [Brian Armstrong](https://github.com/barmstrong) for geo sitemaps
 
 Copyright (c) 2009 Karl Varga released under the MIT license
 
@@ -312,3 +370,4 @@ Copyright (c) 2009 Karl Varga released under the MIT license
 [sitemap_protocol]:http://sitemaps.org/protocol.php
 [video_tags]:http://www.google.com/support/webmasters/bin/answer.py?hl=en&answer=80472#4
 [image_tags]:http://www.google.com/support/webmasters/bin/answer.py?hl=en&answer=178636
+[geo_tags]:http://www.google.com/support/webmasters/bin/answer.py?hl=en&answer=94555
