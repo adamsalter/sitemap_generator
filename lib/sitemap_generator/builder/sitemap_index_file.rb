@@ -19,7 +19,7 @@ module SitemapGenerator
         HTML
         @xml_wrapper_start.gsub!(/\s+/, ' ').gsub!(/ *> */, '>').strip!
         @xml_wrapper_end   = %q[</sitemapindex>]
-        self.filesize = bytesize(@xml_wrapper_start) + bytesize(@xml_wrapper_end)
+        @filesize = bytesize(@xml_wrapper_start) + bytesize(@xml_wrapper_end)
       end
 
       # Finalize sitemaps as they are added to the index
@@ -40,7 +40,9 @@ module SitemapGenerator
       def summary
         uncompressed_size = number_to_human_size(filesize) rescue "#{filesize / 8} KB"
         compressed_size =   number_to_human_size(File.size?(full_path)) rescue "#{File.size?(full_path) / 8} KB"
-        "+ #{'%-21s' % self.sitemap_path} #{'%10s' % self.link_count} sitemaps / #{'%10s' % uncompressed_size} / #{'%10s' % compressed_size} gzipped"
+        str = "+ #{'%-21s' % self.sitemap_path} #{'%10s' % self.link_count} sitemaps / #{'%10s' % uncompressed_size} / #{'%10s' % compressed_size} gzipped"
+        str += "\nSitemap stats: #{number_with_delimiter(total_link_count)} links / #{sitemaps.size} sitemaps"
+        str += " / %dm%02ds" % opts[:time_taken].divmod(60) if opts[:time_taken]
       end
     end
   end

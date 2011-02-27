@@ -1,15 +1,13 @@
 require 'builder'
-require 'action_view'
 
 # A LinkSet provisions a bunch of links to sitemap files.  It also writes the index file
 # which lists all the sitemap files written.
 module SitemapGenerator
   class LinkSet
-    include ActionView::Helpers::NumberHelper  # for number_with_delimiter
 
     attr_reader :default_host, :public_path, :sitemaps_path, :filename
     attr_accessor :sitemap, :sitemap_index
-    attr_accessor :verbose, :yahoo_app_id
+    attr_accessor :verbose, :yahoo_app_id, :include_default_links
 
     # Evaluate the sitemap config file and write all sitemaps.
     #
@@ -36,18 +34,20 @@ module SitemapGenerator
       end_time = Time.now
 
       if verbose
-        puts self.sitemap_index.summary
-        puts "\nSitemap stats: #{number_with_delimiter(self.sitemap_index.total_link_count)} links / #{self.sitemap_index.sitemaps.size} sitemaps / " +
-              ("%dm%02ds" % (end_time - start_time).divmod(60))
+        puts self.sitemap_index.summary(:time_taken => end_time - start_time)
       end
     end
 
     # Constructor
     #
-    # <tt>public_path</tt> (optional) full path to the directory to write sitemaps in.
+    # Arguments:
+    #
+    # Options hash containing any of:
+    #
+    # <tt>public_path</tt> full path to the directory to write sitemaps in.
     #   Defaults to your Rails <tt>public/</tt> directory.
     #
-    # <tt>sitemaps_path</tt> (optional) path fragment within public to write sitemaps
+    # <tt>sitemaps_path</tt> path fragment within public to write sitemaps
     #   to e.g. 'en/'.  Sitemaps are written to <tt>public_path</tt> + <tt>sitemaps_path</tt>
     #
     # <tt>default_host</tt> hostname including protocol to use in all sitemap links
@@ -55,15 +55,25 @@ module SitemapGenerator
     #
     # <tt>filename</tt> used in the name of the file like "#{@filename}1.xml.gzip" and "#{@filename}_index.xml.gzip"
     #   Defaults to <tt>sitemap</tt>
-    def initialize(public_path = nil, sitemaps_path = nil, default_host = nil, filename = 'sitemap')
-      @default_host = default_host
-      @public_path = public_path
-      @sitemaps_path = sitemaps_path
-      @filename = filename
+    def initialize(*args)
 
-      if @public_path.nil?
-        @public_path = File.join(::Rails.root, 'public/') rescue 'public/'
+      # Extract options
+      options = if (!args.first.nil? && !args.first.is_a?(Hash)) || args.size > 1
+        warn "Deprecated. Please call with an options hash instead."
+        [:public_path, :sitemaps_path, :default_host, :filename].each_with_index.inject({}) do |hash, arg|
+          hash[arg[0]] = args[arg[1]]
+          hash
+        end
+      else
+        args.first || {}
       end
+
+      options.reverse_merge!({
+        :include_default_links => true,
+        :filename => :sitemap,
+        :public_path => (File.join(::Rails.root, 'public/') rescue 'public/')
+      })
+      options.each_pair { |k, v| instance_variable_set("@#{k}".to_sym, v) }
 
       # Default host is not set yet.  Set it on these objects when `add_links` is called
       self.sitemap_index = SitemapGenerator::Builder::SitemapIndexFile.new(@public_path, sitemap_index_path)
@@ -81,8 +91,10 @@ module SitemapGenerator
 
       # Set default host on the sitemap objects and seed the sitemap with the default links
       self.sitemap.hostname = self.sitemap_index.hostname = default_host
-      self.sitemap.add('/', :lastmod => Time.now, :changefreq => 'always', :priority => 1.0)
-      self.sitemap.add(self.sitemap_index, :lastmod => Time.now, :changefreq => 'always', :priority => 1.0)
+      if include_default_links
+        self.sitemap.add('/', :lastmod => Time.now, :changefreq => 'always', :priority => 1.0)
+        self.sitemap.add(self.sitemap_index, :lastmod => Time.now, :changefreq => 'always', :priority => 1.0)
+      end
 
       yield self
     end
