@@ -96,7 +96,7 @@ task :test => ['test:gem']
 
 Spec::Rake::SpecTask.new(:spec) do |spec|
   spec.libs << 'lib' << 'spec'
-  spec.spec_files = FileList['spec/**/*_spec.rb']
+  spec.spec_files = FileList['spec/sitemap_generator/**/*_spec.rb']
 end
 task :spec => :check_dependencies
 
