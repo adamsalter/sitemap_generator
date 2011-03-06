@@ -5,21 +5,23 @@
 
 Gem::Specification.new do |s|
   s.name = %q{sitemap_generator}
-  s.version = "1.3.9"
+  s.version = "1.3.10"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Karl Varga", "Adam Salter"]
-  s.date = %q{2011-02-26}
+  s.date = %q{2011-03-05}
   s.description = %q{SitemapGenerator is a Rails gem that makes it easy to generate enterprise-class Sitemaps readable by all search engines.  Generated Sitemaps adhere to the Sitemap protocol specification.  When you generate new Sitemaps, SitemapGenerator can automatically ping the major search engines (including Google, Yahoo and Bing) to notify them.  SitemapGenerator includes rake tasks to easily manage your sitemaps.}
   s.email = %q{kjvarga@gmail.com}
   s.extra_rdoc_files = [
-    "README.md"
+    "README.md",
+     "README.md.orig"
   ]
   s.files = [
     "Gemfile",
      "Gemfile.lock",
      "MIT-LICENSE",
      "README.md",
+     "README.md.orig",
      "Rakefile",
      "VERSION",
      "lib/sitemap_generator.rb",
