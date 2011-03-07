@@ -15,7 +15,8 @@ module SitemapGenerator
     class SitemapFile
       include ActionView::Helpers::NumberHelper
       include ActionView::Helpers::TextHelper   # Rails 2.2.2 fails with missing 'pluralize' otherwise
-      attr_accessor :sitemap_path, :public_path, :filesize, :link_count, :hostname
+      attr_accessor :sitemap_path, :public_path, :hostname
+      attr_reader :link_count, :filesize
 
       # <tt>public_path</tt> full path of the directory to write sitemaps in.
       #   Usually your Rails <tt>public/</tt> directory.
@@ -29,7 +30,7 @@ module SitemapGenerator
         self.sitemap_path = sitemap_path
         self.public_path = public_path
         self.hostname = hostname
-        self.link_count = 0
+        @link_count = 0
 
         @xml_content       = ''     # XML urlset content
         @xml_wrapper_start = <<-HTML
@@ -46,7 +47,7 @@ module SitemapGenerator
         HTML
         @xml_wrapper_start.gsub!(/\s+/, ' ').gsub!(/ *> */, '>').strip!
         @xml_wrapper_end   = %q[</urlset>]
-        self.filesize = bytesize(@xml_wrapper_start) + bytesize(@xml_wrapper_end)
+        @filesize = bytesize(@xml_wrapper_start) + bytesize(@xml_wrapper_end)
       end
 
       def lastmod
@@ -54,7 +55,7 @@ module SitemapGenerator
       end
 
       def empty?
-        self.link_count == 0
+        @link_count == 0
       end
 
       def full_url
@@ -68,7 +69,7 @@ module SitemapGenerator
       # Return a boolean indicating whether the sitemap file can fit another link
       # of <tt>bytes</tt> bytes in size.
       def file_can_fit?(bytes)
-        (self.filesize + bytes) < SitemapGenerator::MAX_SITEMAP_FILESIZE && self.link_count < SitemapGenerator::MAX_SITEMAP_LINKS
+        (@filesize + bytes) < SitemapGenerator::MAX_SITEMAP_FILESIZE && @link_count < SitemapGenerator::MAX_SITEMAP_LINKS
       end
 
       # Add a link to the sitemap file.
@@ -98,8 +99,8 @@ module SitemapGenerator
 
         # Add the XML
         @xml_content << xml
-        self.filesize += bytesize(xml)
-        self.link_count += 1
+        @filesize += bytesize(xml)
+        @link_count += 1
         true
       end
 
@@ -140,7 +141,7 @@ module SitemapGenerator
       def summary
         uncompressed_size = number_to_human_size(filesize) rescue "#{filesize / 8} KB"
         compressed_size =   number_to_human_size(File.size?(full_path)) rescue "#{File.size?(full_path) / 8} KB"
-        "+ #{'%-21s' % self.sitemap_path} #{'%13s' % self.link_count} links / #{'%10s' % uncompressed_size} / #{'%10s' % compressed_size} gzipped"
+        "+ #{'%-21s' % self.sitemap_path} #{'%13s' % @link_count} links / #{'%10s' % uncompressed_size} / #{'%10s' % compressed_size} gzipped"
       end
 
       protected
