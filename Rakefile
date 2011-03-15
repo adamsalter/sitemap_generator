@@ -98,7 +98,6 @@ Spec::Rake::SpecTask.new(:spec) do |spec|
   spec.libs << 'lib' << 'spec'
   spec.spec_files = FileList['spec/sitemap_generator/**/*_spec.rb']
 end
-task :spec => :check_dependencies
 
 Spec::Rake::SpecTask.new(:rcov) do |spec|
   spec.libs << 'lib' << 'spec'
