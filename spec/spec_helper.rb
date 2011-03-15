@@ -18,6 +18,8 @@ load(File.join(File.dirname(__FILE__), sitemap_rails, 'Rakefile'))
 # in ./support/ and its subdirectories.
 Dir[File.expand_path(File.join(File.dirname(__FILE__),'support','**','*.rb'))].each {|f| require f}
 
+require 'sitemap_generator'
+
 Spec::Runner.configure do |config|
   config.mock_with :mocha
   config.include(FileMacros)
