@@ -74,7 +74,7 @@ module SitemapGenerator
         :public_path => (File.join(::Rails.root, 'public/') rescue 'public/')
       })
       options.each_pair { |k, v| instance_variable_set("@#{k}".to_sym, v) }
-
+ 
       # Default host is not set yet.  Set it on these objects when `add_links` is called
       self.sitemap_index = SitemapGenerator::Builder::SitemapIndexFile.new(@public_path, sitemap_index_path)
       self.sitemap = SitemapGenerator::Builder::SitemapFile.new(@public_path, new_sitemap_path)
