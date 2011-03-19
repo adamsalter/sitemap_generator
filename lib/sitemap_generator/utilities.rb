@@ -34,5 +34,13 @@ module SitemapGenerator
     rescue
       false  # Rails.version defined in 2.1.0
     end
+
+    # Validate all keys in a hash match *valid keys, raising ArgumentError on a
+    # mismatch. Note that keys are NOT treated indifferently, meaning if you use
+    # strings for keys but assert symbols as keys, this will fail.
+    def assert_valid_keys(hash, *valid_keys)
+      unknown_keys = hash.keys - [valid_keys].flatten
+      raise(ArgumentError, "Unknown key(s): #{unknown_keys.join(", ")}") unless unknown_keys.empty?
+    end
   end
 end

@@ -14,7 +14,7 @@ module SitemapGenerator
           path = path.sitemap_path
         end
 
-        options.assert_valid_keys(:priority, :changefreq, :lastmod, :host, :images, :video, :geo)
+        SitemapGenerator::Utilities.assert_valid_keys(options, :priority, :changefreq, :lastmod, :host, :images, :video, :geo)
         options.reverse_merge!(:priority => 0.5, :changefreq => 'weekly', :lastmod => Time.now, :host => Sitemap.default_host, :images => [])
         self.merge!(
           :path => path,
@@ -94,7 +94,7 @@ module SitemapGenerator
       def prepare_images(images, host)
         images.delete_if { |key,value| key[:loc] == nil }
         images.each do |r|
-          r.assert_valid_keys(:loc, :caption, :geo_location, :title, :license)
+          SitemapGenerator::Utilities.assert_valid_keys(r, :loc, :caption, :geo_location, :title, :license)
           r[:loc] = URI.join(host, r[:loc]).to_s
         end
         images[0..(SitemapGenerator::MAX_SITEMAP_IMAGES-1)]
