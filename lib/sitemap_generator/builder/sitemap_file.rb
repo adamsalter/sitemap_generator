@@ -7,31 +7,34 @@ module SitemapGenerator
     #
     # General Usage:
     #
-    #   sitemap = SitemapFile.new('public/', 'sitemap.xml', 'http://example.com')
+    #   sitemap = SitemapFile.new(:sitemap_path => 'public/', :host => 'http://example.com')
     #   sitemap.add('/', { ... })    <- add a link to the sitemap
-    #   sitemap.finalize!            <- creates a new sitemap file in directory public/
-    #       and freezes the object to protect it from further modification
+    #   sitemap.finalize!            <- write the sitemap file and freeze the object to protect it from further modification
     #
     class SitemapFile
       include ActionView::Helpers::NumberHelper
       include ActionView::Helpers::TextHelper   # Rails 2.2.2 fails with missing 'pluralize' otherwise
-      attr_accessor :sitemap_path, :public_path, :hostname
+      attr_accessor :directory, :host
       attr_reader :link_count, :filesize
 
-      # <tt>public_path</tt> full path of the directory to write sitemaps in.
-      #   Usually your Rails <tt>public/</tt> directory.
+      # Required Options:
       #
-      # <tt>sitemap_path</tt> relative path including filename of the sitemap
-      #   file relative to <tt>public_path</tt>
+      # <tt>host</tt> the sitemaps url host name e.g. http://myserver.com
       #
-      # <tt>hostname</tt> hostname including protocol to use in all links
-      #   e.g. http://en.google.ca
-      def initialize(public_path, sitemap_path, hostname='http://example.com')
-        self.sitemap_path = sitemap_path
-        self.public_path = public_path
-        self.hostname = hostname
-        @link_count = 0
+      # Other options:
+      #
+      # <tt>directory</tt> path to write the sitemap files to. Default: public/
+      #
+      # <tt>filename</tt> symbol giving the base name for the sitemap file.  Default: :sitemap
+      def initialize(opts={})
+        SitemapGenerator::Utilities.assert_valid_keys(opts, :directory, :host, :filename)
+        opts.reverse_merge!(
+          :directory => 'public/',
+          :filename => :sitemap
+        )
+        opts.each_pair { |k, v| instance_variable_set("@#{k}".to_sym, v) }
 
+        @link_count = 0
         @xml_content       = ''     # XML urlset content
         @xml_wrapper_start = <<-HTML
           <?xml version="1.0" encoding="UTF-8"?>
@@ -59,11 +62,11 @@ module SitemapGenerator
       end
 
       def full_url
-        URI.join(self.hostname, self.sitemap_path).to_s
+        URI.join(self.host, self.directory).to_s
       end
 
       def full_path
-        @full_path ||= File.join(self.public_path, self.sitemap_path)
+        @full_path ||= File.join(self.public_path, self.directory)
       end
 
       # Return a boolean indicating whether the sitemap file can fit another link
@@ -141,7 +144,7 @@ module SitemapGenerator
       def summary
         uncompressed_size = number_to_human_size(filesize) rescue "#{filesize / 8} KB"
         compressed_size =   number_to_human_size(File.size?(full_path)) rescue "#{File.size?(full_path) / 8} KB"
-        "+ #{'%-21s' % self.sitemap_path} #{'%13s' % @link_count} links / #{'%10s' % uncompressed_size} / #{'%10s' % compressed_size} gzipped"
+        "+ #{'%-21s' % self.directory} #{'%13s' % @link_count} links / #{'%10s' % uncompressed_size} / #{'%10s' % compressed_size} gzipped"
       end
 
       protected
