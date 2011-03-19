@@ -23,4 +23,30 @@ describe SitemapGenerator::LinkSet do
       linkset.send(option).should == value
     end
   end
+
+  context "default links" do
+    it "should not include the root url" do
+      @ls = SitemapGenerator::LinkSet.new(:default_host => 'http://www.example.com', :include_root => false)
+      @ls.include_root.should be_false
+      @ls.include_index.should be_true
+      @ls.add_links { |sitemap| }
+      @ls.sitemap.link_count.should == 1
+    end
+
+    it "should not include the sitemap index url" do
+      @ls = SitemapGenerator::LinkSet.new(:default_host => 'http://www.example.com', :include_index => false)
+      @ls.include_root.should be_true
+      @ls.include_index.should be_false
+      @ls.add_links { |sitemap| }
+      @ls.sitemap.link_count.should == 1
+    end
+
+    it "should not include the root url or the sitemap index url" do
+      @ls = SitemapGenerator::LinkSet.new(:default_host => 'http://www.example.com', :include_root => false, :include_index => false)
+      @ls.include_root.should be_false
+      @ls.include_index.should be_false
+      @ls.add_links { |sitemap| }
+      @ls.sitemap.link_count.should == 0
+    end
+  end
 end

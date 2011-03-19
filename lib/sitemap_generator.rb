@@ -11,7 +11,7 @@ module SitemapGenerator
   class SitemapError <StandardError; end
   class SitemapFullError < SitemapError; end
   class SitemapFinalizedError < SitemapError; end
-  
+
   silence_warnings do
     VERSION = File.read(File.dirname(__FILE__) + "/../VERSION").strip
     MAX_SITEMAP_FILES    = 50_000        # max sitemap links per index file
@@ -28,5 +28,4 @@ module SitemapGenerator
 
   self.root = File.expand_path(File.join(File.dirname(__FILE__), '../'))
   self.templates = SitemapGenerator::Templates.new(self.root)
-
 end

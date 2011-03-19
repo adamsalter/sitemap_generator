@@ -7,7 +7,7 @@ module SitemapGenerator
 
     attr_reader :default_host, :public_path, :sitemaps_path, :filename
     attr_accessor :sitemap, :sitemap_index
-    attr_accessor :verbose, :yahoo_app_id, :include_default_links
+    attr_accessor :verbose, :yahoo_app_id, :include_root, :include_index
 
     # Evaluate the sitemap config file and write all sitemaps.
     #
@@ -69,7 +69,8 @@ module SitemapGenerator
       end
 
       options.reverse_merge!({
-        :include_default_links => true,
+        :include_root => true,
+        :include_index => true,
         :filename => :sitemap,
         :public_path => (File.join(::Rails.root, 'public/') rescue 'public/')
       })
@@ -91,10 +92,9 @@ module SitemapGenerator
 
       # Set default host on the sitemap objects and seed the sitemap with the default links
       self.sitemap.hostname = self.sitemap_index.hostname = default_host
-      if include_default_links
-        self.sitemap.add('/', :lastmod => Time.now, :changefreq => 'always', :priority => 1.0)
-        self.sitemap.add(self.sitemap_index, :lastmod => Time.now, :changefreq => 'always', :priority => 1.0)
-      end
+
+      self.sitemap.add('/', :lastmod => Time.now, :changefreq => 'always', :priority => 1.0, :host => default_host) if include_root
+      self.sitemap.add(self.sitemap_index, :lastmod => Time.now, :changefreq => 'always', :priority => 1.0) if include_index
 
       yield self
     end
