@@ -6,7 +6,6 @@ module SitemapGenerator
   class LinkSet
 
     attr_reader :default_host, :public_path, :sitemaps_path, :filename
-    attr_accessor :sitemap, :sitemap_index
     attr_accessor :verbose, :yahoo_app_id, :include_root, :include_index
 
     # Evaluate the sitemap config file and write all sitemaps.
@@ -21,8 +20,8 @@ module SitemapGenerator
 
       start_time = Time.now
       if self.sitemap_index.finalized?
-        self.sitemap_index = SitemapGenerator::Builder::SitemapIndexFile.new(@public_path, sitemap_index_path)
-        self.sitemap = SitemapGenerator::Builder::SitemapFile.new(@public_path, new_sitemap_path)
+        @sitemap_index = SitemapGenerator::Builder::SitemapIndexFile.new(@public_path, sitemap_index_path)
+        @sitemap = SitemapGenerator::Builder::SitemapFile.new(@public_path, new_sitemap_path)
       end
 
       SitemapGenerator::Interpreter.new(self, config_file, &block)
@@ -68,6 +67,7 @@ module SitemapGenerator
         args.first || {}
       end
 
+      # Option defaults
       options.reverse_merge!({
         :include_root => true,
         :include_index => true,
@@ -75,10 +75,6 @@ module SitemapGenerator
         :public_path => (File.join(::Rails.root, 'public/') rescue 'public/')
       })
       options.each_pair { |k, v| instance_variable_set("@#{k}".to_sym, v) }
- 
-      # Default host is not set yet.  Set it on these objects when `add_links` is called
-      self.sitemap_index = SitemapGenerator::Builder::SitemapIndexFile.new(@public_path, sitemap_index_path)
-      self.sitemap = SitemapGenerator::Builder::SitemapFile.new(@public_path, new_sitemap_path)
     end
 
     # Entry point for users.
@@ -109,7 +105,7 @@ module SitemapGenerator
           self.sitemap_index.add(self.sitemap)
           puts self.sitemap.summary if verbose
         end
-        self.sitemap = SitemapGenerator::Builder::SitemapFile.new(public_path, new_sitemap_path, default_host)
+        @sitemap = SitemapGenerator::Builder::SitemapFile.new(public_path, new_sitemap_path, default_host)
         retry
       end
     end
@@ -195,6 +191,16 @@ module SitemapGenerator
     # up to 50,000 sitemap files.
     def sitemap_index_path
       File.join(self.sitemaps_path || '', "#{@filename}_index.xml.gz")
+    end
+
+    # Lazy-initialize a sitemap instance when it's accessed
+    def sitemap
+      @sitemap ||= SitemapGenerator::Builder::SitemapFile.new(@public_path, new_sitemap_path)
+    end
+
+    # Lazy-initialize a sitemap index instance when it's accessed
+    def sitemap_index
+      @sitemap_index ||= SitemapGenerator::Builder::SitemapIndexFile.new(@public_path, sitemap_index_path)
     end
   end
 end
