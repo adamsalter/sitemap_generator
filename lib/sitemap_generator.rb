@@ -8,9 +8,9 @@ require 'sitemap_generator/railtie' if SitemapGenerator::Utilities.rails3?
 require 'active_support/core_ext/numeric'
 
 module SitemapGenerator
-  class SitemapError <StandardError; end
-  class SitemapFullError < SitemapError; end
-  class SitemapFinalizedError < SitemapError; end
+  SitemapError = Class.new(StandardError)
+  SitemapFullError = Class.new(SitemapError)
+  SitemapFinalizedError = Class.new(SitemapError)
 
   silence_warnings do
     VERSION = File.read(File.dirname(__FILE__) + "/../VERSION").strip
