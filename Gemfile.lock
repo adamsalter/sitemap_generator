@@ -16,7 +16,7 @@ GEM
     activeresource (2.3.8)
       activesupport (= 2.3.8)
     activesupport (2.3.8)
-    columnize (0.3.2)
+    columnize (0.3.1)
     gemcutter (0.6.1)
     git (1.2.5)
     github (0.4.5)
