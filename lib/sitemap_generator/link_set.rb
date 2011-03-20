@@ -5,7 +5,7 @@ require 'builder'
 module SitemapGenerator
   class LinkSet
 
-    attr_reader :default_host, :public_path, :sitemaps_path, :filename
+    attr_reader :default_host, :public_path, :sitemaps_path, :filename, :sitemap
     attr_accessor :verbose, :yahoo_app_id, :include_root, :include_index
 
     # Evaluate the sitemap config file and write all sitemaps.
@@ -19,21 +19,18 @@ module SitemapGenerator
       require 'sitemap_generator/interpreter'
 
       start_time = Time.now
-      if self.sitemap_index.finalized?
-        @sitemap_index = SitemapGenerator::Builder::SitemapIndexFile.new(@public_path, sitemap_index_path)
-        @sitemap = SitemapGenerator::Builder::SitemapFile.new(@public_path, new_sitemap_path)
-      end
+      @sitemap_index = @sitemap = nil
 
       SitemapGenerator::Interpreter.new(self, config_file, &block)
-      unless self.sitemap.finalized?
-        self.sitemap_index.add(self.sitemap)
-        puts self.sitemap.summary if verbose
+      unless sitemap.finalized?
+        sitemap_index.add(sitemap)
+        puts sitemap.summary if verbose
       end
-      self.sitemap_index.finalize!
+      sitemap_index.finalize!
       end_time = Time.now
 
       if verbose
-        puts self.sitemap_index.summary(:time_taken => end_time - start_time)
+        puts sitemap_index.summary(:time_taken => end_time - start_time)
       end
     end
 
@@ -49,7 +46,7 @@ module SitemapGenerator
     # <tt>sitemaps_path</tt> path fragment within public to write sitemaps
     #   to e.g. 'en/'.  Sitemaps are written to <tt>public_path</tt> + <tt>sitemaps_path</tt>
     #
-    # <tt>default_host</tt> hostname including protocol to use in all sitemap links
+    # <tt>default_host</tt> host including protocol to use in all sitemap links
     #   e.g. http://en.google.ca
     #
     # <tt>filename</tt> used in the name of the file like "#{@filename}1.xml.gzip" and "#{@filename}_index.xml.gzip"
@@ -72,7 +69,8 @@ module SitemapGenerator
         :include_root => true,
         :include_index => true,
         :filename => :sitemap,
-        :public_path => (File.join(::Rails.root, 'public/') rescue 'public/')
+        :public_path => (File.join(::Rails.root, 'public/') rescue 'public/'),
+        :sitemaps_path => './'
       })
       options.each_pair { |k, v| instance_variable_set("@#{k}".to_sym, v) }
     end
@@ -84,13 +82,10 @@ module SitemapGenerator
     #
     # TODO: Refactor.  The call chain is confusing and convoluted here.
     def add_links
-      raise ArgumentError, "Default hostname not set" if default_host.blank?
+      raise ArgumentError, "Default host not set" if default_host.blank?
 
-      # Set default host on the sitemap objects and seed the sitemap with the default links
-      self.sitemap.hostname = self.sitemap_index.hostname = default_host
-
-      self.sitemap.add('/', :lastmod => Time.now, :changefreq => 'always', :priority => 1.0, :host => default_host) if include_root
-      self.sitemap.add(self.sitemap_index, :lastmod => Time.now, :changefreq => 'always', :priority => 1.0) if include_index
+      sitemap.add('/', :lastmod => Time.now, :changefreq => 'always', :priority => 1.0, :host => @default_host) if include_root
+      sitemap.add(sitemap_index, :lastmod => Time.now, :changefreq => 'always', :priority => 1.0) if include_index
 
       yield self
     end
@@ -98,16 +93,14 @@ module SitemapGenerator
     # Add a link to a Sitemap.  If a new Sitemap is required, one will be created for
     # you.
     def add(link, options={})
-      begin
-        self.sitemap.add(link, options)
-      rescue SitemapGenerator::SitemapError => e
-        if e.is_a?(SitemapGenerator::SitemapFullError)
-          self.sitemap_index.add(self.sitemap)
-          puts self.sitemap.summary if verbose
-        end
-        @sitemap = SitemapGenerator::Builder::SitemapFile.new(public_path, new_sitemap_path, default_host)
-        retry
-      end
+      sitemap.add(link, options)
+    rescue SitemapGenerator::SitemapFullError
+      sitemap_index.add(sitemap)
+      puts sitemap.summary if verbose
+      retry
+    rescue SitemapGenerator::SitemapFinalizedError
+      @sitemap = sitemap.next
+      retry
     end
 
     # Ping search engines.
@@ -116,7 +109,7 @@ module SitemapGenerator
     def ping_search_engines
       require 'open-uri'
 
-      sitemap_index_url = CGI.escape(self.sitemap_index.full_url)
+      sitemap_index_url = CGI.escape(sitemap_index.full_url)
       search_engines = {
         :google         => "http://www.google.com/webmasters/sitemaps/ping?sitemap=#{sitemap_index_url}",
         :yahoo          => "http://search.yahooapis.com/SiteExplorerService/V1/ping?sitemap=#{sitemap_index_url}&appid=#{yahoo_app_id}",
@@ -149,58 +142,49 @@ module SitemapGenerator
     end
 
     def link_count
-      self.sitemap_index.total_link_count
+      sitemap_index.total_link_count
     end
 
     def default_host=(value)
       @default_host = value
-      self.sitemap_index.hostname = value unless self.sitemap_index.finalized?
-      self.sitemap.hostname = value unless self.sitemap.finalized?
+      sitemap_index.host = value unless sitemap_index.finalized?
+      sitemap.host = value unless sitemap.finalized?
     end
 
     def public_path=(value)
       @public_path = value
-      self.sitemap_index.public_path = value unless self.sitemap_index.finalized?
-      self.sitemap.public_path = value unless self.sitemap.finalized?
+      sitemap_index.directory = File.join(@public_path, @sitemaps_path) unless sitemap_index.finalized?
+      sitemap.directory = File.join(@public_path, @sitemaps_path) unless sitemap.finalized?
     end
 
     def sitemaps_path=(value)
       @sitemaps_path = value
-      self.sitemap_index.sitemap_path = sitemap_index_path unless self.sitemap_index.finalized?
-      self.sitemap.sitemap_path = new_sitemap_path unless self.sitemap.finalized?
+      sitemap_index.directory = File.join(@public_path, @sitemaps_path) unless sitemap_index.finalized?
+      sitemap.directory = File.join(@public_path, @sitemaps_path) unless sitemap.finalized?
     end
 
     def filename=(value)
       @filename = value
-      self.sitemap_index.sitemap_path = sitemap_index_path unless self.sitemap_index.finalized?
-      self.sitemap.sitemap_path = new_sitemap_path unless self.sitemap.finalized?
-    end
-
-    protected
-
-    # Return the current sitemap filename with index.
-    #
-    # The index depends on the length of the <tt>sitemaps</tt> array.
-    def new_sitemap_path
-      File.join(self.sitemaps_path || '', "#{@filename}#{self.sitemap_index.sitemaps.length + 1}.xml.gz")
-    end
-
-    # Return the current sitemap index filename.
-    #
-    # At the moment we only support one index file which can link to
-    # up to 50,000 sitemap files.
-    def sitemap_index_path
-      File.join(self.sitemaps_path || '', "#{@filename}_index.xml.gz")
+      sitemap_index.filename = @filename unless sitemap_index.finalized?
+      sitemap.filename = @filename unless sitemap.finalized?
     end
 
     # Lazy-initialize a sitemap instance when it's accessed
     def sitemap
-      @sitemap ||= SitemapGenerator::Builder::SitemapFile.new(@public_path, new_sitemap_path)
+      @sitemap ||= SitemapGenerator::Builder::SitemapFile.new(
+        :directory => File.join(@public_path, @sitemaps_path),
+        :filename => @filename,
+        :host => @default_host
+      )
     end
 
     # Lazy-initialize a sitemap index instance when it's accessed
     def sitemap_index
-      @sitemap_index ||= SitemapGenerator::Builder::SitemapIndexFile.new(@public_path, sitemap_index_path)
+      @sitemap_index ||= SitemapGenerator::Builder::SitemapIndexFile.new(
+        :directory => File.join(@public_path, @sitemaps_path),
+        :filename => @filename,
+        :host => @default_host
+      )
     end
   end
 end

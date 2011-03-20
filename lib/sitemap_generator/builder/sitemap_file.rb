@@ -25,15 +25,18 @@ module SitemapGenerator
       #
       # <tt>directory</tt> path to write the sitemap files to. Default: public/
       #
-      # <tt>filename</tt> symbol giving the base name for the sitemap file.  Default: :sitemap
+      # <tt>filename</tt> a symbol giving the base of the sitemap fileaname.  Default: :sitemap
+      #
+      # <tt>namer</tt> (optional) if provided is used to get the next sitemap filename, overriding :filename
       def initialize(opts={})
-        SitemapGenerator::Utilities.assert_valid_keys(opts, :directory, :host, :filename)
-        opts.reverse_merge!(
-          :directory => 'public/',
-          :filename => :sitemap
-        )
+        @options = [:directory, :host, :filename, :namer]
+        @defaults = { :directory => 'public/', :filename => :sitemap}
+        SitemapGenerator::Utilities.assert_valid_keys(opts, @options)
+        opts.reverse_merge!(@defaults)
         opts.each_pair { |k, v| instance_variable_set("@#{k}".to_sym, v) }
 
+        @namer ||= SitemapGenerator::SitemapNamer.new(@filename)
+        @filename = @namer.next
         @link_count = 0
         @xml_content       = ''     # XML urlset content
         @xml_wrapper_start = <<-HTML
@@ -54,57 +57,45 @@ module SitemapGenerator
       end
 
       def lastmod
-        File.mtime(self.full_path) rescue nil
+        File.mtime(path) rescue nil
       end
 
       def empty?
         @link_count == 0
       end
 
-      def full_url
-        URI.join(self.host, self.directory).to_s
-      end
-
-      def full_path
-        @full_path ||= File.join(self.public_path, self.directory)
-      end
-
       # Return a boolean indicating whether the sitemap file can fit another link
-      # of <tt>bytes</tt> bytes in size.
+      # of <tt>bytes</tt> bytes in size.  You can also pass a string and the
+      # bytesize will be calculated for you.
       def file_can_fit?(bytes)
+        bytes = bytes.is_a?(String) ? bytesize(bytes) : bytes
         (@filesize + bytes) < SitemapGenerator::MAX_SITEMAP_FILESIZE && @link_count < SitemapGenerator::MAX_SITEMAP_LINKS
       end
 
       # Add a link to the sitemap file.
       #
       # If a link cannot be added, for example if the file is too large or the link
-      # limit has been reached, a SitemapGenerator::SitemapFullError exception is raised.
+      # limit has been reached, a SitemapGenerator::SitemapFullError exception is raised
+      # and the sitemap is finalized.
       #
       # If the Sitemap has already been finalized a SitemapGenerator::SitemapFinalizedError
       # exception is raised.
+      #
+      # Return the new link count.
       #
       # Call with:
       #   sitemap_url - a SitemapUrl instance
       #   sitemap, options - a Sitemap instance and options hash
       #   path, options - a path for the URL and options hash
       def add(link, options={})
-        xml = if link.is_a?(SitemapGenerator::Builder::SitemapUrl)
-          link.to_xml
-        else
-          SitemapGenerator::Builder::SitemapUrl.new(link, options).to_xml
-        end
+        raise SitemapGenerator::SitemapFinalizedError if self.finalized?
+        xml = (link.is_a?(SitemapUrl) ? link : SitemapUrl.new(link, options)).to_xml
+        raise SitemapGenerator::SitemapFullError if !file_can_fit?(xml)
 
-        if self.finalized?
-          raise SitemapGenerator::SitemapFinalizedError
-        elsif !file_can_fit?(bytesize(xml))
-          raise SitemapGenerator::SitemapFullError
-        end
-
-        # Add the XML
+        # Add the XML to the sitemap
         @xml_content << xml
         @filesize += bytesize(xml)
         @link_count += 1
-        true
       end
 
       # Write out the Sitemap file and freeze this object.
@@ -118,14 +109,14 @@ module SitemapGenerator
         raise SitemapGenerator::SitemapFinalizedError if self.finalized?
 
         # Ensure that the directory exists
-        dir = File.dirname(self.full_path)
+        dir = File.dirname(self.path)
         if !File.exists?(dir)
           FileUtils.mkdir_p(dir)
         elsif !File.directory?(dir)
           raise SitemapError.new("#{dir} should be a directory!")
         end
 
-        open(self.full_path, 'wb') do |file|
+        open(self.path, 'wb') do |file|
           gz = Zlib::GzipWriter.new(file)
           gz.write @xml_wrapper_start
           gz.write @xml_content
@@ -140,11 +131,33 @@ module SitemapGenerator
         return self.frozen?
       end
 
+      # Return a new instance of the sitemap file with the same options, and the next name in the sequence.
+      def next
+        self.class.new(@options.inject({}) do |memo, key|
+          memo[key] = instance_variable_get("@#{key}".to_sym)
+          memo
+        end)
+      end
+
       # Return a summary string
       def summary
         uncompressed_size = number_to_human_size(filesize) rescue "#{filesize / 8} KB"
-        compressed_size =   number_to_human_size(File.size?(full_path)) rescue "#{File.size?(full_path) / 8} KB"
+        compressed_size =   number_to_human_size(File.size?(path)) rescue "#{File.size?(path) / 8} KB"
         "+ #{'%-21s' % self.directory} #{'%13s' % @link_count} links / #{'%10s' % uncompressed_size} / #{'%10s' % compressed_size} gzipped"
+      end
+
+      def filename=(filename)
+        @filename = filename
+        @namer = SitemapGenerator::SitemapNamer.new(@filename)
+      end
+
+      def path
+        @path ||= File.join(@directory, @filename)
+      end
+
+      def url
+        debugger if @host.nil?
+        @url ||= URI.join(@host, @filename).to_s
       end
 
       protected
