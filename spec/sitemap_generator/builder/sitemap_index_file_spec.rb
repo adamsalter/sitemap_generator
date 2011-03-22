@@ -14,7 +14,6 @@ context 'SitemapGenerator::Builder::SitemapIndexFile' do
   end
 
   it "should be empty" do
-    debugger
     @s.empty?.should be_true
     @s.link_count.should == 0
   end

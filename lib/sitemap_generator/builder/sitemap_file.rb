@@ -141,9 +141,9 @@ module SitemapGenerator
 
       # Return a summary string
       def summary
-        uncompressed_size = number_to_human_size(filesize) rescue "#{filesize / 8} KB"
+        uncompressed_size = number_to_human_size(@filesize) rescue "#{@filesize / 8} KB"
         compressed_size =   number_to_human_size(File.size?(path)) rescue "#{File.size?(path) / 8} KB"
-        "+ #{'%-21s' % directory} #{'%13s' % @link_count} links / #{'%10s' % uncompressed_size} / #{'%10s' % compressed_size} gzipped"
+        "+ #{'%-21s' % @directory} #{'%13s' % @link_count} links / #{'%10s' % uncompressed_size} / #{'%10s' % compressed_size} gzipped"
       end
 
       # Set a new filename on the instance (creates a new SitemapNamer instance)

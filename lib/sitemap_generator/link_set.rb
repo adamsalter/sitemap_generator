@@ -109,7 +109,7 @@ module SitemapGenerator
     def ping_search_engines
       require 'open-uri'
 
-      sitemap_index_url = CGI.escape(sitemap_index.full_url)
+      sitemap_index_url = CGI.escape(sitemap_index.url)
       search_engines = {
         :google         => "http://www.google.com/webmasters/sitemaps/ping?sitemap=#{sitemap_index_url}",
         :yahoo          => "http://search.yahooapis.com/SiteExplorerService/V1/ping?sitemap=#{sitemap_index_url}&appid=#{yahoo_app_id}",
@@ -147,8 +147,9 @@ module SitemapGenerator
 
     def default_host=(value)
       @default_host = value
-      sitemap_index.host = value unless sitemap_index.finalized?
-      sitemap.host = value unless sitemap.finalized?
+      sitemaps_host = URI.join(@default_host, @sitemaps_path).to_s
+      sitemap_index.host = sitemaps_host unless sitemap_index.finalized?
+      sitemap.host = sitemaps_host unless sitemap.finalized?
     end
 
     def public_path=(value)
@@ -182,7 +183,7 @@ module SitemapGenerator
     def sitemap_index
       @sitemap_index ||= SitemapGenerator::Builder::SitemapIndexFile.new(
         :directory => File.join(@public_path, @sitemaps_path),
-        :filename => @filename,
+        :filename => "#{@filename}_index",
         :host => @default_host
       )
     end

@@ -12,7 +12,7 @@ module SitemapGenerator
 
         @link_count = 0
         @filename = "#{@filename}.xml.gz"
-        @sitemaps = []
+        @sitemaps_link_count = 0
         @xml_content = '' # XML urlset content
         @xml_wrapper_start = <<-HTML
           <?xml version="1.0" encoding="UTF-8"?>
@@ -31,7 +31,7 @@ module SitemapGenerator
       # Finalize sitemaps as they are added to the index
       def add(link, options={})
         if file = link.is_a?(SitemapFile) && link
-          @sitemaps << file
+          @sitemaps_link_count += file.link_count
           file.finalize!
         end
         super(SitemapGenerator::Builder::SitemapIndexUrl.new(link, options))
@@ -39,7 +39,7 @@ module SitemapGenerator
 
       # Return the total number of links in all sitemaps reference by this index file
       def total_link_count
-        @sitemaps.inject(0) { |link_count_sum, sitemap| link_count_sum + sitemap.link_count }
+        @sitemaps_link_count
       end
 
       # Set a new filename on the instance.  Should not include any extensions e.g. :sitemap_index
@@ -49,10 +49,10 @@ module SitemapGenerator
 
       # Return a summary string
       def summary
-        uncompressed_size = number_to_human_size(filesize) rescue "#{filesize / 8} KB"
-        compressed_size =   number_to_human_size(File.size?(full_path)) rescue "#{File.size?(full_path) / 8} KB"
-        str = "+ #{'%-21s' % sitemap_path} #{'%10s' % link_count} sitemaps / #{'%10s' % uncompressed_size} / #{'%10s' % compressed_size} gzipped"
-        str += "\nSitemap stats: #{number_with_delimiter(total_link_count)} links / #{@sitemaps.size} sitemaps"
+        uncompressed_size = number_to_human_size(@filesize) rescue "#{@filesize / 8} KB"
+        compressed_size =   number_to_human_size(File.size?(path)) rescue "#{File.size?(path) / 8} KB"
+        str = "+ #{'%-21s' % directory} #{'%10s' % @link_count} sitemaps / #{'%10s' % uncompressed_size} / #{'%10s' % compressed_size} gzipped"
+        str += "\nSitemap stats: #{number_with_delimiter(total_link_count)} links / #{@link_count} sitemaps"
         str += " / %dm%02ds" % opts[:time_taken].divmod(60) if opts[:time_taken]
       end
     end
