@@ -15,7 +15,7 @@ module SitemapGenerator
       include ActionView::Helpers::NumberHelper
       include ActionView::Helpers::TextHelper   # Rails 2.2.2 fails with missing 'pluralize' otherwise
       attr_accessor :directory, :host
-      attr_reader :link_count, :filesize
+      attr_reader :link_count, :filesize, :filename
 
       # Required Options:
       #
@@ -30,14 +30,14 @@ module SitemapGenerator
       # <tt>namer</tt> (optional) if provided is used to get the next sitemap filename, overriding :filename
       def initialize(opts={})
         @options = [:directory, :host, :filename, :namer]
-        @defaults = { :directory => 'public/', :filename => :sitemap}
+        @defaults = { :directory => 'public/', :filename => :sitemap }
         SitemapGenerator::Utilities.assert_valid_keys(opts, @options)
         opts.reverse_merge!(@defaults)
         opts.each_pair { |k, v| instance_variable_set("@#{k}".to_sym, v) }
 
+        @link_count = 0
         @namer ||= SitemapGenerator::SitemapNamer.new(@filename)
         @filename = @namer.next
-        @link_count = 0
         @xml_content       = ''     # XML urlset content
         @xml_wrapper_start = <<-HTML
           <?xml version="1.0" encoding="UTF-8"?>
@@ -88,7 +88,7 @@ module SitemapGenerator
       #   sitemap, options - a Sitemap instance and options hash
       #   path, options - a path for the URL and options hash
       def add(link, options={})
-        raise SitemapGenerator::SitemapFinalizedError if self.finalized?
+        raise SitemapGenerator::SitemapFinalizedError if finalized?
         xml = (link.is_a?(SitemapUrl) ? link : SitemapUrl.new(link, options)).to_xml
         raise SitemapGenerator::SitemapFullError if !file_can_fit?(xml)
 
@@ -106,17 +106,17 @@ module SitemapGenerator
       # A SitemapGenerator::SitemapFinalizedError exception is raised if the Sitemap
       # has already been finalized
       def finalize!
-        raise SitemapGenerator::SitemapFinalizedError if self.finalized?
+        raise SitemapGenerator::SitemapFinalizedError if finalized?
 
         # Ensure that the directory exists
-        dir = File.dirname(self.path)
+        dir = File.dirname(path)
         if !File.exists?(dir)
           FileUtils.mkdir_p(dir)
         elsif !File.directory?(dir)
           raise SitemapError.new("#{dir} should be a directory!")
         end
 
-        open(self.path, 'wb') do |file|
+        open(path, 'wb') do |file|
           gz = Zlib::GzipWriter.new(file)
           gz.write @xml_wrapper_start
           gz.write @xml_content
@@ -124,11 +124,11 @@ module SitemapGenerator
           gz.close
         end
         @xml_content = @xml_wrapper_start = @xml_wrapper_end = ''
-        self.freeze
+        freeze
       end
 
       def finalized?
-        return self.frozen?
+        frozen?
       end
 
       # Return a new instance of the sitemap file with the same options, and the next name in the sequence.
@@ -143,21 +143,21 @@ module SitemapGenerator
       def summary
         uncompressed_size = number_to_human_size(filesize) rescue "#{filesize / 8} KB"
         compressed_size =   number_to_human_size(File.size?(path)) rescue "#{File.size?(path) / 8} KB"
-        "+ #{'%-21s' % self.directory} #{'%13s' % @link_count} links / #{'%10s' % uncompressed_size} / #{'%10s' % compressed_size} gzipped"
+        "+ #{'%-21s' % directory} #{'%13s' % @link_count} links / #{'%10s' % uncompressed_size} / #{'%10s' % compressed_size} gzipped"
       end
 
+      # Set a new filename on the instance (creates a new SitemapNamer instance)
       def filename=(filename)
         @filename = filename
         @namer = SitemapGenerator::SitemapNamer.new(@filename)
       end
 
       def path
-        @path ||= File.join(@directory, @filename)
+        @path ||= File.join(@directory, @filename.to_s)
       end
 
       def url
-        debugger if @host.nil?
-        @url ||= URI.join(@host, @filename).to_s
+        @url ||= URI.join(@host, @filename.to_s).to_s
       end
 
       protected

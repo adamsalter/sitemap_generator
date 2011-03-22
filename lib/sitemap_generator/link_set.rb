@@ -70,7 +70,7 @@ module SitemapGenerator
         :include_index => true,
         :filename => :sitemap,
         :public_path => (File.join(::Rails.root, 'public/') rescue 'public/'),
-        :sitemaps_path => './'
+        :sitemaps_path => ''
       })
       options.each_pair { |k, v| instance_variable_set("@#{k}".to_sym, v) }
     end
