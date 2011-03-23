@@ -36,9 +36,7 @@ module SitemapGenerator
 
     # Constructor
     #
-    # Arguments:
-    #
-    # Options hash containing any of:
+    # Call with a hash of options.  Options:
     #
     # <tt>public_path</tt> full path to the directory to write sitemaps in.
     #   Defaults to your Rails <tt>public/</tt> directory.
@@ -49,8 +47,15 @@ module SitemapGenerator
     # <tt>default_host</tt> host including protocol to use in all sitemap links
     #   e.g. http://en.google.ca
     #
-    # <tt>filename</tt> used in the name of the file like "#{@filename}1.xml.gzip" and "#{@filename}_index.xml.gzip"
-    #   Defaults to <tt>sitemap</tt>
+    # <tt>filename</tt> symbol giving the base name for files (default <tt>:sitemap</tt>).
+    #   The sitemap names are generated like "#{@filename}1.xml.gzip", "#{@filename}2.xml.gzip"
+    #   and the index name is like "#{@filename}_index.xml.gzip".
+    #
+    # <tt>include_root</tt> whether to include the root url i.e. '/' in each group of sitemaps.
+    #   Default is false.
+    #
+    # <tt>include_index</tt> whether to include the sitemap index URL in each group of sitemaps.
+    #   Default is false.
     def initialize(*args)
 
       # Extract options
@@ -70,7 +75,7 @@ module SitemapGenerator
         :include_index => true,
         :filename => :sitemap,
         :public_path => (File.join(::Rails.root, 'public/') rescue 'public/'),
-        :sitemaps_path => ''
+        :sitemaps_path => nil
       })
       options.each_pair { |k, v| instance_variable_set("@#{k}".to_sym, v) }
     end
@@ -78,9 +83,13 @@ module SitemapGenerator
     # Entry point for users.
     #
     # Called within the user's eval'ed sitemap config file.  Add links to sitemap files
-    # passing a block.
+    # passing a block.  This instance is passed in as an argument.  You can call
+    # `add` on it to add links.
     #
-    # TODO: Refactor.  The call chain is confusing and convoluted here.
+    # Example:
+    #   add_links do |sitemap|
+    #     sitemap.add '/'
+    #   end
     def add_links
       raise ArgumentError, "Default host not set" if default_host.blank?
 
@@ -92,6 +101,9 @@ module SitemapGenerator
 
     # Add a link to a Sitemap.  If a new Sitemap is required, one will be created for
     # you.
+    #
+    # link - string link e.g. '/merchant', '/article/1' or whatever.
+    # options - see README.
     def add(link, options={})
       sitemap.add(link, options)
     rescue SitemapGenerator::SitemapFullError
@@ -141,27 +153,36 @@ module SitemapGenerator
       end
     end
 
+    # Return a count of the total number of links in all sitemaps
     def link_count
       sitemap_index.total_link_count
     end
 
+    # Set the host name, including protocol, that will be used by default on each
+    # of your sitemap links.  You can pass a different host in your options to `add`
+    # if you need to change it on a per-link basis.
     def default_host=(value)
       @default_host = value
-      sitemaps_host = URI.join(@default_host, @sitemaps_path).to_s
-      sitemap_index.host = sitemaps_host unless sitemap_index.finalized?
-      sitemap.host = sitemaps_host unless sitemap.finalized?
+      sitemap_index.host = sitemaps_url unless sitemap_index.finalized?
+      sitemap.host = sitemaps_url unless sitemap.finalized?
     end
 
+    # Set the public_path.   This path gives the location of your public directory.
+    # Example: 'public/' to generate your sitemaps in 'public/', or 'tmp/' if you
+    # don't want to generate in public.  If set to nil the current directory is used.
     def public_path=(value)
       @public_path = value
-      sitemap_index.directory = File.join(@public_path, @sitemaps_path) unless sitemap_index.finalized?
-      sitemap.directory = File.join(@public_path, @sitemaps_path) unless sitemap.finalized?
+      sitemap_index.directory = sitemaps_directory unless sitemap_index.finalized?
+      sitemap.directory = sitemaps_directory unless sitemap.finalized?
     end
 
+    # Set the sitemaps_path.  This path gives the location to write sitemaps to
+    # relative to your public_path.
+    # Example: 'sitemaps/' to generate your sitemaps in 'public/sitemaps/'.
     def sitemaps_path=(value)
       @sitemaps_path = value
-      sitemap_index.directory = File.join(@public_path, @sitemaps_path) unless sitemap_index.finalized?
-      sitemap.directory = File.join(@public_path, @sitemaps_path) unless sitemap.finalized?
+      sitemap_index.directory = sitemaps_directory unless sitemap_index.finalized?
+      sitemap.directory = sitemaps_directory unless sitemap.finalized?
     end
 
     def filename=(value)
@@ -173,19 +194,29 @@ module SitemapGenerator
     # Lazy-initialize a sitemap instance when it's accessed
     def sitemap
       @sitemap ||= SitemapGenerator::Builder::SitemapFile.new(
-        :directory => File.join(@public_path, @sitemaps_path),
+        :directory => sitemaps_directory,
         :filename => @filename,
-        :host => @default_host
+        :host => sitemaps_url
       )
     end
 
     # Lazy-initialize a sitemap index instance when it's accessed
     def sitemap_index
       @sitemap_index ||= SitemapGenerator::Builder::SitemapIndexFile.new(
-        :directory => File.join(@public_path, @sitemaps_path),
+        :directory => sitemaps_directory,
         :filename => "#{@filename}_index",
-        :host => @default_host
+        :host => sitemaps_url
       )
+    end
+
+    # Return the url to the sitemaps
+    def sitemaps_url
+      URI.join(@default_host.to_s, @sitemaps_path.to_s).to_s
+    end
+
+    # Return the sitemaps directory
+    def sitemaps_directory
+      File.join(@public_path.to_s, @sitemaps_path.to_s)
     end
   end
 end

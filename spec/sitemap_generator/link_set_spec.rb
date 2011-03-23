@@ -24,7 +24,7 @@ describe SitemapGenerator::LinkSet do
     end
   end
 
-  context "default links" do
+  context "include_root include_index option" do
     it "should not include the root url" do
       @ls = SitemapGenerator::LinkSet.new(:default_host => 'http://www.example.com', :include_root => false)
       @ls.include_root.should be_false
