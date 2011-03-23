@@ -5,7 +5,7 @@ require 'builder'
 module SitemapGenerator
   class LinkSet
 
-    attr_reader :default_host, :public_path, :sitemaps_path, :filename, :sitemap
+    attr_reader :default_host, :public_path, :sitemaps_path, :sitemap
     attr_accessor :verbose, :yahoo_app_id, :include_root, :include_index
 
     # Evaluate the sitemap config file and write all sitemaps.
