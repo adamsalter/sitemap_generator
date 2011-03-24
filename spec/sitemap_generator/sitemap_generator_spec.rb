@@ -2,6 +2,12 @@ require 'spec_helper'
 
 describe "SitemapGenerator" do
 
+  context "root" do
+    it "should be set to the root of the gem" do
+      SitemapGenerator.root.should == File.expand_path('../../../' , __FILE__)
+    end
+  end
+  
   context "clean task" do
     before :each do
       copy_sitemap_file_to_rails_app
