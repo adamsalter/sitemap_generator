@@ -162,14 +162,16 @@ describe "SitemapGenerator" do
   #
 
   def rails_path(file)
-    File.join(::Rails.root, file)
+    SitemapGenerator.app.root + file
   end
 
   def copy_sitemap_file_to_rails_app
-    FileUtils.cp(File.join(SitemapGenerator.root, 'spec/sitemap.file'), File.join(::Rails.root, '/config/sitemap.rb'))
+    FileUtils.cp(File.join(SitemapGenerator.root, 'spec/sitemap.file'), SitemapGenerator.app.root + '/config/sitemap.rb')
   end
 
   def delete_sitemap_file_from_rails_app
-    FileUtils.remove(File.join(::Rails.root, '/config/sitemap.rb')) rescue nil
+    FileUtils.remove(SitemapGenerator.app.root + '/config/sitemap.rb')
+  rescue
+    nil
   end
 end

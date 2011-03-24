@@ -6,9 +6,9 @@ module SitemapGenerator
   # Rails URL helpers.
   class Interpreter
 
-    if SitemapGenerator::Utilities.rails3?
+    if SitemapGenerator.app.rails3?
       include ::Rails.application.routes.url_helpers
-    else
+    elsif SitemapGenerator.app.rails?
       require 'action_controller'
       include ActionController::UrlWriter
     end
@@ -23,7 +23,7 @@ module SitemapGenerator
       if block_given?
         instance_eval(&block)
       else
-        sitemap_config_file ||= File.join(::Rails.root, 'config/sitemap.rb')
+        sitemap_config_file ||= SitemapGenerator.app.root + 'config/sitemap.rb'
         eval(File.read(sitemap_config_file), nil, sitemap_config_file.to_s)
       end
     end
