@@ -166,9 +166,13 @@ module SitemapGenerator
       update_sitemaps(:host)
     end
 
-    # Set the public_path.   This path gives the location of your public directory.
-    # Example: 'public/' to generate your sitemaps in 'public/', or 'tmp/' if you
-    # don't want to generate in public.  If set to nil the current directory is used.
+    # Set the public_path.  This path gives the location of your public directory.
+    # The default is the public/ directory in your Rails root.  Or if Rails is not
+    # found, it defaults to public/ in the current directory (of the process).
+    #
+    # Example: 'tmp/' if you don't want to generate in public for some reason.
+    #
+    # Set to nil to use the current directory.
     def public_path=(value)
       @public_path = value
       update_sitemaps(:directory)

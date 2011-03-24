@@ -79,7 +79,7 @@ describe SitemapGenerator::LinkSet do
 
     it "should change when the public_path is changed" do
       @ls.public_path = 'tmp/'
-      @ls.sitemaps_directory.should == File.expand_path(Rails.root + 'tmp/')
+      @ls.sitemaps_directory.should == File.expand_path('../../../tmp/', __FILE__) # process current directory
     end
 
     it "should change when the sitemaps_path is changed" do
