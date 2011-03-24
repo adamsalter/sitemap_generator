@@ -91,7 +91,7 @@ module SitemapGenerator
     #     sitemap.add '/'
     #   end
     def add_links
-      raise ArgumentError, "Default host not set" if default_host.blank?
+      assert_default_host!
 
       sitemap.add('/', :lastmod => Time.now, :changefreq => 'always', :priority => 1.0, :host => @default_host) if include_root
       sitemap.add(sitemap_index, :lastmod => Time.now, :changefreq => 'always', :priority => 1.0) if include_index
@@ -211,12 +211,19 @@ module SitemapGenerator
 
     # Return the url to the sitemaps
     def sitemaps_url
+      assert_default_host!
       URI.join(@default_host.to_s, @sitemaps_path.to_s).to_s
     end
 
     # Return the sitemaps directory
     def sitemaps_directory
-      File.join(@public_path.to_s, @sitemaps_path.to_s)
+      File.expand_path(File.join(@public_path.to_s, @sitemaps_path.to_s))
+    end
+
+    protected
+
+    def assert_default_host!
+      raise SitemapGenerator::SitemapError, "Default host not set" if @default_host.blank?
     end
   end
 end

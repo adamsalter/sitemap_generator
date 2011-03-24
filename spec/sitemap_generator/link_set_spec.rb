@@ -4,7 +4,7 @@ describe SitemapGenerator::LinkSet do
 
   context "initializer options" do
     options = [:public_path, :sitemaps_path, :default_host, :filename]
-    values = ['tmp/', 'mobile/', 'http://myhost.com', :xxx]
+    values = [File.expand_path(Rails.root + 'tmp/'), 'mobile/', 'http://myhost.com', :xxx]
 
     options.zip(values).each do |option, value|
       it "should set #{option} to #{value}" do
@@ -15,7 +15,7 @@ describe SitemapGenerator::LinkSet do
 
     it "should support calling with positional arguments (deprecated)" do
       @ls = SitemapGenerator::LinkSet.new(*values[0..3])
-      options.each do |option|
+      options.zip(values).each do |option, value|
         @ls.send(option).should == value
       end
     end
@@ -25,7 +25,7 @@ describe SitemapGenerator::LinkSet do
     default_options = {
       :filename => :sitemap,
       :sitemaps_path => nil,
-      :public_path => 'public/',
+      :public_path => File.expand_path(Rails.root + 'public/'),
       :default_host => nil,
       :include_index => true,
       :include_root => true
@@ -74,17 +74,17 @@ describe SitemapGenerator::LinkSet do
     end
 
     it "should default to public/" do
-      @ls.sitemaps_directory.should == 'public/'
+      @ls.sitemaps_directory.should == File.expand_path(Rails.root + 'public/')
     end
 
     it "should change when the public_path is changed" do
       @ls.public_path = 'tmp/'
-      @ls.sitemaps_directory.should == 'tmp/'
+      @ls.sitemaps_directory.should == File.expand_path(Rails.root + 'tmp/')
     end
 
     it "should change when the sitemaps_path is changed" do
       @ls.sitemaps_path = 'sitemaps/'
-      @ls.sitemaps_directory.should == 'public/sitemaps/'
+      @ls.sitemaps_directory.should == File.expand_path(Rails.root + 'public/sitemaps/')
     end
   end
 
@@ -93,10 +93,10 @@ describe SitemapGenerator::LinkSet do
       @ls = SitemapGenerator::LinkSet.new
     end
 
-    it "should not have a default" do
-      @ls.sitemaps_url.should be_nil
+    it "should raise if no default host is set" do
+      lambda { @ls.sitemaps_url }.should raise SitemapGenerator::SitemapError
     end
-
+    
     it "should change when the default_host is changed" do
       @ls.default_host = 'http://one.com'
       @ls.sitemaps_url.should == 'http://one.com'
