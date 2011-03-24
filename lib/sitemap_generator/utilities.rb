@@ -26,15 +26,6 @@ module SitemapGenerator
       FileUtils.rm(Dir[File.join(Rails.root, 'public/sitemap*.xml.gz')])
     end
 
-    # Returns a boolean indicating whether this environment is Rails 3
-    #
-    # @return [Boolean]
-    def self.rails3?
-      Rails.version.to_f >= 3
-    rescue
-      false  # Rails.version defined in 2.1.0
-    end
-
     # Validate all keys in a hash match *valid keys, raising ArgumentError on a
     # mismatch. Note that keys are NOT treated indifferently, meaning if you use
     # strings for keys but assert symbols as keys, this will fail.

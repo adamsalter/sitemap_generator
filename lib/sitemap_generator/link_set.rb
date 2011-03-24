@@ -74,7 +74,7 @@ module SitemapGenerator
         :include_root => true,
         :include_index => true,
         :filename => :sitemap,
-        :public_path => (File.join(::Rails.root, 'public/') rescue 'public/'),
+        :public_path => SitemapGenerator.app.root + 'public/',
         :sitemaps_path => nil
       })
       options.each_pair { |k, v| instance_variable_set("@#{k}".to_sym, v) }

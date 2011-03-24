@@ -9,13 +9,13 @@ module SitemapGenerator
       #   sitemap - a Sitemap instance, or
       #   path, options - a path for the URL and options hash
       def initialize(path, options={})
-        if file = path.is_a?(SitemapGenerator::Builder::SitemapFile) && path
-          options.reverse_merge!(:host => file.host, :lastmod => file.lastmod)
-          path = file.path
+        if sitemap = path.is_a?(SitemapGenerator::Builder::SitemapFile) && path
+          options.reverse_merge!(:host => sitemap.host, :lastmod => sitemap.lastmod)
+          path = sitemap.path
         end
 
         SitemapGenerator::Utilities.assert_valid_keys(options, :priority, :changefreq, :lastmod, :host, :images, :video, :geo)
-        options.reverse_merge!(:priority => 0.5, :changefreq => 'weekly', :lastmod => Time.now, :host => Sitemap.default_host, :images => [])
+        options.reverse_merge!(:priority => 0.5, :changefreq => 'weekly', :lastmod => Time.now, :host => SitemapGenerator::Sitemap.default_host, :images => [])
         self.merge!(
           :path => path,
           :priority => options[:priority],

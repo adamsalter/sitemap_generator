@@ -3,8 +3,7 @@ require 'sitemap_generator/sitemap_namer'
 require 'sitemap_generator/link_set'
 require 'sitemap_generator/templates'
 require 'sitemap_generator/utilities'
-require 'sitemap_generator/railtie' if SitemapGenerator::Utilities.rails3?
-
+require 'sitemap_generator/application'
 require 'active_support/core_ext/numeric'
 
 module SitemapGenerator
@@ -19,13 +18,21 @@ module SitemapGenerator
     MAX_SITEMAP_IMAGES   = 1_000         # max images per url
     MAX_SITEMAP_FILESIZE = 10.megabytes  # bytes
 
-    Sitemap = LinkSet.new
+    # Lazy-initialize the LinkSet instance
+    Sitemap = Class.new do
+      def method_missing(*args)
+        (@link_set ||= LinkSet.new).send(*args)
+      end
+    end
   end
 
   class << self
-    attr_accessor :root, :templates
+    attr_accessor :root, :app, :templates
   end
 
   self.root = File.expand_path(File.join(File.dirname(__FILE__), '../'))
   self.templates = SitemapGenerator::Templates.new(self.root)
+  self.app = SitemapGenerator::Application.new
 end
+
+require 'sitemap_generator/railtie' if SitemapGenerator.app.rails3?
