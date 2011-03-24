@@ -163,8 +163,7 @@ module SitemapGenerator
     # if you need to change it on a per-link basis.
     def default_host=(value)
       @default_host = value
-      sitemap_index.host = sitemaps_url unless sitemap_index.finalized?
-      sitemap.host = sitemaps_url unless sitemap.finalized?
+      update_sitemaps(:host)
     end
 
     # Set the public_path.   This path gives the location of your public directory.
@@ -172,8 +171,7 @@ module SitemapGenerator
     # don't want to generate in public.  If set to nil the current directory is used.
     def public_path=(value)
       @public_path = value
-      sitemap_index.directory = sitemaps_directory unless sitemap_index.finalized?
-      sitemap.directory = sitemaps_directory unless sitemap.finalized?
+      update_sitemaps(:directory)
     end
 
     # Set the sitemaps_path.  This path gives the location to write sitemaps to
@@ -181,14 +179,12 @@ module SitemapGenerator
     # Example: 'sitemaps/' to generate your sitemaps in 'public/sitemaps/'.
     def sitemaps_path=(value)
       @sitemaps_path = value
-      sitemap_index.directory = sitemaps_directory unless sitemap_index.finalized?
-      sitemap.directory = sitemaps_directory unless sitemap.finalized?
+      update_sitemaps(:directory)
     end
 
     def filename=(value)
       @filename = value
-      sitemap_index.filename = @filename unless sitemap_index.finalized?
-      sitemap.filename = @filename unless sitemap.finalized?
+      update_sitemaps(:filename)
     end
 
     # Lazy-initialize a sitemap instance when it's accessed
@@ -224,6 +220,23 @@ module SitemapGenerator
 
     def assert_default_host!
       raise SitemapGenerator::SitemapError, "Default host not set" if @default_host.blank?
+    end
+
+    # Update the given attribute on the current sitemap index and sitemap files.  But
+    # don't create the index or sitemap files yet if they are not already created.
+    def update_sitemaps(attribute)
+      return unless @sitemap || @sitemap_index
+      value =
+        case attribute
+        when :host
+          sitemaps_url
+        when :directory
+          sitemaps_directory
+        when :filename
+          @filename
+        end
+      sitemap_index.send("#{attribute}=", value) if @sitemap_index && !@sitemap_index.finalized?
+      sitemap.send("#{attribute}=", value) if @sitemap && !@sitemap.finalized?
     end
   end
 end
