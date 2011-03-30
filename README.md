@@ -18,7 +18,8 @@ Features
 Changelog
 -------
 
-- v1.4.0: [Geo sitemap][geo_tags] support, support for generate multiple sitemap sets with different filenames
+- v1.5.0: Major refactoring & testing in preparation for new API & features
+- v1.4.0: [Geo sitemap][geo_tags] support, multiple sitemap support via CONFIG_FILE rake option
 - v1.3.0: Support setting the sitemaps path
 - v1.2.0: Verified working with Rails 3 stable release
 - v1.1.0: [Video sitemap][sitemap_video] support
