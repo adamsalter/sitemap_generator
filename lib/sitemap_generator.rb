@@ -19,11 +19,11 @@ module SitemapGenerator
     MAX_SITEMAP_FILESIZE = 10.megabytes  # bytes
 
     # Lazy-initialize the LinkSet instance
-    Sitemap = Class.new do
-      def method_missing(*args)
-        (@link_set ||= LinkSet.new).send(*args)
+    Sitemap = (Class.new do
+      def method_missing(*args, &block)
+        (@link_set ||= LinkSet.new).send(*args, &block)
       end
-    end
+    end).new
   end
 
   class << self
