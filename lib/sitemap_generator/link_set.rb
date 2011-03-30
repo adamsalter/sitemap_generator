@@ -18,20 +18,16 @@ module SitemapGenerator
     def create(config_file = 'config/sitemap.rb', &block)
       require 'sitemap_generator/interpreter'
 
-      start_time = Time.now
+      # Clear out the current objects.  New objects will be lazy-initialized.
       @sitemap_index = @sitemap = nil
 
+      start_time = Time.now
       SitemapGenerator::Interpreter.new(self, config_file, &block)
-      unless sitemap.finalized?
-        sitemap_index.add(sitemap)
-        puts sitemap.summary if verbose
-      end
-      sitemap_index.finalize!
+      finalize_sitemap
+      finalize_sitemap_index
       end_time = Time.now
 
-      if verbose
-        puts sitemap_index.summary(:time_taken => end_time - start_time)
-      end
+      puts sitemap_index.stats_summary(:time_taken => end_time - start_time) if verbose
     end
 
     # Constructor
@@ -108,8 +104,7 @@ module SitemapGenerator
     def add(link, options={})
       sitemap.add(link, options.reverse_merge!(:host => @default_host))
     rescue SitemapGenerator::SitemapFullError
-      sitemap_index.add(sitemap)
-      puts sitemap.summary if verbose
+      finalize_sitemap
       retry
     rescue SitemapGenerator::SitemapFinalizedError
       @sitemap = sitemap.next
@@ -222,6 +217,22 @@ module SitemapGenerator
     end
 
     protected
+
+    # Finalize a sitemap by including it in the index and outputting a summary line.
+    # Do nothing if it has already been finalized.
+    def finalize_sitemap
+      return if sitemap.finalized?
+      sitemap_index.add(sitemap)
+      puts sitemap.summary(:sitemaps_path => @sitemaps_path) if verbose
+    end
+
+    # Finalize a sitemap index and output a summary line.  Do nothing if it has already
+    # been finalized.
+    def finalize_sitemap_index
+      return if sitemap_index.finalized?
+      sitemap_index.finalize!
+      puts sitemap_index.summary(:sitemaps_path => @sitemaps_path) if verbose
+    end
 
     def assert_default_host!
       raise SitemapGenerator::SitemapError, "Default host not set" if @default_host.blank?

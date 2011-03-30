@@ -140,10 +140,11 @@ module SitemapGenerator
       end
 
       # Return a summary string
-      def summary
+      def summary(opts={})
+        relative_path = (opts[:sitemaps_path] ? opts[:sitemaps_path] : '') + @filename
         uncompressed_size = number_to_human_size(@filesize) rescue "#{@filesize / 8} KB"
         compressed_size =   number_to_human_size(File.size?(path)) rescue "#{File.size?(path) / 8} KB"
-        "+ #{'%-21s' % @directory} #{'%13s' % @link_count} links / #{'%10s' % uncompressed_size} / #{'%10s' % compressed_size} gzipped"
+        "+ #{'%-21s' % relative_path} #{'%15s' % @link_count} links / #{'%10s' % uncompressed_size} / #{'%10s' % compressed_size} gzipped"
       end
 
       # Set a new filename on the instance (creates a new SitemapNamer instance)
@@ -153,11 +154,11 @@ module SitemapGenerator
       end
 
       def path
-        @path ||= File.join(@directory, @filename.to_s)
+        File.join(@directory, @filename.to_s)
       end
 
       def url
-        @url ||= URI.join(@host, @filename.to_s).to_s
+        URI.join(@host, @filename.to_s).to_s
       end
 
       protected

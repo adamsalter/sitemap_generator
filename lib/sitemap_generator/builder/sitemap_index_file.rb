@@ -48,11 +48,15 @@ module SitemapGenerator
       end
 
       # Return a summary string
-      def summary
+      def summary(opts={})
+        relative_path = (opts[:sitemaps_path] ? opts[:sitemaps_path] : '') + @filename
         uncompressed_size = number_to_human_size(@filesize) rescue "#{@filesize / 8} KB"
         compressed_size =   number_to_human_size(File.size?(path)) rescue "#{File.size?(path) / 8} KB"
-        str = "+ #{'%-21s' % directory} #{'%10s' % @link_count} sitemaps / #{'%10s' % uncompressed_size} / #{'%10s' % compressed_size} gzipped"
-        str += "\nSitemap stats: #{number_with_delimiter(total_link_count)} links / #{@link_count} sitemaps"
+        "+ #{'%-21s' % relative_path} #{'%10s' % @link_count} sitemaps / #{'%10s' % uncompressed_size} / #{'%10s' % compressed_size} gzipped"
+      end
+
+      def stats_summary(opts={})
+        str = "Sitemap stats: #{number_with_delimiter(@sitemaps_link_count)} links / #{@link_count} sitemaps"
         str += " / %dm%02ds" % opts[:time_taken].divmod(60) if opts[:time_taken]
       end
     end
