@@ -10,7 +10,7 @@ gem 'rspec-rails', '~>1.3.2', :require => 'spec/rails'
 
 # Simplify these dependencies
 gem 'git', '1.2.5'
-gem 'jeweler', '~>1.5.2'
+gem 'jeweler', '=1.4.0'
 gem 'github', '0.4.5'
 gem 'gemcutter', '0.6.1'
 
