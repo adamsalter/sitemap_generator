@@ -104,8 +104,9 @@ module SitemapGenerator
     #
     # link - string link e.g. '/merchant', '/article/1' or whatever.
     # options - see README.
+    #   host - host for the link, defaults to your <tt>default_host</tt>.
     def add(link, options={})
-      sitemap.add(link, options)
+      sitemap.add(link, options.reverse_merge!(:host => @default_host))
     rescue SitemapGenerator::SitemapFullError
       sitemap_index.add(sitemap)
       puts sitemap.summary if verbose

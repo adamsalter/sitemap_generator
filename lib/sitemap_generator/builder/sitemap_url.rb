@@ -15,7 +15,7 @@ module SitemapGenerator
         end
 
         SitemapGenerator::Utilities.assert_valid_keys(options, :priority, :changefreq, :lastmod, :host, :images, :video, :geo)
-        options.reverse_merge!(:priority => 0.5, :changefreq => 'weekly', :lastmod => Time.now, :host => SitemapGenerator::Sitemap.default_host, :images => [])
+        options.reverse_merge!(:priority => 0.5, :changefreq => 'weekly', :lastmod => Time.now, :images => [])
         self.merge!(
           :path => path,
           :priority => options[:priority],
