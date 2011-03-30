@@ -6,12 +6,12 @@ describe "SitemapGenerator" do
     loc = 'http://www.example.com/geo_page.kml'
     format = 'kml'
 
-    geo_xml_fragment = SitemapGenerator::Builder::SitemapUrl.new('geo_page.kml', {
+    geo_xml_fragment = SitemapGenerator::Builder::SitemapUrl.new('geo_page.kml',
       :host => 'http://www.example.com',
       :geo => {
         :format => format
       }
-    }).to_xml
+    ).to_xml
 
     # Check that the options were parsed correctly
     doc = Nokogiri::XML.parse("<root xmlns:geo='http://www.google.com/geo/schemas/sitemap/1.0'>#{geo_xml_fragment}</root>")
