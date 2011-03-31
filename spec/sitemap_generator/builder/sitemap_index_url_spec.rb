@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe SitemapGenerator::Builder::SitemapUrl do
+describe SitemapGenerator::Builder::SitemapIndexUrl do
   before :all do
     @host = 'http://example.com/test/'
     @loc = SitemapGenerator::SitemapLocation.new(
@@ -8,11 +8,11 @@ describe SitemapGenerator::Builder::SitemapUrl do
       :public_path => '/public',
       :host => 'http://test.com' 
     )
-    @s = SitemapGenerator::Builder::SitemapFile.new(:location => @loc)
+    @s = SitemapGenerator::Builder::SitemapIndexFile.new(:location => @loc)
   end
 
   it "should return the correct url" do
     @u = SitemapGenerator::Builder::SitemapUrl.new(@s)
-    @u[:loc].should == 'http://test.com/sitemaps/sitemap1.xml.gz'
+    @u[:loc].should == 'http://test.com/sitemaps/sitemap_index.xml.gz'
   end
 end
