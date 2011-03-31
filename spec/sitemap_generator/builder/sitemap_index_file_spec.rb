@@ -31,8 +31,8 @@ context 'SitemapGenerator::Builder::SitemapIndexFile' do
     @s.filename.should == 'sitemap_index.xml.gz'
   end
   
-  it "should set the filename" do
+  it "should set the filename base" do
     @s.filename = 'xxx'
-    @s.filename.should == 'xxx.xml.gz'
+    @s.filename.should == 'xxx_index.xml.gz'
   end
 end

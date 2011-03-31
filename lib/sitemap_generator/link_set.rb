@@ -122,7 +122,7 @@ module SitemapGenerator
     def ping_search_engines
       require 'open-uri'
 
-      sitemap_index_url = CGI.escape(sitemap_index.url)
+      sitemap_index_url = CGI.escape(sitemap_index.location.url)
       search_engines = {
         :google         => "http://www.google.com/webmasters/sitemaps/ping?sitemap=#{sitemap_index_url}",
         :yahoo          => "http://search.yahooapis.com/SiteExplorerService/V1/ping?sitemap=#{sitemap_index_url}&appid=#{yahoo_app_id}",
@@ -230,7 +230,7 @@ module SitemapGenerator
       sitemap_index.send("#{attribute}=", value) if @sitemap_index && !@sitemap_index.finalized?
       sitemap.send("#{attribute}=", value) if @sitemap && !@sitemap.finalized?
     end
-    
+
     # Update the given attribute on the current sitemap index and sitemap file location objects.
     # But don't create the index or sitemap files yet if they are not already created.
     def update_location_info(attribute, value)

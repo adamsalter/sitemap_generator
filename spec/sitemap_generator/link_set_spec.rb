@@ -117,4 +117,14 @@ describe SitemapGenerator::LinkSet do
       @ls.sitemap_index.location.url.should == 'http://one.com/sitemaps/sitemap_index.xml.gz'
     end
   end
+
+  describe "ping search engines" do
+    before do
+      @ls = SitemapGenerator::LinkSet.new :default_host => 'http://one.com'
+    end
+
+    it "should not fail" do
+      lambda { @ls.ping_search_engines }.should_not raise_error
+    end
+  end
 end

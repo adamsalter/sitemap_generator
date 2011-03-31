@@ -7,7 +7,7 @@ describe "SitemapGenerator" do
       SitemapGenerator.root.should == File.expand_path('../../../' , __FILE__)
     end
   end
-  
+
   context "clean task" do
     before :each do
       copy_sitemap_file_to_rails_app
@@ -147,14 +147,14 @@ describe "SitemapGenerator" do
       after :each do
         Object::Rails = @rails
       end
-    
+
       it "should work outside of Rails" do
         defined?(Rails).should be_nil
         lambda { ::SitemapGenerator::LinkSet.new }.should_not raise_exception
       end
     end
   end
-  
+
   protected
 
   #

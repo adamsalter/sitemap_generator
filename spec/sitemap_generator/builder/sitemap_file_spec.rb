@@ -31,6 +31,11 @@ context 'SitemapGenerator::Builder::SitemapFile' do
     @s.finalized?.should be_false
   end
 
+  it "should set the filename base" do
+    @s.filename = 'xxx'
+    @s.filename.should == 'xxx1.xml.gz'
+  end
+
   context "next" do
     before :each do
       @orig_s = @s
@@ -45,7 +50,7 @@ context 'SitemapGenerator::Builder::SitemapFile' do
       @s.location.url.should == 'http://example.com/test/sitemap2.xml.gz'
       @s.location.path.should == '/public/test/sitemap2.xml.gz'
     end
-    
+
     it "should duplicate the location" do
       @s.location.should_not be(@orig_s.location)
     end
