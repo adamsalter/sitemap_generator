@@ -111,7 +111,7 @@ describe "SitemapGenerator" do
       directory_should_not_exist(rails_path('public/sitemaps/'))
 
       sm = ::SitemapGenerator::Sitemap
-      sm.sitemaps_path = '/sitemaps'
+      sm.sitemaps_path = 'sitemaps/'
       sm.create do
         add '/'
         add '/another'
@@ -125,7 +125,7 @@ describe "SitemapGenerator" do
       directory_should_not_exist(rails_path('public/sitemaps/deep/directory'))
 
       sm = ::SitemapGenerator::Sitemap
-      sm.sitemaps_path = '/sitemaps/deep/directory/'
+      sm.sitemaps_path = 'sitemaps/deep/directory/'
       sm.create do
         add '/'
         add '/another'

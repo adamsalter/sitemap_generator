@@ -68,44 +68,53 @@ describe SitemapGenerator::LinkSet do
     end
   end
 
-  context "sitemaps_directory" do
+  context "sitemaps directory" do
     before do
       @ls = SitemapGenerator::LinkSet.new
     end
 
     it "should default to public/" do
-      @ls.sitemaps_directory.should == File.expand_path(SitemapGenerator.app.root + 'public/')
+      @ls.location.directory.should == File.expand_path(SitemapGenerator.app.root + 'public/')
     end
 
     it "should change when the public_path is changed" do
       @ls.public_path = 'tmp/'
-      @ls.sitemaps_directory.should == File.expand_path('../../../tmp/', __FILE__) # process current directory
+      @ls.location.directory.should == 'tmp' # process current directory
+      @ls.location.directory.should == @ls.sitemap.location.directory
+      @ls.location.directory.should == @ls.sitemap_index.location.directory
     end
 
     it "should change when the sitemaps_path is changed" do
       @ls.sitemaps_path = 'sitemaps/'
-      @ls.sitemaps_directory.should == File.expand_path(SitemapGenerator.app.root + 'public/sitemaps/')
+      @ls.location.directory.should == (SitemapGenerator.app.root + 'public/sitemaps/').to_s
+      @ls.location.directory.should == @ls.sitemap.location.directory
+      @ls.location.directory.should == @ls.sitemap_index.location.directory
     end
   end
 
-  context "sitemaps_url" do
+  context "sitemaps url" do
     before do
       @ls = SitemapGenerator::LinkSet.new
     end
 
     it "should raise if no default host is set" do
-      lambda { @ls.sitemaps_url }.should raise_error(SitemapGenerator::SitemapError)
+      lambda { @ls.location.url }.should raise_error(SitemapGenerator::SitemapError)
     end
 
     it "should change when the default_host is changed" do
       @ls.default_host = 'http://one.com'
-      @ls.sitemaps_url.should == 'http://one.com'
+      @ls.location.host.should == 'http://one.com'
+      @ls.location.host.should == @ls.sitemap.location.host
+      @ls.location.host.should == @ls.sitemap_index.location.host
     end
 
     it "should change when the sitemaps_path is changed" do
       @ls.default_host = 'http://one.com'
       @ls.sitemaps_path = 'sitemaps/'
-      @ls.sitemaps_url.should == 'http://one.com/sitemaps/'
+      @ls.location[:filename] = 'xxx'
+      @ls.location.url.should == 'http://one.com/sitemaps/xxx'
+      @ls.sitemap.location.url.should == 'http://one.com/sitemaps/sitemap1.xml.gz'
+      @ls.sitemap_index.location.url.should == 'http://one.com/sitemaps/sitemap_index.xml.gz'
     end
   end
 end
