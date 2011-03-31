@@ -5,9 +5,9 @@ module SitemapGenerator
     class SitemapIndexUrl < SitemapUrl
 
       def initialize(path, options={})
-        if path.is_a?(SitemapGenerator::Builder::SitemapIndexFile)
-          options.reverse_merge!(:host => path.hostname, :lastmod => Time.now, :changefreq => 'always', :priority => 1.0)
-          path = path.sitemap_path
+        if index = path.is_a?(SitemapGenerator::Builder::SitemapIndexFile) && path
+          options.reverse_merge!(:host => index.location.host, :lastmod => Time.now, :changefreq => 'always', :priority => 1.0)
+          path = index.location.path_in_public
           super(path, options)
         else
           super

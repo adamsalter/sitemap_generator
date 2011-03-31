@@ -4,14 +4,12 @@ module SitemapGenerator
       attr_accessor :sitemaps
 
       def initialize(opts={})
-        @options = [:directory, :host, :filename]
-        @defaults = { :directory => 'public/', :filename => :sitemap_index }
+        @options = [:location, :filename]
         SitemapGenerator::Utilities.assert_valid_keys(opts, @options)
-        opts.reverse_merge!(@defaults)
-        opts.each_pair { |k, v| instance_variable_set("@#{k}".to_sym, v) }
 
+        @location = opts.delete(:location) || SitemapGenerator::SitemapLocation.new
+        @filename = "#{opts.value?(:filename) ? opts.delete(:filename) : :sitemap_index}.xml.gz"
         @link_count = 0
-        @filename = "#{@filename}.xml.gz"
         @sitemaps_link_count = 0
         @xml_content = '' # XML urlset content
         @xml_wrapper_start = <<-HTML
@@ -49,10 +47,9 @@ module SitemapGenerator
 
       # Return a summary string
       def summary(opts={})
-        relative_path = (opts[:sitemaps_path] ? opts[:sitemaps_path] : '') + @filename
         uncompressed_size = number_to_human_size(@filesize) rescue "#{@filesize / 8} KB"
-        compressed_size =   number_to_human_size(File.size?(path)) rescue "#{File.size?(path) / 8} KB"
-        "+ #{'%-21s' % relative_path} #{'%10s' % @link_count} sitemaps / #{'%10s' % uncompressed_size} / #{'%10s' % compressed_size} gzipped"
+        compressed_size =   number_to_human_size(@location.filesize) rescue "#{@location.filesize / 8} KB"
+        "+ #{'%-21s' % @location.path_in_public} #{'%10s' % @link_count} sitemaps / #{'%10s' % uncompressed_size} / #{'%10s' % compressed_size} gzipped"
       end
 
       def stats_summary(opts={})

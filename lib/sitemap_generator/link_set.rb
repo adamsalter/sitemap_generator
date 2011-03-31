@@ -74,6 +74,14 @@ module SitemapGenerator
         :sitemaps_path => nil
       })
       options.each_pair { |k, v| instance_variable_set("@#{k}".to_sym, v) }
+
+
+      # Create a location object to store all the location options
+      @loc = SitemapGenerator::SitemapLocation.new(
+        :sitemaps_path => @sitemaps_path,
+        :public_path => @public_path,
+        :host => @default_host
+      )
     end
 
     # Entry point for users.
@@ -87,11 +95,8 @@ module SitemapGenerator
     #     sitemap.add '/'
     #   end
     def add_links
-      assert_default_host!
-
-      sitemap.add('/', :lastmod => Time.now, :changefreq => 'always', :priority => 1.0, :host => @default_host) if include_root
+      sitemap.add('/', :lastmod => Time.now, :changefreq => 'always', :priority => 1.0, :host => @loc.host) if include_root
       sitemap.add(sitemap_index, :lastmod => Time.now, :changefreq => 'always', :priority => 1.0) if include_index
-
       yield self
     end
 
@@ -102,7 +107,7 @@ module SitemapGenerator
     # options - see README.
     #   host - host for the link, defaults to your <tt>default_host</tt>.
     def add(link, options={})
-      sitemap.add(link, options.reverse_merge!(:host => @default_host))
+      sitemap.add(link, options.reverse_merge!(:host => @loc.host))
     rescue SitemapGenerator::SitemapFullError
       finalize_sitemap
       retry
@@ -158,8 +163,7 @@ module SitemapGenerator
     # of your sitemap links.  You can pass a different host in your options to `add`
     # if you need to change it on a per-link basis.
     def default_host=(value)
-      @default_host = value
-      update_sitemaps(:host)
+      update_location_info(:host, value)
     end
 
     # Set the public_path.  This path gives the location of your public directory.
@@ -170,50 +174,35 @@ module SitemapGenerator
     #
     # Set to nil to use the current directory.
     def public_path=(value)
-      @public_path = value
-      update_sitemaps(:directory)
+      update_location_info(:public_path, value)
     end
 
     # Set the sitemaps_path.  This path gives the location to write sitemaps to
     # relative to your public_path.
     # Example: 'sitemaps/' to generate your sitemaps in 'public/sitemaps/'.
     def sitemaps_path=(value)
-      @sitemaps_path = value
-      update_sitemaps(:directory)
+      update_location_info(:sitemaps_path, value)
     end
 
     def filename=(value)
       @filename = value
-      update_sitemaps(:filename)
+      update_sitemap_info(:filename, value)
     end
 
     # Lazy-initialize a sitemap instance when it's accessed
     def sitemap
       @sitemap ||= SitemapGenerator::Builder::SitemapFile.new(
-        :directory => sitemaps_directory,
-        :filename => @filename,
-        :host => sitemaps_url
+        :location => @loc.dup,
+        :filename => @filename
       )
     end
 
     # Lazy-initialize a sitemap index instance when it's accessed
     def sitemap_index
       @sitemap_index ||= SitemapGenerator::Builder::SitemapIndexFile.new(
-        :directory => sitemaps_directory,
-        :filename => "#{@filename}_index",
-        :host => sitemaps_url
+        :location => @loc.dup,
+        :filename => "#{@loc.filename}_index"
       )
-    end
-
-    # Return the url to the sitemaps
-    def sitemaps_url
-      assert_default_host!
-      URI.join(@default_host.to_s, @sitemaps_path.to_s).to_s
-    end
-
-    # Return the sitemaps directory
-    def sitemaps_directory
-      File.expand_path(File.join(@public_path.to_s, @sitemaps_path.to_s))
     end
 
     protected
@@ -223,7 +212,7 @@ module SitemapGenerator
     def finalize_sitemap
       return if sitemap.finalized?
       sitemap_index.add(sitemap)
-      puts sitemap.summary(:sitemaps_path => @sitemaps_path) if verbose
+      puts sitemap.summary if verbose
     end
 
     # Finalize a sitemap index and output a summary line.  Do nothing if it has already
@@ -231,28 +220,22 @@ module SitemapGenerator
     def finalize_sitemap_index
       return if sitemap_index.finalized?
       sitemap_index.finalize!
-      puts sitemap_index.summary(:sitemaps_path => @sitemaps_path) if verbose
-    end
-
-    def assert_default_host!
-      raise SitemapGenerator::SitemapError, "Default host not set" if @default_host.blank?
+      puts sitemap_index.summary if verbose
     end
 
     # Update the given attribute on the current sitemap index and sitemap files.  But
     # don't create the index or sitemap files yet if they are not already created.
-    def update_sitemaps(attribute)
-      return unless @sitemap || @sitemap_index
-      value =
-        case attribute
-        when :host
-          sitemaps_url
-        when :directory
-          sitemaps_directory
-        when :filename
-          @filename
-        end
-      sitemap_index.send("#{attribute}=", value) if @sitemap_index && !@sitemap_index.finalized?
-      sitemap.send("#{attribute}=", value) if @sitemap && !@sitemap.finalized?
+    def update_sitemap_info(attribute, value)
+      sitemap_index.send(attribute, value) if @sitemap_index && !@sitemap_index.finalized?
+      sitemap.send(attribute, value) if @sitemap && !@sitemap.finalized?
+    end
+    
+    # Update the given attribute on the current sitemap index and sitemap file location objects.
+    # But don't create the index or sitemap files yet if they are not already created.
+    def update_location_info(attribute, value)
+      @loc.merge!(attribute => value)
+      sitemap_index.location.merge!(attribute => value) if @sitemap_index && !@sitemap_index.finalized?
+      sitemap.location.merge!(attribute => value) if @sitemap && !@sitemap.finalized?
     end
   end
 end

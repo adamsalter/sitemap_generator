@@ -21,7 +21,7 @@ describe SitemapGenerator::Application do
     end
   end
 
-  describe "root" do
+  describe "with Rails" do
     before :each do
       @root = '/test'
       Rails.expects(:root).returns(@root).at_least_once
@@ -34,7 +34,7 @@ describe SitemapGenerator::Application do
     end
   end
 
-  describe "root with no Rails" do
+  describe "with no Rails" do
     before :each do
       @rails = Rails
       Object.send(:remove_const, :Rails)
@@ -42,6 +42,10 @@ describe SitemapGenerator::Application do
 
     after :each do
       Object::Rails = @rails
+    end
+
+    it "should not be Rails" do
+      @app.rails?.should be_false
     end
 
     it "should use the current working directory" do

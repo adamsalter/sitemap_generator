@@ -10,8 +10,8 @@ module SitemapGenerator
       #   path, options - a path for the URL and options hash
       def initialize(path, options={})
         if sitemap = path.is_a?(SitemapGenerator::Builder::SitemapFile) && path
-          options.reverse_merge!(:host => sitemap.host, :lastmod => sitemap.lastmod)
-          path = sitemap.path
+          options.reverse_merge!(:host => sitemap.location.host, :lastmod => sitemap.lastmod)
+          path = sitemap.location.path_in_public
         end
 
         SitemapGenerator::Utilities.assert_valid_keys(options, :priority, :changefreq, :lastmod, :host, :images, :video, :geo)

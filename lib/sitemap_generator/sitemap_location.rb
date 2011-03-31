@@ -1,6 +1,19 @@
 module SitemapGenerator
   class SitemapLocation < Hash
 
+    [:filename, :host].each do |method|
+      define_method(method) do
+        raise SitemapGenerator::SitemapError, "No value set for #{method}" unless self[method]
+        self[method]
+      end
+    end
+
+    [:public_path, :sitemaps_path].each do |method|
+      define_method(method) do
+        Pathname.new(self[method].nil? ? '' : self[method])
+      end
+    end
+
     # The filename is not required at initialization but must be set when calling
     # methods that depend on it like <tt>path</tt>.
     #
@@ -16,18 +29,12 @@ module SitemapGenerator
     #   filename      - name of the file
     def initialize(opts={})
       opts.reverse_merge!(
-        :sitemaps_path => SitemapGenerator.app.root + 'public/',
-        :public_path => nil,
+        :sitemaps_path => nil,
+        :public_path => SitemapGenerator.app.root + 'public/',
         :host => nil,
         :filename => nil
       )
       self.merge!(opts)
-
-      [:public_path, :filename, :sitemaps_path, :host].each do |method|
-        define_method(method) do
-          self[method] || raise "No value set for #{method}"
-        end
-      end
     end
 
     # Return a new Location instance with the given options merged in
@@ -35,23 +42,29 @@ module SitemapGenerator
       self.merge(opts)
     end
 
-    def filename
-      self[:filename] && self[:filename].to_s || raise "No filename set"
-    end
-
     # Full path to the directory of the file.
     def directory
-      File.join(public_path, sitemaps_path)
+      (public_path + sitemaps_path).to_s
     end
 
     # Full path of the file including the filename.
     def path
-      File.join(public_path, sitemaps_path, filename)
+      (public_path + sitemaps_path + filename).to_s
     end
 
+    # Relative path of the file (including the filename) relative to <tt>public_path</tt>
+    def path_in_public
+      (sitemaps_path + filename).to_s
+    end
+    
     # Full URL of the file.
     def url
-      URI.join(host, sitemaps_path, filename).to_s
+      URI.join(host, sitemaps_path.to_s, filename.to_s).to_s
+    end
+    
+    # Return the size of the file at <tt>path</tt>
+    def filesize
+      File.size?(path)
     end
   end
 end
