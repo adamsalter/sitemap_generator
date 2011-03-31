@@ -2,15 +2,16 @@ require 'spec_helper'
 
 context 'SitemapGenerator::Builder::SitemapIndexFile' do
   before :each do
-    @s = SitemapGenerator::Builder::SitemapIndexFile.new(:directory => 'public/test/', :host => 'http://example.com/test/')
+    @loc = SitemapGenerator::SitemapLocation.new(:public_path => '/public/', :sitemaps_path => 'test/', :host => 'http://example.com/')
+    @s = SitemapGenerator::Builder::SitemapIndexFile.new(:location => @loc)
   end
 
   it "should return the URL" do
-    @s.url.should == 'http://example.com/test/sitemap_index.xml.gz'
+    @s.location.url.should == 'http://example.com/test/sitemap_index.xml.gz'
   end
 
   it "should return the path" do
-    @s.path.should == 'public/test/sitemap_index.xml.gz'
+    @s.location.path.should == '/public/test/sitemap_index.xml.gz'
   end
 
   it "should be empty" do
@@ -24,5 +25,14 @@ context 'SitemapGenerator::Builder::SitemapIndexFile' do
 
   it "should not be finalized" do
     @s.finalized?.should be_false
+  end
+  
+  it "filename should default to sitemap_index" do
+    @s.filename.should == 'sitemap_index.xml.gz'
+  end
+  
+  it "should set the filename" do
+    @s.filename = 'xxx'
+    @s.filename.should == 'xxx.xml.gz'
   end
 end

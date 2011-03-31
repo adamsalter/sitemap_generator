@@ -2,7 +2,8 @@ require 'spec_helper'
 
 context 'SitemapGenerator::Builder::SitemapFile' do
   before :each do
-    @s = SitemapGenerator::Builder::SitemapFile.new(:directory => 'public/test/', :host => 'http://example.com/test/')
+    @loc = SitemapGenerator::SitemapLocation.new(:public_path => '/public/', :sitemaps_path => 'test/', :host => 'http://example.com/')
+    @s = SitemapGenerator::Builder::SitemapFile.new(:location => @loc)
   end
 
   it "should return the name of the sitemap file" do
@@ -10,11 +11,11 @@ context 'SitemapGenerator::Builder::SitemapFile' do
   end
 
   it "should return the URL" do
-    @s.url.should == 'http://example.com/test/sitemap1.xml.gz'
+    @s.location.url.should == 'http://example.com/test/sitemap1.xml.gz'
   end
 
   it "should return the path" do
-    @s.path.should == 'public/test/sitemap1.xml.gz'
+    @s.location.path.should == '/public/test/sitemap1.xml.gz'
   end
 
   it "should be empty" do
@@ -32,6 +33,7 @@ context 'SitemapGenerator::Builder::SitemapFile' do
 
   context "next" do
     before :each do
+      @orig_s = @s
       @s = @s.next
     end
 
@@ -40,8 +42,12 @@ context 'SitemapGenerator::Builder::SitemapFile' do
     end
 
     it "should inherit the same options" do
-      @s.url.should == 'http://example.com/test/sitemap2.xml.gz'
-      @s.path.should == 'public/test/sitemap2.xml.gz'
+      @s.location.url.should == 'http://example.com/test/sitemap2.xml.gz'
+      @s.location.path.should == '/public/test/sitemap2.xml.gz'
+    end
+    
+    it "should duplicate the location" do
+      @s.location.should_not be(@orig_s.location)
     end
   end
 end

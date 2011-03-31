@@ -28,6 +28,7 @@ module SitemapGenerator
     #                   the <tt>host</tt>, <tt>sitemaps_path</tt> and <tt>filename</tt>
     #   filename      - name of the file
     def initialize(opts={})
+      SitemapGenerator::Utilities.assert_valid_keys(opts, [:public_path, :sitemaps_path, :host, :filename])
       opts.reverse_merge!(
         :sitemaps_path => nil,
         :public_path => SitemapGenerator.app.root + 'public/',

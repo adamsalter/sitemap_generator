@@ -9,6 +9,8 @@ module SitemapGenerator
 
         @location = opts.delete(:location) || SitemapGenerator::SitemapLocation.new
         @filename = "#{opts.value?(:filename) ? opts.delete(:filename) : :sitemap_index}.xml.gz"
+        @location[:filename] = @filename
+        
         @link_count = 0
         @sitemaps_link_count = 0
         @xml_content = '' # XML urlset content
@@ -42,7 +44,7 @@ module SitemapGenerator
 
       # Set a new filename on the instance.  Should not include any extensions e.g. :sitemap_index
       def filename=(filename)
-        @filename = "#{filename}.xml.gz"
+        @filename = @location[:filename] = "#{filename}.xml.gz"
       end
 
       # Return a summary string

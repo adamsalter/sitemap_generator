@@ -24,8 +24,7 @@ module SitemapGenerator
       #
       # <tt>namer</tt> (optional) if provided is used to get the next sitemap filename, overriding :filename
       def initialize(opts={})
-        @options = [:location, :filename, :namer]
-        SitemapGenerator::Utilities.assert_valid_keys(opts, @options)
+        SitemapGenerator::Utilities.assert_valid_keys(opts, [:location, :filename, :namer])
 
         @location = opts.delete(:location) || SitemapGenerator::SitemapLocation.new
         @namer = opts.delete(:namer) || new_namer(opts.delete(:filename))
@@ -127,10 +126,7 @@ module SitemapGenerator
 
       # Return a new instance of the sitemap file with the same options, and the next name in the sequence.
       def next
-        self.class.new(@options.inject({}) do |memo, key|
-          memo[key] = instance_variable_get("@#{key}".to_sym)
-          memo
-        end)
+        self.class.new(:location => @location.dup, :namer => @namer)
       end
 
       # Return a summary string

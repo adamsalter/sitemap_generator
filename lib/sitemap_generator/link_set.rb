@@ -77,7 +77,7 @@ module SitemapGenerator
 
 
       # Create a location object to store all the location options
-      @loc = SitemapGenerator::SitemapLocation.new(
+      @location = SitemapGenerator::SitemapLocation.new(
         :sitemaps_path => @sitemaps_path,
         :public_path => @public_path,
         :host => @default_host
@@ -95,7 +95,7 @@ module SitemapGenerator
     #     sitemap.add '/'
     #   end
     def add_links
-      sitemap.add('/', :lastmod => Time.now, :changefreq => 'always', :priority => 1.0, :host => @loc.host) if include_root
+      sitemap.add('/', :lastmod => Time.now, :changefreq => 'always', :priority => 1.0, :host => @location.host) if include_root
       sitemap.add(sitemap_index, :lastmod => Time.now, :changefreq => 'always', :priority => 1.0) if include_index
       yield self
     end
@@ -107,7 +107,7 @@ module SitemapGenerator
     # options - see README.
     #   host - host for the link, defaults to your <tt>default_host</tt>.
     def add(link, options={})
-      sitemap.add(link, options.reverse_merge!(:host => @loc.host))
+      sitemap.add(link, options.reverse_merge!(:host => @location.host))
     rescue SitemapGenerator::SitemapFullError
       finalize_sitemap
       retry
@@ -184,6 +184,7 @@ module SitemapGenerator
       update_location_info(:sitemaps_path, value)
     end
 
+    # Set the filename base to use when generating sitemaps and sitemap indexes.
     def filename=(value)
       @filename = value
       update_sitemap_info(:filename, value)
@@ -192,7 +193,7 @@ module SitemapGenerator
     # Lazy-initialize a sitemap instance when it's accessed
     def sitemap
       @sitemap ||= SitemapGenerator::Builder::SitemapFile.new(
-        :location => @loc.dup,
+        :location => @location.dup,
         :filename => @filename
       )
     end
@@ -200,8 +201,8 @@ module SitemapGenerator
     # Lazy-initialize a sitemap index instance when it's accessed
     def sitemap_index
       @sitemap_index ||= SitemapGenerator::Builder::SitemapIndexFile.new(
-        :location => @loc.dup,
-        :filename => "#{@loc.filename}_index"
+        :location => @location.dup,
+        :filename => "#{@filename}_index"
       )
     end
 
@@ -226,14 +227,14 @@ module SitemapGenerator
     # Update the given attribute on the current sitemap index and sitemap files.  But
     # don't create the index or sitemap files yet if they are not already created.
     def update_sitemap_info(attribute, value)
-      sitemap_index.send(attribute, value) if @sitemap_index && !@sitemap_index.finalized?
-      sitemap.send(attribute, value) if @sitemap && !@sitemap.finalized?
+      sitemap_index.send("#{attribute}=", value) if @sitemap_index && !@sitemap_index.finalized?
+      sitemap.send("#{attribute}=", value) if @sitemap && !@sitemap.finalized?
     end
     
     # Update the given attribute on the current sitemap index and sitemap file location objects.
     # But don't create the index or sitemap files yet if they are not already created.
     def update_location_info(attribute, value)
-      @loc.merge!(attribute => value)
+      @location.merge!(attribute => value)
       sitemap_index.location.merge!(attribute => value) if @sitemap_index && !@sitemap_index.finalized?
       sitemap.location.merge!(attribute => value) if @sitemap && !@sitemap.finalized?
     end
