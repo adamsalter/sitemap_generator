@@ -18,7 +18,7 @@ Features
 Changelog
 -------
 
-- v1.5.0: Major refactoring & testing in preparation for new API & features
+- v1.5.0: New options `include_root`, `include_index`; Major testing & refactoring
 - v1.4.0: [Geo sitemap][geo_tags] support, multiple sitemap support via CONFIG_FILE rake option
 - v1.3.0: Support setting the sitemaps path
 - v1.2.0: Verified working with Rails 3 stable release
@@ -153,7 +153,7 @@ Page with geo data can be added by passing a <tt>:geo</tt> Hash to <tt>add()</tt
 Supported geo options include:
 
 * `format` Required, either 'kml' or 'georss'
-    
+
 Configuration
 ======
 
@@ -184,7 +184,7 @@ Valid [options to <tt>add</tt>](http://sitemaps.org/protocol.php#xmlTagDefinitio
 * `changefreq`  One of: always, hourly, daily, weekly, monthly, yearly, never. Default _weekly_
 * `lastmod` Time instance. The date of last modification.  Default `Time.now`
 * `host` Optional host for the link's URL.  Defaults to `default_host`
-    
+
 Sitemaps Path
 ----------
 
@@ -256,7 +256,7 @@ To generate multiple sets of sitemaps you can create multiple configuration file
 
     rake sitemap:refresh
     rake sitemap:refresh CONFIG_FILE="config/geo_sitemap.rb"
-    
+
 The first one uses the default config file at <tt>config/sitemap.rb</tt>.  Your first config file might look like this:
 
     # config/sitemap.rb
