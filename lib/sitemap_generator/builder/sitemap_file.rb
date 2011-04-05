@@ -14,7 +14,7 @@ module SitemapGenerator
     class SitemapFile
       include ActionView::Helpers::NumberHelper
       include ActionView::Helpers::TextHelper   # Rails 2.2.2 fails with missing 'pluralize' otherwise
-      attr_reader :link_count, :filesize, :filename, :location
+      attr_reader :link_count, :filesize, :filename, :location, :namer
 
       # Options:
       #

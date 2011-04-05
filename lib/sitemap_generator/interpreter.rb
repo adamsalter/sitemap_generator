@@ -31,11 +31,14 @@ module SitemapGenerator
     def add(*args)
       @sitemap.add(*args)
     end
-
-    # Evaluate the sitemap config file in this namespace which includes the
-    # URL helpers.
-    def self.run
-      new(SitemapGenerator::Sitemap)
+    
+    def group(*args)
+      @sitemap.group(*args)
+    end
+    
+    # Evaluate the sitemap config file using the default sitemap.
+    def self.run(*args, &block)
+      new(SitemapGenerator::Sitemap, *args, &block)
     end
   end
 end

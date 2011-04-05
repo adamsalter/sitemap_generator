@@ -6,27 +6,26 @@ module SitemapGenerator
   class LinkSet
 
     attr_reader :default_host, :public_path, :sitemaps_path, :filename, :sitemap, :location
-    attr_accessor :verbose, :yahoo_app_id, :include_root, :include_index
+    attr_accessor :verbose, :yahoo_app_id, :include_root, :include_index, :sitemaps_host
 
-    # Evaluate the sitemap config file and write all sitemaps.
-    #
-    # The Sitemap Interpreter includes the URL helpers and API methods
-    # that the block argument to `add_links` is evaluted within.
-    #
-    # TODO: Refactor so that we can have multiple instances
-    # of LinkSet.
-    def create(config_file = 'config/sitemap.rb', &block)
-      require 'sitemap_generator/interpreter'
 
+    # Main entry-point.  Pass a block which contains calls to your URL helper methods
+    # and sitemap methods like:
+    #   +add+   - Add a link to the current sitemap
+    #   +group+ - Start a new group of sitemaps
+    #
+    # The sitemaps are written as they get full or at then end of the block.
+    def create(&block)
       # Clear out the current objects.  New objects will be lazy-initialized.
       @sitemap_index = @sitemap = nil
 
-      start_time = Time.now
-      SitemapGenerator::Interpreter.new(self, config_file, &block)
-      finalize_sitemap
-      finalize_sitemap_index
-      end_time = Time.now
+      sitemap.add('/', :lastmod => Time.now, :changefreq => 'always', :priority => 1.0, :host => @location.host) if include_root
+      sitemap.add(sitemap_index, :lastmod => Time.now, :changefreq => 'always', :priority => 1.0) if include_index
 
+      start_time = Time.now
+      SitemapGenerator::Interpreter.new(self, nil, :yield_sitemap => @yield_sitemap || SitemapGenerator.yield_sitemap?, &block)
+      finalize!
+      end_time = Time.now
       puts sitemap_index.stats_summary(:time_taken => end_time - start_time) if verbose
     end
 
@@ -52,6 +51,9 @@ module SitemapGenerator
     #
     # <tt>include_index</tt> whether to include the sitemap index URL in each group of sitemaps.
     #   Default is false.
+    #
+    # <tt>sitemaps_host</tt> - host (including protocol) to use in links to the sitemaps.  Useful if your sitemaps
+    #   are hosted o different server e.g. 'http://amazon.aws.com/'
     def initialize(*args)
 
       # Extract options
@@ -71,7 +73,8 @@ module SitemapGenerator
         :include_index => true,
         :filename => :sitemap,
         :public_path => SitemapGenerator.app.root + 'public/',
-        :sitemaps_path => nil
+        :sitemaps_path => nil,
+        :sitemaps_host => nil
       })
       options.each_pair { |k, v| instance_variable_set("@#{k}".to_sym, v) }
 
@@ -84,20 +87,10 @@ module SitemapGenerator
       )
     end
 
-    # Entry point for users.
-    #
-    # Called within the user's eval'ed sitemap config file.  Add links to sitemap files
-    # passing a block.  This instance is passed in as an argument.  You can call
-    # `add` on it to add links.
-    #
-    # Example:
-    #   add_links do |sitemap|
-    #     sitemap.add '/'
-    #   end
-    def add_links
-      sitemap.add('/', :lastmod => Time.now, :changefreq => 'always', :priority => 1.0, :host => @location.host) if include_root
-      sitemap.add(sitemap_index, :lastmod => Time.now, :changefreq => 'always', :priority => 1.0) if include_index
-      yield self
+    # Dreprecated.  Use create.
+    def add_links(&block)
+      @yield_sitemap = true
+      create(&block)
     end
 
     # Add a link to a Sitemap.  If a new Sitemap is required, one will be created for
@@ -109,11 +102,18 @@ module SitemapGenerator
     def add(link, options={})
       sitemap.add(link, options.reverse_merge!(:host => @location.host))
     rescue SitemapGenerator::SitemapFullError
-      finalize_sitemap
+      finalize_sitemap!
       retry
     rescue SitemapGenerator::SitemapFinalizedError
       @sitemap = sitemap.next
       retry
+    end
+
+    # Start a new group of sitemaps.
+    def group(opts={})
+      previous_namer = @sitemap.namer
+      finalize_sitemap!
+      @loc = @location.with(opts)
     end
 
     # Ping search engines.
@@ -184,6 +184,13 @@ module SitemapGenerator
       update_location_info(:sitemaps_path, value)
     end
 
+    # Set the host name, including protocol, that will be used on all links to your sitemap
+    # files.  Useful when the server that hosts the sitemaps is not on the same host as
+    # the links in the sitemap.
+    def sitemaps_host=(value)
+      update_location_info(:host, value, :and_self => false)
+    end
+
     # Set the filename base to use when generating sitemaps and sitemap indexes.
     def filename=(value)
       @filename = value
@@ -191,11 +198,12 @@ module SitemapGenerator
     end
 
     # Lazy-initialize a sitemap instance when it's accessed
-    def sitemap
-      @sitemap ||= SitemapGenerator::Builder::SitemapFile.new(
-        :location => @location.dup,
+    def sitemap(opts={})
+      opts.reverse_merge!(
+        :location => @location.dup.with(:host => @sitemaps_host || @host),
         :filename => @filename
       )
+      @sitemap ||= SitemapGenerator::Builder::SitemapFile.new(opts)
     end
 
     # Lazy-initialize a sitemap index instance when it's accessed
@@ -208,9 +216,14 @@ module SitemapGenerator
 
     protected
 
+    def finalize!
+      finalize_sitemap!
+      finalize_sitemap_index!
+    end
+
     # Finalize a sitemap by including it in the index and outputting a summary line.
     # Do nothing if it has already been finalized.
-    def finalize_sitemap
+    def finalize_sitemap!
       return if sitemap.finalized?
       sitemap_index.add(sitemap)
       puts sitemap.summary if verbose
@@ -218,7 +231,7 @@ module SitemapGenerator
 
     # Finalize a sitemap index and output a summary line.  Do nothing if it has already
     # been finalized.
-    def finalize_sitemap_index
+    def finalize_sitemap_index!
       return if sitemap_index.finalized?
       sitemap_index.finalize!
       puts sitemap_index.summary if verbose
@@ -233,8 +246,9 @@ module SitemapGenerator
 
     # Update the given attribute on the current sitemap index and sitemap file location objects.
     # But don't create the index or sitemap files yet if they are not already created.
-    def update_location_info(attribute, value)
-      @location.merge!(attribute => value)
+    def update_location_info(attribute, value, opts={})
+      opts.reverse_merge!(:and_self => true)
+      @location.merge!(attribute => value) if opts[:and_self]
       sitemap_index.location.merge!(attribute => value) if @sitemap_index && !@sitemap_index.finalized?
       sitemap.location.merge!(attribute => value) if @sitemap && !@sitemap.finalized?
     end

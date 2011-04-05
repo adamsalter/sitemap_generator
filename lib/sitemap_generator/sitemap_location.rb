@@ -57,12 +57,12 @@ module SitemapGenerator
     def path_in_public
       (sitemaps_path + filename).to_s
     end
-    
+
     # Full URL of the file.
     def url
       URI.join(host, sitemaps_path.to_s, filename.to_s).to_s
     end
-    
+
     # Return the size of the file at <tt>path</tt>
     def filesize
       File.size?(path)

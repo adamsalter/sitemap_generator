@@ -29,8 +29,14 @@ module SitemapGenerator
 
   class << self
     attr_accessor :root, :app, :templates
+    attr_writer :yield_sitemap
   end
-
+  
+  # Returns true if we should yield the sitemap instance to the block, false otherwise.
+  def self.yield_sitemap?
+    !!@yeild_sitemap
+  end               
+  
   self.root = File.expand_path(File.join(File.dirname(__FILE__), '../'))
   self.templates = SitemapGenerator::Templates.new(self.root)
   self.app = SitemapGenerator::Application.new
