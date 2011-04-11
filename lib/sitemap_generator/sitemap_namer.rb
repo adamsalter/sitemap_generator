@@ -26,5 +26,9 @@ module SitemapGenerator
     ensure
       @count += 1
     end
+
+    def reset
+      @count = @options[:start]
+    end
   end
 end
