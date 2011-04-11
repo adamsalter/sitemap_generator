@@ -23,7 +23,8 @@ module SitemapGenerator
       sitemap.add(sitemap_index, :lastmod => Time.now, :changefreq => 'always', :priority => 1.0) if include_index
 
       start_time = Time.now
-      SitemapGenerator::Interpreter.new(self, nil, :yield_sitemap => @yield_sitemap || SitemapGenerator.yield_sitemap?, &block)
+      interpreter.eval(:yield_sitemap => @yield_sitemap || SitemapGenerator.yield_sitemap?, &block)
+      @yield_sitemap = false # needed to support old add_links call style
       finalize!
       end_time = Time.now
       puts sitemap_index.stats_summary(:time_taken => end_time - start_time) if verbose
@@ -109,11 +110,19 @@ module SitemapGenerator
       retry
     end
 
-    # Start a new group of sitemaps.
+    # Start a new group of sitemaps.  Any of the options to +initialize+ may
+    # be passed.  In fact, this just starts a new LinkSet and runs the interpreter
+    # on the block using it.
     def group(opts={})
-      previous_namer = @sitemap.namer
+      namer = opts.include?(:filename) ? sitemap.namer : nil
+      namer.reset if namer && sitemap.empty?
       finalize_sitemap!
-      @loc = @location.with(opts)
+
+      # save current options
+      # process new options
+      # set them on this instance
+      # maybe create an options class
+      interpreter.eval(&block)
     end
 
     # Ping search engines.
@@ -209,7 +218,7 @@ module SitemapGenerator
     # Lazy-initialize a sitemap index instance when it's accessed
     def sitemap_index
       @sitemap_index ||= SitemapGenerator::Builder::SitemapIndexFile.new(
-        :location => @location.dup,
+        :location => @location.dup.with(:host => @sitemaps_host || @host),
         :filename => "#{@filename}_index"
       )
     end
@@ -251,6 +260,11 @@ module SitemapGenerator
       @location.merge!(attribute => value) if opts[:and_self]
       sitemap_index.location.merge!(attribute => value) if @sitemap_index && !@sitemap_index.finalized?
       sitemap.location.merge!(attribute => value) if @sitemap && !@sitemap.finalized?
+    end
+
+    def interpreter
+      require 'sitemap_generator/interpreter'
+      @interpreter ||= SitemapGenerator::Interpreter.new
     end
   end
 end
