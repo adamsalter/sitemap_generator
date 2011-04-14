@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe SitemapGenerator::LinkSet do
 
-  context "initializer options" do
+  describe "initializer options" do
     options = [:public_path, :sitemaps_path, :default_host, :filename]
     values = [File.expand_path(SitemapGenerator.app.root + 'tmp/'), 'mobile/', 'http://myhost.com', :xxx]
 
@@ -21,7 +21,7 @@ describe SitemapGenerator::LinkSet do
     end
   end
 
-  context "default options" do
+  describe "default options" do
     default_options = {
       :filename => :sitemap,
       :sitemaps_path => nil,
@@ -42,7 +42,7 @@ describe SitemapGenerator::LinkSet do
     end
   end
 
-  context "include_root include_index option" do
+  describe "include_root include_index option" do
     it "should not include the root url" do
       @ls = SitemapGenerator::LinkSet.new(:default_host => 'http://www.example.com', :include_root => false)
       @ls.include_root.should be_false
@@ -68,7 +68,7 @@ describe SitemapGenerator::LinkSet do
     end
   end
 
-  context "sitemaps directory" do
+  describe "sitemaps directory" do
     before do
       @ls = SitemapGenerator::LinkSet.new
     end
@@ -92,7 +92,7 @@ describe SitemapGenerator::LinkSet do
     end
   end
 
-  context "sitemaps url" do
+  describe "sitemaps url" do
     before do
       @ls = SitemapGenerator::LinkSet.new
     end
@@ -125,6 +125,28 @@ describe SitemapGenerator::LinkSet do
 
     it "should not fail" do
       lambda { @ls.ping_search_engines }.should_not raise_error
+    end
+  end
+
+  describe "sitemaps host" do
+    before do
+      @ls = SitemapGenerator::LinkSet.new(:default_host => 'http://example.com')
+    end
+
+    it "should have a host" do
+      @ls.default_host = 'http://example.com'
+      @ls.location.host.should == @ls.default_host
+    end
+
+    it "should default to default host" do
+      @ls.sitemaps_host.should == @ls.default_host
+    end
+
+    it "should update the location in the sitemaps" do
+      @ls.sitemaps_host = 'http://wowza.com'
+      @ls.sitemaps_host.should == 'http://wowza.com'
+      @ls.sitemap.location.host.should == @ls.sitemaps_host
+      @ls.sitemap_index.location.host.should == @ls.sitemaps_host
     end
   end
 end
