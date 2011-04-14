@@ -168,6 +168,7 @@ module SitemapGenerator
     # of your sitemap links.  You can pass a different host in your options to `add`
     # if you need to change it on a per-link basis.
     def default_host=(value)
+      @default_host = value
       update_location_info(:host, value)
     end
 
@@ -179,6 +180,7 @@ module SitemapGenerator
     #
     # Set to nil to use the current directory.
     def public_path=(value)
+      @public_path = value
       update_location_info(:public_path, value)
     end
 
@@ -186,6 +188,7 @@ module SitemapGenerator
     # relative to your public_path.
     # Example: 'sitemaps/' to generate your sitemaps in 'public/sitemaps/'.
     def sitemaps_path=(value)
+      @sitemaps_path = value
       update_location_info(:sitemaps_path, value)
     end
 
@@ -193,7 +196,12 @@ module SitemapGenerator
     # files.  Useful when the server that hosts the sitemaps is not on the same host as
     # the links in the sitemap.
     def sitemaps_host=(value)
+      @sitemaps_host = value
       update_location_info(:host, value, :and_self => false)
+    end
+
+    def sitemaps_host
+      @sitemaps_host || @default_host
     end
 
     # Set the filename base to use when generating sitemaps and sitemap indexes.
@@ -205,7 +213,7 @@ module SitemapGenerator
     # Lazy-initialize a sitemap instance when it's accessed
     def sitemap(opts={})
       opts.reverse_merge!(
-        :location => @location.dup.with(:host => @sitemaps_host || @host),
+        :location => @location.dup.with(:host => @sitemaps_host || @default_host),
         :filename => @filename
       )
       @sitemap ||= SitemapGenerator::Builder::SitemapFile.new(opts)
@@ -214,7 +222,7 @@ module SitemapGenerator
     # Lazy-initialize a sitemap index instance when it's accessed
     def sitemap_index
       @sitemap_index ||= SitemapGenerator::Builder::SitemapIndexFile.new(
-        :location => @location.dup.with(:host => @sitemaps_host || @host),
+        :location => @location.dup.with(:host => @sitemaps_host || @default_host),
         :filename => "#{@filename}_index"
       )
     end
