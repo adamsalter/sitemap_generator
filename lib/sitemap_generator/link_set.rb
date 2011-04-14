@@ -79,7 +79,6 @@ module SitemapGenerator
       })
       options.each_pair { |k, v| instance_variable_set("@#{k}".to_sym, v) }
 
-
       # Create a location object to store all the location options
       @location = SitemapGenerator::SitemapLocation.new(
         :sitemaps_path => @sitemaps_path,
@@ -111,18 +110,15 @@ module SitemapGenerator
     end
 
     # Start a new group of sitemaps.  Any of the options to +initialize+ may
-    # be passed.  In fact, this just starts a new LinkSet and runs the interpreter
-    # on the block using it.
-    def group(opts={})
-      namer = opts.include?(:filename) ? sitemap.namer : nil
-      namer.reset if namer && sitemap.empty?
+    # be passed.
+    def group(opts={}, &block)
       finalize_sitemap!
-
-      # save current options
-      # process new options
-      # set them on this instance
-      # maybe create an options class
+      original_sitemap = sitemap
+      opts.each do |option, value|
+        send(option, value)
+      end
       interpreter.eval(&block)
+      @sitemap = original_sitemap
     end
 
     # Ping search engines.

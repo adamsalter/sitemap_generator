@@ -28,8 +28,12 @@ module SitemapGenerator
       @linkset.add(*args)
     end
 
-    def group(*args)
-      @linkset.group(*args)
+    # Start a new group of sitemaps.  Any of the options to SitemapGenerator.new may
+    # be passed.  Pass a block with calls to +add+ to add links to the sitemaps.
+    #
+    # All groups use the same sitemap index.
+    def group(*args, &block)
+      @linkset.group(*args, &block)
     end
 
     # Evaluate the block in the interpreter.  Pass :yield_sitemap => true to
