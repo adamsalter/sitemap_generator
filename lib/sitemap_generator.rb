@@ -8,6 +8,8 @@ require 'sitemap_generator/sitemap_location'
 require 'active_support/core_ext/numeric'
 
 module SitemapGenerator
+  autoload(:Interpreter, 'sitemap_generator/interpreter')
+
   SitemapError = Class.new(StandardError)
   SitemapFullError = Class.new(SitemapError)
   SitemapFinalizedError = Class.new(SitemapError)
@@ -31,12 +33,12 @@ module SitemapGenerator
     attr_accessor :root, :app, :templates
     attr_writer :yield_sitemap
   end
-  
+
   # Returns true if we should yield the sitemap instance to the block, false otherwise.
   def self.yield_sitemap?
     !!@yeild_sitemap
-  end               
-  
+  end
+
   self.root = File.expand_path(File.join(File.dirname(__FILE__), '../'))
   self.templates = SitemapGenerator::Templates.new(self.root)
   self.app = SitemapGenerator::Application.new
