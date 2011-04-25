@@ -53,7 +53,7 @@ module SitemapGenerator
     #   :config_file - full path to the config file (default is config/sitemap.rb in your root directory)
     def self.run(config_file=nil, &block)
       config_file ||= SitemapGenerator.app.root + 'config/sitemap.rb'
-      eval(File.read(config_file), nil, config_file.to_s)
+      self.new.instance_eval(File.read(config_file), config_file.to_s)
     end
   end
 end
