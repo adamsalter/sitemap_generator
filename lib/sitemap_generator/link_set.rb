@@ -115,7 +115,7 @@ module SitemapGenerator
       finalize_sitemap!
       original_sitemap = sitemap
       opts.each do |option, value|
-        send("#{option}=", value)
+        send("#{option}=", value, :include_index => false)
       end
       interpreter.eval(&block)
       @sitemap = original_sitemap
@@ -164,50 +164,8 @@ module SitemapGenerator
       sitemap_index.total_link_count
     end
 
-    # Set the host name, including protocol, that will be used by default on each
-    # of your sitemap links.  You can pass a different host in your options to `add`
-    # if you need to change it on a per-link basis.
-    def default_host=(value)
-      @default_host = value
-      update_location_info(:host, value)
-    end
-
-    # Set the public_path.  This path gives the location of your public directory.
-    # The default is the public/ directory in your Rails root.  Or if Rails is not
-    # found, it defaults to public/ in the current directory (of the process).
-    #
-    # Example: 'tmp/' if you don't want to generate in public for some reason.
-    #
-    # Set to nil to use the current directory.
-    def public_path=(value)
-      @public_path = value
-      update_location_info(:public_path, value)
-    end
-
-    # Set the sitemaps_path.  This path gives the location to write sitemaps to
-    # relative to your public_path.
-    # Example: 'sitemaps/' to generate your sitemaps in 'public/sitemaps/'.
-    def sitemaps_path=(value)
-      @sitemaps_path = value
-      update_location_info(:sitemaps_path, value)
-    end
-
-    # Set the host name, including protocol, that will be used on all links to your sitemap
-    # files.  Useful when the server that hosts the sitemaps is not on the same host as
-    # the links in the sitemap.
-    def sitemaps_host=(value)
-      @sitemaps_host = value
-      update_location_info(:host, value, :and_self => false)
-    end
-
     def sitemaps_host
       @sitemaps_host || @default_host
-    end
-
-    # Set the filename base to use when generating sitemaps and sitemap indexes.
-    def filename=(value)
-      @filename = value
-      update_sitemap_info(:filename, value)
     end
 
     # Lazy-initialize a sitemap instance when it's accessed
@@ -250,25 +208,77 @@ module SitemapGenerator
       puts sitemap_index.summary if verbose
     end
 
-    # Update the given attribute on the current sitemap index and sitemap files.  But
-    # don't create the index or sitemap files yet if they are not already created.
-    def update_sitemap_info(attribute, value)
-      sitemap_index.send("#{attribute}=", value) if @sitemap_index && !@sitemap_index.finalized?
-      sitemap.send("#{attribute}=", value) if @sitemap && !@sitemap.finalized?
-    end
-
-    # Update the given attribute on the current sitemap index and sitemap file location objects.
-    # But don't create the index or sitemap files yet if they are not already created.
-    def update_location_info(attribute, value, opts={})
-      opts.reverse_merge!(:and_self => true)
-      @location.merge!(attribute => value) if opts[:and_self]
-      sitemap_index.location.merge!(attribute => value) if @sitemap_index && !@sitemap_index.finalized?
-      sitemap.location.merge!(attribute => value) if @sitemap && !@sitemap.finalized?
-    end
-
+    # Return the interpreter linked to this instance.
     def interpreter
       require 'sitemap_generator/interpreter'
       @interpreter ||= SitemapGenerator::Interpreter.new(:link_set => self)
     end
+
+    module LocationHelpers
+      public
+
+      # Set the host name, including protocol, that will be used by default on each
+      # of your sitemap links.  You can pass a different host in your options to `add`
+      # if you need to change it on a per-link basis.
+      def default_host=(value, opts={})
+        @default_host = value
+        update_location_info(:host, value, opts)
+      end
+
+      # Set the public_path.  This path gives the location of your public directory.
+      # The default is the public/ directory in your Rails root.  Or if Rails is not
+      # found, it defaults to public/ in the current directory (of the process).
+      #
+      # Example: 'tmp/' if you don't want to generate in public for some reason.
+      #
+      # Set to nil to use the current directory.
+      def public_path=(value, opts={})
+        @public_path = value
+        update_location_info(:public_path, value, opts)
+      end
+
+      # Set the sitemaps_path.  This path gives the location to write sitemaps to
+      # relative to your public_path.
+      # Example: 'sitemaps/' to generate your sitemaps in 'public/sitemaps/'.
+      def sitemaps_path=(value, opts={})
+        @sitemaps_path = value
+        update_location_info(:sitemaps_path, value, opts)
+      end
+
+      # Set the host name, including protocol, that will be used on all links to your sitemap
+      # files.  Useful when the server that hosts the sitemaps is not on the same host as
+      # the links in the sitemap.
+      def sitemaps_host=(value, opts={})
+        opts.reverse_merge!(:and_self => false)
+        @sitemaps_host = value
+        update_location_info(:host, value, opts)
+      end
+
+      # Set the filename base to use when generating sitemaps and sitemap indexes.
+      def filename=(value, opts={})
+        @filename = value
+        update_sitemap_info(:filename, value, opts)
+      end
+
+      protected
+
+      # Update the given attribute on the current sitemap index and sitemap files.  But
+      # don't create the index or sitemap files yet if they are not already created.
+      def update_sitemap_info(attribute, value, opts={})
+        opts.reverse_merge!(:include_index => true)
+        sitemap_index.send("#{attribute}=", value) if opts[:include_index] && @sitemap_index && !@sitemap_index.finalized?
+        sitemap.send("#{attribute}=", value) if @sitemap && !@sitemap.finalized?
+      end
+
+      # Update the given attribute on the current sitemap index and sitemap file location objects.
+      # But don't create the index or sitemap files yet if they are not already created.
+      def update_location_info(attribute, value, opts={})
+        opts.reverse_merge!(:and_self => true, :include_index => true)
+        @location.merge!(attribute => value) if opts[:and_self]
+        sitemap_index.location.merge!(attribute => value) if opts[:include_index] && @sitemap_index && !@sitemap_index.finalized?
+        sitemap.location.merge!(attribute => value) if @sitemap && !@sitemap.finalized?
+      end
+    end
+    include LocationHelpers
   end
 end
