@@ -115,7 +115,7 @@ module SitemapGenerator
       finalize_sitemap!
       original_sitemap = sitemap
       opts.each do |option, value|
-        send(option, value)
+        send("#{option}=", value)
       end
       interpreter.eval(&block)
       @sitemap = original_sitemap
@@ -268,7 +268,7 @@ module SitemapGenerator
 
     def interpreter
       require 'sitemap_generator/interpreter'
-      @interpreter ||= SitemapGenerator::Interpreter.new
+      @interpreter ||= SitemapGenerator::Interpreter.new(:link_set => self)
     end
   end
 end
