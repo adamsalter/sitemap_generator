@@ -2,13 +2,13 @@ require 'spec_helper'
 
 describe "SitemapGenerator" do
 
-  context "root" do
+  describe "root" do
     it "should be set to the root of the gem" do
       SitemapGenerator.root.should == File.expand_path('../../../' , __FILE__)
     end
   end
 
-  context "clean task" do
+  describe "clean task" do
     before :each do
       copy_sitemap_file_to_rails_app
       FileUtils.touch(rails_path('public/sitemap_index.xml.gz'))
@@ -20,7 +20,7 @@ describe "SitemapGenerator" do
     end
   end
 
-  context "fresh install" do
+  describe "fresh install" do
     before :each do
       delete_sitemap_file_from_rails_app
       Helpers.invoke_task('sitemap:install')
@@ -36,7 +36,7 @@ describe "SitemapGenerator" do
     end
   end
 
-  context "install multiple times" do
+  describe "install multiple times" do
     before :each do
       copy_sitemap_file_to_rails_app
       Helpers.invoke_task('sitemap:install')
@@ -48,7 +48,7 @@ describe "SitemapGenerator" do
     end
   end
 
-  context "generate sitemap" do
+  describe "generate sitemap" do
     before :each do
       old_max_links = SitemapGenerator::MAX_SITEMAP_LINKS
       begin
@@ -88,7 +88,7 @@ describe "SitemapGenerator" do
     end
   end
 
-  context "sitemap path" do
+  describe "sitemap path" do
     before :each do
       ::SitemapGenerator::Sitemap.default_host = 'http://test.local'
       ::SitemapGenerator::Sitemap.filename = 'sitemap'
@@ -137,8 +137,8 @@ describe "SitemapGenerator" do
     end
   end
 
-  context "external dependencies" do
-    context "rails" do
+  describe "external dependencies" do
+    describe "rails" do
       before :each do
         @rails = Rails
         Object.send(:remove_const, :Rails)

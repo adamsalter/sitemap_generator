@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-context 'SitemapGenerator::Builder::SitemapFile' do
+describe 'SitemapGenerator::Builder::SitemapFile' do
   before :each do
     @loc = SitemapGenerator::SitemapLocation.new(:public_path => '/public/', :sitemaps_path => 'test/', :host => 'http://example.com/')
     @s = SitemapGenerator::Builder::SitemapFile.new(:location => @loc)
@@ -36,7 +36,7 @@ context 'SitemapGenerator::Builder::SitemapFile' do
     @s.filename.should == 'xxx1.xml.gz'
   end
 
-  context "next" do
+  describe "next" do
     before :each do
       @orig_s = @s
       @s = @s.next

@@ -5,7 +5,7 @@ describe SitemapGenerator::Application do
     @app = SitemapGenerator::Application.new
   end
 
-  context "rails3?" do
+  describe "rails3?" do
     tests = {
       :nil => false,
       '2.3.11' => false,
