@@ -37,7 +37,6 @@ namespace :sitemap do
   task 'refresh:no_ping' => ['sitemap:create']
 
   task :create => ['sitemap:require_environment'] do
-    SitemapGenerator::Sitemap.verbose = verbose   
-    SitemapGenerator::Interpreter.run(ENV["CONFIG_FILE"])
+    SitemapGenerator::Interpreter.run(:config_file => ENV["CONFIG_FILE"], :verbose => verbose)
   end
 end

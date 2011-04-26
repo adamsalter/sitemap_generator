@@ -13,4 +13,10 @@ describe SitemapGenerator::Interpreter do
     Rails.expects(:root).returns(rails_root).at_least_once
     lambda { SitemapGenerator::Interpreter.run }.should_not raise_exception(Errno::ENOENT)
   end
+  
+  it "should set the verbose option" do
+    SitemapGenerator::Interpreter.any_instance.expects(:instance_eval)
+    interpreter = SitemapGenerator::Interpreter.run(:verbose => true)
+    interpreter.instance_variable_get(:@linkset).verbose.should be_true
+  end
 end

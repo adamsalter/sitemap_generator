@@ -16,11 +16,14 @@ module SitemapGenerator
     # Call with a block to evaluate a dynamic config.  The only method exposed for you is
     # `add` to add a link to the sitemap object attached to this interpreter.
     #
-    # Options:
-    #   link_set - a LinkSet instance to use.  Default is SitemapGenerator::Sitemap
+    # === Options
+    # * <tt>link_set</tt> - a LinkSet instance to use.  Default is SitemapGenerator::Sitemap.
+    # * <tt>verbose</tt> - set to false to prevent the sitemaps summary being
+    #   output.
     def initialize(opts={}, &block)
       opts.reverse_merge!(:link_set => SitemapGenerator::Sitemap)
       @linkset = opts[:link_set]
+      @linkset.verbose = opts[:verbose] if opts.include?(:verbose)
       eval(&block) if block_given?
     end
 
@@ -48,12 +51,19 @@ module SitemapGenerator
       end
     end
 
-    # Pass the :config_file option to evaluate a specific config file.
-    # Options:
-    #   :config_file - full path to the config file (default is config/sitemap.rb in your root directory)
-    def self.run(config_file=nil, &block)
+    # Run the interpreter on a config file using
+    # the default <tt>SitemapGenerator::Sitemap</tt> sitemap object.
+    #
+    # === Options
+    # * <tt>:config_file</tt> - full path to the config file to evaluate.
+    #   Default is config/sitemap.rb in your application's root directory.
+    # All other options are passed to +new+.
+    def self.run(opts={}, &block)
+      config_file = opts.delete(:config_file)
       config_file ||= SitemapGenerator.app.root + 'config/sitemap.rb'
-      self.new.instance_eval(File.read(config_file), config_file.to_s)
+      interpreter = self.new(opts)
+      interpreter.instance_eval(File.read(config_file), config_file.to_s)
+      interpreter
     end
   end
 end

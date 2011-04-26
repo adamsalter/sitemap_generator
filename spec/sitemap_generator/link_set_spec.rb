@@ -268,5 +268,14 @@ describe SitemapGenerator::LinkSet do
       @host = 'http://sitemaphost.com'
       @ls.group(:sitemaps_host => @host).sitemaps_host.should == @host
     end
+
+    it "should inherit the verbose option" do
+      @ls = SitemapGenerator::LinkSet.new(:default_host => 'http://example.com', :verbose => true)
+      @ls.group.verbose.should be_true
+    end
+
+    it "should set the verbose option" do
+      @ls.group(:verbose => !!@ls.verbose).verbose.should == !!@ls.verbose
+    end
   end
 end
