@@ -149,4 +149,23 @@ describe SitemapGenerator::LinkSet do
       @ls.sitemap_index.location.host.should == @ls.sitemaps_host
     end
   end
+
+  describe "with a sitemap index specified" do
+    before :each do
+      @index = SitemapGenerator::Builder::SitemapIndexFile.new(:location => SitemapGenerator::SitemapLocation.new(:host => 'http://example.com'))
+      @ls = SitemapGenerator::LinkSet.new(:sitemap_index => @index, :sitemaps_host => 'http://newhost.com')
+    end
+
+    it "should not modify the index" do
+      @ls.filename = :newname
+      @ls.sitemap.filename.should =~ /newname/
+      @ls.sitemap_index.filename =~ /sitemap_index/
+    end
+
+    it "should not modify the index" do
+      @ls.sitemaps_host = 'http://newhost.com'
+      @ls.sitemap.location.host.should == 'http://newhost.com'
+      @ls.sitemap_index.location.host.should == 'http://example.com'
+    end
+  end
 end
