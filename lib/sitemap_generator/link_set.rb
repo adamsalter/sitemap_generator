@@ -90,7 +90,7 @@ module SitemapGenerator
       )
 
       if options[:sitemap_index]
-        @protected_index = true
+        @protect_index = true
       end
     end
 
@@ -117,8 +117,6 @@ module SitemapGenerator
     end
 
     # Create a new group of sitemaps.  Returns a new LinkSet instance with options set on it.
-    # If a block is passed it is evaluated inside the interpreter linked to the new LinkSet,
-    # so any links added in the block are added to the new LinkSet.
     #
     # All groups share this LinkSet's sitemap index, which is not modified by any of the options
     # passed to +group+.
@@ -127,6 +125,9 @@ module SitemapGenerator
     # Any of the options to LinkSet.new can be passed.  All of the current LinkSet's options
     # are used when creating the new group of sitemaps.  The only exception to this rule are
     # <tt>:include_index</tt> and <tt>:include_root</tt> which default to +false+.
+    #
+    # Pass a block to add links to the new LinkSet.  If you pass a block the new sitemaps will
+    # be finalized when the block returns (but the index will not).
     def group(opts={}, &block)
       opts.reverse_merge!(
         :include_index => false,
@@ -138,7 +139,10 @@ module SitemapGenerator
       end)
 
       linkset = SitemapGenerator::LinkSet.new(opts)
-      linkset.interpreter.eval(&block) if block_given?
+      if block_given?
+        linkset.interpreter.eval(&block)
+        linkset.finalize!
+      end
       linkset
     end
 
@@ -226,7 +230,7 @@ module SitemapGenerator
     # Finalize a sitemap index and output a summary line.  Do nothing if it has already
     # been finalized.
     def finalize_sitemap_index!
-      return if sitemap_index.finalized?
+      return if @protect_index || sitemap_index.finalized?
       sitemap_index.finalize!
       puts sitemap_index.summary if verbose
     end
@@ -288,7 +292,7 @@ module SitemapGenerator
       # Update the given attribute on the current sitemap index and sitemap files.  But
       # don't create the index or sitemap files yet if they are not already created.
       def update_sitemap_info(attribute, value, opts={})
-        opts.reverse_merge!(:include_index => !@protected_index)
+        opts.reverse_merge!(:include_index => !@protect_index)
         sitemap_index.send("#{attribute}=", value) if opts[:include_index] && @sitemap_index && !@sitemap_index.finalized?
         sitemap.send("#{attribute}=", value) if @sitemap && !@sitemap.finalized?
       end
@@ -296,7 +300,7 @@ module SitemapGenerator
       # Update the given attribute on the current sitemap index and sitemap file location objects.
       # But don't create the index or sitemap files yet if they are not already created.
       def update_location_info(attribute, value, opts={})
-        opts.reverse_merge!(:and_self => true, :include_index => !@protected_index)
+        opts.reverse_merge!(:and_self => true, :include_index => !@protect_index)
         @location.merge!(attribute => value) if opts[:and_self]
         sitemap_index.location.merge!(attribute => value) if opts[:include_index] && @sitemap_index && !@sitemap_index.finalized?
         sitemap.location.merge!(attribute => value) if @sitemap && !@sitemap.finalized?

@@ -168,27 +168,59 @@ describe SitemapGenerator::LinkSet do
       @ls.sitemap.location.host.should == 'http://newhost.com'
       @ls.sitemap_index.location.host.should == 'http://example.com'
     end
+
+    it "should not finalize the index" do
+      @ls.send(:finalize_sitemap_index!)
+      @ls.sitemap_index.finalized?.should be_false
+    end
   end
 
-  describe "create a new group" do
+  describe "new group" do
     before :each do
       @ls = SitemapGenerator::LinkSet.new(:default_host => 'http://example.com')
     end
 
-    it "include_root should be false" do
+    it "should share the sitemap_index" do
+      @ls.group.sitemap_index.should == @ls.sitemap_index
+    end
+
+    it "should protect the sitemap_index" do
+      @ls.group.instance_variable_get(:@protect_index).should be_true
+    end
+
+    it "include_root should default to false" do
       @ls.group.include_root.should be_false
     end
 
-    it "include_index should be false" do
+    it "include_index should default to false" do
       @ls.group.include_index.should be_false
     end
 
-    it "include_root should be true" do
+    it "should set include_root" do
       @ls.group(:include_root => true).include_root.should be_true
     end
 
-    it "include_index should be true" do
+    it "should set include_index" do
       @ls.group(:include_index => true).include_index.should be_true
+    end
+
+    it "filename should be inherited" do
+      @ls.group.filename.should == :sitemap
+    end
+
+    it "should set filename but not modify the index" do
+      @ls.group(:filename => :newname).filename.should == :newname
+      @ls.sitemap_index.filename.should =~ /sitemap_index/
+    end
+
+    it "should finalize the sitemaps if a block is passed" do
+      @group = @ls.group
+      @group.sitemap.finalized?.should be_false
+    end
+
+    it "should only finalize the sitemaps if a block is passed" do
+      @group = @ls.group
+      @group.sitemap.finalized?.should be_false
     end
   end
 end
