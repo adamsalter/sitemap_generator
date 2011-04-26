@@ -188,6 +188,10 @@ describe SitemapGenerator::LinkSet do
       @ls.group.instance_variable_get(:@protect_index).should be_true
     end
 
+    it "should not set the public_path" do
+      @ls.group(:public_path => 'new/path/').public_path.to_s.should == @ls.public_path.to_s
+    end
+
     it "include_root should default to false" do
       @ls.group.include_root.should be_false
     end
@@ -221,6 +225,15 @@ describe SitemapGenerator::LinkSet do
     it "should only finalize the sitemaps if a block is passed" do
       @group = @ls.group
       @group.sitemap.finalized?.should be_false
+    end
+
+    it "should set the sitemaps_path" do
+      @ls.group(:sitemaps_path => 'new/path/').sitemaps_path.should == 'new/path/'
+    end
+
+    it "should set the sitemaps_host" do
+      @host = 'http://sitemaphost.com'
+      @ls.group(:sitemaps_host => @host).sitemaps_host.should == @host
     end
   end
 end

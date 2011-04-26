@@ -122,18 +122,21 @@ module SitemapGenerator
     # passed to +group+.
     #
     # === Options
-    # Any of the options to LinkSet.new can be passed.  All of the current LinkSet's options
-    # are used when creating the new group of sitemaps.  The only exception to this rule are
-    # <tt>:include_index</tt> and <tt>:include_root</tt> which default to +false+.
+    # Any of the options to LinkSet.new.  Except for <tt>:public_path</tt> which is shared
+    # by all groups.
     #
-    # Pass a block to add links to the new LinkSet.  If you pass a block the new sitemaps will
-    # be finalized when the block returns (but the index will not).
+    # The current options are inherited by the new group of sitemaps.  The only exceptions 
+    # being <tt>:include_index</tt> and <tt>:include_root</tt> which default to +false+.
+    #
+    # Pass a block to add links to the new LinkSet.  If you pass a block the sitemaps will
+    # be finalized when the block returns.  The index will not be finalized.
     def group(opts={}, &block)
+      opts.delete(:public_path)
       opts.reverse_merge!(
         :include_index => false,
         :include_root => false
       )
-      opts.reverse_merge!([:include_root, :include_index, :filename, :public_path, :sitemaps_path, :sitemaps_host, :sitemap_index].inject({}) do |hash, key|
+      opts.reverse_merge!([:include_root, :include_index, :filename, :sitemaps_path, :public_path, :sitemaps_host, :sitemap_index].inject({}) do |hash, key|
         hash[key] = send(key)
         hash
       end)
