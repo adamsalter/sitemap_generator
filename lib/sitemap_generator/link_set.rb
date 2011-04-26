@@ -33,6 +33,8 @@ module SitemapGenerator
     # Constructor
     #
     # == Options:
+    # * <tt>:verbose</tt> - If +true+, output a summary line for each sitemap and sitemap
+    #   index that is created.  Default is +false+.
     #
     # * <tt>:public_path</tt> - full path to the directory to write sitemaps in.
     #   Defaults to your Rails <tt>public/</tt> directory.
@@ -78,7 +80,8 @@ module SitemapGenerator
         :filename => :sitemap,
         :public_path => SitemapGenerator.app.root + 'public/',
         :sitemaps_path => nil,
-        :sitemaps_host => nil
+        :sitemaps_host => nil,
+        :verbose => false
       })
       options.each_pair { |k, v| instance_variable_set("@#{k}".to_sym, v) }
 
@@ -125,7 +128,7 @@ module SitemapGenerator
     # Any of the options to LinkSet.new.  Except for <tt>:public_path</tt> which is shared
     # by all groups.
     #
-    # The current options are inherited by the new group of sitemaps.  The only exceptions 
+    # The current options are inherited by the new group of sitemaps.  The only exceptions
     # being <tt>:include_index</tt> and <tt>:include_root</tt> which default to +false+.
     #
     # Pass a block to add links to the new LinkSet.  If you pass a block the sitemaps will
@@ -215,12 +218,12 @@ module SitemapGenerator
       )
     end
 
-    protected
-
     def finalize!
       finalize_sitemap!
       finalize_sitemap_index!
     end
+
+    protected
 
     # Finalize a sitemap by including it in the index and outputting a summary line.
     # Do nothing if it has already been finalized.

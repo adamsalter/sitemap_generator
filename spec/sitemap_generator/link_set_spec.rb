@@ -129,6 +129,39 @@ describe SitemapGenerator::LinkSet do
     end
   end
 
+  describe "verbose" do
+    before do
+      @ls = SitemapGenerator::LinkSet.new(:default_host => 'http://one.com')
+    end
+
+    it "should default to false" do
+      @ls.verbose.should be_false
+    end
+
+    it "should be set as an initialize option" do
+      SitemapGenerator::LinkSet.new(:default_host => 'http://one.com', :verbose => true).verbose.should be_true
+    end
+
+    it "should be set as an accessor" do
+      @ls.verbose = true
+      @ls.verbose.should be_true
+    end
+  end
+
+  describe "when finalizing" do
+    before do
+      @ls = SitemapGenerator::LinkSet.new(:default_host => 'http://one.com', :verbose => true)
+    end
+
+    it "should output summary lines" do
+      @ls.sitemap.expects(:finalize!)
+      @ls.sitemap.expects(:summary)
+      @ls.sitemap_index.expects(:finalize!)
+      @ls.sitemap_index.expects(:summary)
+      @ls.finalize!
+    end
+  end
+
   describe "sitemaps host" do
     before do
       @ls = SitemapGenerator::LinkSet.new(:default_host => 'http://example.com')
