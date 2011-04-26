@@ -169,4 +169,26 @@ describe SitemapGenerator::LinkSet do
       @ls.sitemap_index.location.host.should == 'http://example.com'
     end
   end
+
+  describe "create a new group" do
+    before :each do
+      @ls = SitemapGenerator::LinkSet.new(:default_host => 'http://example.com')
+    end
+
+    it "include_root should be false" do
+      @ls.group.include_root.should be_false
+    end
+
+    it "include_index should be false" do
+      @ls.group.include_index.should be_false
+    end
+
+    it "include_root should be true" do
+      @ls.group(:include_root => true).include_root.should be_true
+    end
+
+    it "include_index should be true" do
+      @ls.group(:include_index => true).include_index.should be_true
+    end
+  end
 end

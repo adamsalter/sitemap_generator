@@ -116,12 +116,30 @@ module SitemapGenerator
       retry
     end
 
-    # Start a new group of sitemaps.  Any of the options to LinkSet.new may
-    # be passed.  Pass a block which has calls to +add+ to add links to the sitemaps.
+    # Create a new group of sitemaps.  Returns a new LinkSet instance with options set on it.
+    # If a block is passed it is evaluated inside the interpreter linked to the new LinkSet,
+    # so any links added in the block are added to the new LinkSet.
     #
-    # All groups use the same sitemap index.
+    # All groups share this LinkSet's sitemap index, which is not modified by any of the options
+    # passed to +group+.
+    #
+    # === Options
+    # Any of the options to LinkSet.new can be passed.  All of the current LinkSet's options
+    # are used when creating the new group of sitemaps.  The only exception to this rule are
+    # <tt>:include_index</tt> and <tt>:include_root</tt> which default to +false+.
     def group(opts={}, &block)
-      SitemapGenerator::LinkSet.new(opts.reverse_merge(self.options)).interpreter.eval(&block)
+      opts.reverse_merge!(
+        :include_index => false,
+        :include_root => false
+      )
+      opts.reverse_merge!([:include_root, :include_index, :filename, :public_path, :sitemaps_path, :sitemaps_host, :sitemap_index].inject({}) do |hash, key|
+        hash[key] = send(key)
+        hash
+      end)
+
+      linkset = SitemapGenerator::LinkSet.new(opts)
+      linkset.interpreter.eval(&block) if block_given?
+      linkset
     end
 
     # Ping search engines.
@@ -263,13 +281,6 @@ module SitemapGenerator
       def filename=(value, opts={})
         @filename = value
         update_sitemap_info(:filename, value, opts)
-      end
-
-      # Return a hash with the current value of options on this LinkSet
-      def options
-        [:include_root, :include_index, :filename, :public_path, :sitemaps_path, :sitemaps_host, :without_index].inject({}) do |hash, key|
-          hash[:key] = self.send(key)
-        end
       end
 
       protected
