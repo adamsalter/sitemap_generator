@@ -143,7 +143,9 @@ module SitemapGenerator
       search_engines.each do |engine, link|
         next if engine == :yahoo && !self.yahoo_app_id
         begin
-          open(link)
+          Timeout::timeout(10) {
+            open(link)
+          }
           puts "Successful ping of #{engine.to_s.titleize}" if verbose
         rescue Timeout::Error, StandardError => e
           puts "Ping failed for #{engine.to_s.titleize}: #{e.inspect} (URL #{link})" if verbose

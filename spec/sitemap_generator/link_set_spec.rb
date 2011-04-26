@@ -124,6 +124,7 @@ describe SitemapGenerator::LinkSet do
     end
 
     it "should not fail" do
+      @ls.expects(:open).at_least_once
       lambda { @ls.ping_search_engines }.should_not raise_error
     end
   end
