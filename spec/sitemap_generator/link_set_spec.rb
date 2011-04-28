@@ -1,8 +1,9 @@
 require 'spec_helper'
 
 describe SitemapGenerator::LinkSet do
-  before :all do
+  before :each do
     @default_host = 'http://example.com'
+    @ls = SitemapGenerator::LinkSet.new
   end
 
   describe "initializer options" do
@@ -34,10 +35,6 @@ describe SitemapGenerator::LinkSet do
       :include_root => true
     }
 
-    before :all do
-      @ls = SitemapGenerator::LinkSet.new
-    end
-
     default_options.each do |option, value|
       it "#{option} should default to #{value}" do
         @ls.send(option).should == value
@@ -47,7 +44,7 @@ describe SitemapGenerator::LinkSet do
 
   describe "include_root include_index option" do
     it "should not include the root url" do
-      @ls = SitemapGenerator::LinkSet.new(:default_host => 'http://www.example.com', :include_root => false)
+      @ls = SitemapGenerator::LinkSet.new(:default_host => @default_host, :include_root => false)
       @ls.include_root.should be_false
       @ls.include_index.should be_true
       @ls.add_links { |sitemap| }
@@ -55,7 +52,7 @@ describe SitemapGenerator::LinkSet do
     end
 
     it "should not include the sitemap index url" do
-      @ls = SitemapGenerator::LinkSet.new(:default_host => 'http://www.example.com', :include_index => false)
+      @ls = SitemapGenerator::LinkSet.new(:default_host => @default_host, :include_index => false)
       @ls.include_root.should be_true
       @ls.include_index.should be_false
       @ls.add_links { |sitemap| }
@@ -63,7 +60,7 @@ describe SitemapGenerator::LinkSet do
     end
 
     it "should not include the root url or the sitemap index url" do
-      @ls = SitemapGenerator::LinkSet.new(:default_host => 'http://www.example.com', :include_root => false, :include_index => false)
+      @ls = SitemapGenerator::LinkSet.new(:default_host => @default_host, :include_root => false, :include_index => false)
       @ls.include_root.should be_false
       @ls.include_index.should be_false
       @ls.add_links { |sitemap| }
@@ -72,10 +69,6 @@ describe SitemapGenerator::LinkSet do
   end
 
   describe "sitemaps directory" do
-    before do
-      @ls = SitemapGenerator::LinkSet.new
-    end
-
     it "should default to public/" do
       @ls.location.directory.should == File.expand_path(SitemapGenerator.app.root + 'public/')
     end
@@ -96,10 +89,6 @@ describe SitemapGenerator::LinkSet do
   end
 
   describe "sitemaps url" do
-    before do
-      @ls = SitemapGenerator::LinkSet.new
-    end
-
     it "should raise if no default host is set" do
       lambda { @ls.location.url }.should raise_error(SitemapGenerator::SitemapError)
     end
@@ -216,6 +205,10 @@ describe SitemapGenerator::LinkSet do
       @ls = SitemapGenerator::LinkSet.new(:default_host => @default_host)
     end
 
+    it "should return a LinkSet" do
+      @ls.group.should be_a(SitemapGenerator::LinkSet)
+    end
+
     it "should share the sitemap_index" do
       @ls.group.sitemap_index.should == @ls.sitemap_index
     end
@@ -284,6 +277,12 @@ describe SitemapGenerator::LinkSet do
     it "should set the default_host" do
       @ls.group.default_host.should == @default_host
     end
+
+    it "should not finalize the sitemap if a group is created" do
+      @ls.create { group {} }
+      @ls.sitemap.empty?.should be_true
+      @ls.sitemap.finalized?.should be_false
+    end
   end
 
   describe "after create" do
@@ -294,6 +293,17 @@ describe SitemapGenerator::LinkSet do
     it "should finalize the sitemap index" do
       @ls.create {}
       @ls.sitemap_index.finalized?.should be_true
+    end
+
+    it "should finalize the sitemap" do
+      @ls.create {}
+      @ls.sitemap.finalized?.should be_true
+    end
+
+    it "should not finalize the sitemap if a group was created" do
+      @ls.instance_variable_set(:@created_group, true)
+      @ls.send(:finalize_sitemap!)
+      @ls.sitemap.finalized?.should be_false
     end
   end
 end

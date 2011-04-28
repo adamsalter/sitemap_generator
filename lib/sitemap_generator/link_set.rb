@@ -19,14 +19,11 @@ module SitemapGenerator
       # Clear out the current objects.  New objects will be lazy-initialized.
       @sitemap_index = @sitemap = nil
 
-      sitemap.add('/', :lastmod => Time.now, :changefreq => 'always', :priority => 1.0, :host => @location.host) if include_root
-      sitemap.add(sitemap_index, :lastmod => Time.now, :changefreq => 'always', :priority => 1.0) if include_index
-
-      start_time = Time.now
+      start_time = Time.now if verbose
       interpreter.eval(:yield_sitemap => @yield_sitemap || SitemapGenerator.yield_sitemap?, &block)
       @yield_sitemap = false # needed to support old add_links call style
       finalize!
-      end_time = Time.now
+      end_time = Time.now if verbose
       puts sitemap_index.stats_summary(:time_taken => end_time - start_time) if verbose
     end
 
@@ -110,6 +107,7 @@ module SitemapGenerator
     # options - see README.
     #   host - host for the link, defaults to your <tt>default_host</tt>.
     def add(link, options={})
+      add_default_links if !@added_default_links
       sitemap.add(link, options.reverse_merge!(:host => @location.host))
     rescue SitemapGenerator::SitemapFullError
       finalize_sitemap!
@@ -144,6 +142,7 @@ module SitemapGenerator
         hash
       end)
 
+      @created_group = true
       linkset = SitemapGenerator::LinkSet.new(opts)
       if block_given?
         linkset.interpreter.eval(&block)
@@ -225,10 +224,25 @@ module SitemapGenerator
 
     protected
 
+    # Add default links if those options are turned on.  Record the fact that we have done so
+    # in an instance variable.
+    def add_default_links
+      sitemap.add('/', :lastmod => Time.now, :changefreq => 'always', :priority => 1.0, :host => @location.host) if include_root
+      sitemap.add(sitemap_index, :lastmod => Time.now, :changefreq => 'always', :priority => 1.0) if include_index
+      @added_default_links = true
+    end
+
     # Finalize a sitemap by including it in the index and outputting a summary line.
     # Do nothing if it has already been finalized.
+    #
+    # Don't finalize if the sitemap is empty and a group has been created.  The reason
+    # being that the group will have written out its sitemap.                   
+    #
+    # Add the default links if they have not been added yet and no groups have been created.
+    # If the default links haven't been added we know that the sitemap is empty.
     def finalize_sitemap!
-      return if sitemap.finalized?
+      add_default_links if !@added_default_links && !@created_group
+      return if sitemap.finalized? || sitemap.empty? && @created_group
       sitemap_index.add(sitemap)
       puts sitemap.summary if verbose
     end
