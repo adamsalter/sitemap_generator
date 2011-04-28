@@ -139,7 +139,7 @@ module SitemapGenerator
         :include_index => false,
         :include_root => false
       )
-      opts.reverse_merge!([:include_root, :include_index, :filename, :sitemaps_path, :public_path, :sitemaps_host, :sitemap_index, :verbose].inject({}) do |hash, key|
+      opts.reverse_merge!([:include_root, :include_index, :filename, :sitemaps_path, :public_path, :sitemaps_host, :sitemap_index, :verbose, :default_host].inject({}) do |hash, key|
         hash[key] = send(key)
         hash
       end)

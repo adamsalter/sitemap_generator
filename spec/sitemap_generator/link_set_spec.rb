@@ -1,6 +1,9 @@
 require 'spec_helper'
 
 describe SitemapGenerator::LinkSet do
+  before :all do
+    @default_host = 'http://example.com'
+  end
 
   describe "initializer options" do
     options = [:public_path, :sitemaps_path, :default_host, :filename]
@@ -164,11 +167,11 @@ describe SitemapGenerator::LinkSet do
 
   describe "sitemaps host" do
     before do
-      @ls = SitemapGenerator::LinkSet.new(:default_host => 'http://example.com')
+      @ls = SitemapGenerator::LinkSet.new(:default_host => @default_host)
     end
 
     it "should have a host" do
-      @ls.default_host = 'http://example.com'
+      @ls.default_host = @default_host
       @ls.location.host.should == @ls.default_host
     end
 
@@ -186,7 +189,7 @@ describe SitemapGenerator::LinkSet do
 
   describe "with a sitemap index specified" do
     before :each do
-      @index = SitemapGenerator::Builder::SitemapIndexFile.new(:location => SitemapGenerator::SitemapLocation.new(:host => 'http://example.com'))
+      @index = SitemapGenerator::Builder::SitemapIndexFile.new(:location => SitemapGenerator::SitemapLocation.new(:host => @default_host))
       @ls = SitemapGenerator::LinkSet.new(:sitemap_index => @index, :sitemaps_host => 'http://newhost.com')
     end
 
@@ -199,7 +202,7 @@ describe SitemapGenerator::LinkSet do
     it "should not modify the index" do
       @ls.sitemaps_host = 'http://newhost.com'
       @ls.sitemap.location.host.should == 'http://newhost.com'
-      @ls.sitemap_index.location.host.should == 'http://example.com'
+      @ls.sitemap_index.location.host.should == @default_host
     end
 
     it "should not finalize the index" do
@@ -210,7 +213,7 @@ describe SitemapGenerator::LinkSet do
 
   describe "new group" do
     before :each do
-      @ls = SitemapGenerator::LinkSet.new(:default_host => 'http://example.com')
+      @ls = SitemapGenerator::LinkSet.new(:default_host => @default_host)
     end
 
     it "should share the sitemap_index" do
@@ -270,12 +273,27 @@ describe SitemapGenerator::LinkSet do
     end
 
     it "should inherit the verbose option" do
-      @ls = SitemapGenerator::LinkSet.new(:default_host => 'http://example.com', :verbose => true)
+      @ls = SitemapGenerator::LinkSet.new(:default_host => @default_host, :verbose => true)
       @ls.group.verbose.should be_true
     end
 
     it "should set the verbose option" do
       @ls.group(:verbose => !!@ls.verbose).verbose.should == !!@ls.verbose
+    end
+
+    it "should set the default_host" do
+      @ls.group.default_host.should == @default_host
+    end
+  end
+
+  describe "after create" do
+    before :each do
+      @ls = SitemapGenerator::LinkSet.new :default_host => @default_host
+    end
+
+    it "should finalize the sitemap index" do
+      @ls.create {}
+      @ls.sitemap_index.finalized?.should be_true
     end
   end
 end
