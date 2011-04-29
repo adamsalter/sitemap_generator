@@ -135,12 +135,13 @@ module SitemapGenerator
       opts.delete(:public_path)
       opts.reverse_merge!(
         :include_index => false,
-        :include_root => false
+        :include_root => false,
+        :sitemap_index => sitemap_index
       )
       opts.reverse_merge!(get_options)
-      linkset = SitemapGenerator::LinkSet.new(opts)
-      linkset.create(&block) if block_given?
-      linkset
+      @group = SitemapGenerator::LinkSet.new(opts)
+      @group.create(&block) if block_given?
+      @group
     end
 
     # Ping search engines.
@@ -224,7 +225,7 @@ module SitemapGenerator
 
     # Return a hash of options which can be used to reconstruct this instance.
     def get_options
-      [:include_root, :include_index, :filename, :sitemaps_path, :public_path, :sitemaps_host, :sitemap_index, :verbose, :default_host].inject({}) do |hash, key|
+      [:include_root, :include_index, :filename, :sitemaps_path, :public_path, :sitemaps_host, :verbose, :default_host].inject({}) do |hash, key|
         hash[key] = send(key)
         hash
       end
