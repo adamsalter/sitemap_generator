@@ -1,8 +1,6 @@
 module SitemapGenerator
   module Builder
     class SitemapIndexFile < SitemapFile
-      attr_accessor :sitemaps
-
       def initialize(opts={})
         @options = [:location, :filename]
         SitemapGenerator::Utilities.assert_valid_keys(opts, @options)
@@ -10,7 +8,7 @@ module SitemapGenerator
         @location = opts.delete(:location) || SitemapGenerator::SitemapLocation.new
         @filename = "#{opts.fetch(:filename, :sitemap_index)}.xml.gz"
         @location[:filename] = @filename
-        
+
         @link_count = 0
         @sitemaps_link_count = 0
         @xml_content = '' # XML urlset content
@@ -35,6 +33,14 @@ module SitemapGenerator
           file.finalize!
         end
         super(SitemapGenerator::Builder::SitemapIndexUrl.new(link, options))
+      end
+
+      # Return a boolean indicating whether the sitemap file can fit another link
+      # of <tt>bytes</tt> bytes in size.  You can also pass a string and the
+      # bytesize will be calculated for you.
+      def file_can_fit?(bytes)
+        bytes = bytes.is_a?(String) ? bytesize(bytes) : bytes
+        (@filesize + bytes) < SitemapGenerator::MAX_SITEMAP_FILESIZE && @link_count < SitemapGenerator::MAX_SITEMAP_FILES
       end
 
       # Return the total number of links in all sitemaps reference by this index file
