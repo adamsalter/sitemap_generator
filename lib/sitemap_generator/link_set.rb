@@ -13,10 +13,16 @@ module SitemapGenerator
     #   +add+   - Add a link to the current sitemap
     #   +group+ - Start a new group of sitemaps
     #
-    # The sitemaps are written as they get full or at then end of the block.
+    # The sitemaps are written as they get full and at the end of the block.
+    #
+    # All options are passed to this instance using accessor methods.  Any option
+    # supported by +new+ can be passed.
+    #
+    # If the sitemap or index is finalized, a new one is created.  Generally
+    # you shouldn't be calling +create+ more than once.
     def create(opts={}, &block)
-      # Clear out the current objects.  New objects will be lazy-initialized.
-      @sitemap_index = @sitemap = nil
+      @sitemap_index = nil if @sitemap_index && @sitemap_index.finalized? && !@protect_index
+      @sitemap = nil if @sitemap && @sitemap.finalized?
       set_options(opts)
       start_time = Time.now if verbose
       interpreter.eval(:yield_sitemap => @yield_sitemap || SitemapGenerator.yield_sitemap?, &block)
