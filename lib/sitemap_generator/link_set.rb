@@ -8,23 +8,28 @@ module SitemapGenerator
     attr_reader :default_host, :public_path, :sitemaps_path, :filename, :sitemap, :location
     attr_accessor :verbose, :yahoo_app_id, :include_root, :include_index, :sitemaps_host
 
-
     # Main entry-point.  Pass a block which contains calls to your URL helper methods
     # and sitemap methods like:
     #   +add+   - Add a link to the current sitemap
     #   +group+ - Start a new group of sitemaps
     #
     # The sitemaps are written as they get full or at then end of the block.
-    def create(&block)
+    def create(opts={}, &block)
       # Clear out the current objects.  New objects will be lazy-initialized.
       @sitemap_index = @sitemap = nil
-
+      set_options(opts)
       start_time = Time.now if verbose
       interpreter.eval(:yield_sitemap => @yield_sitemap || SitemapGenerator.yield_sitemap?, &block)
-      @yield_sitemap = false # needed to support old add_links call style
       finalize!
       end_time = Time.now if verbose
       puts sitemap_index.stats_summary(:time_taken => end_time - start_time) if verbose
+    end
+
+    # Dreprecated.  Use create.
+    def add_links(&block)
+      @yield_sitemap = true
+      create(&block)
+      @yield_sitemap = false
     end
 
     # Constructor
@@ -94,12 +99,6 @@ module SitemapGenerator
       end
     end
 
-    # Dreprecated.  Use create.
-    def add_links(&block)
-      @yield_sitemap = true
-      create(&block)
-    end
-
     # Add a link to a Sitemap.  If a new Sitemap is required, one will be created for
     # you.
     #
@@ -132,22 +131,15 @@ module SitemapGenerator
     # Pass a block to add links to the new LinkSet.  If you pass a block the sitemaps will
     # be finalized when the block returns.  The index will not be finalized.
     def group(opts={}, &block)
+      @created_group = true
       opts.delete(:public_path)
       opts.reverse_merge!(
         :include_index => false,
         :include_root => false
       )
-      opts.reverse_merge!([:include_root, :include_index, :filename, :sitemaps_path, :public_path, :sitemaps_host, :sitemap_index, :verbose, :default_host].inject({}) do |hash, key|
-        hash[key] = send(key)
-        hash
-      end)
-
-      @created_group = true
+      opts.reverse_merge!(get_options)
       linkset = SitemapGenerator::LinkSet.new(opts)
-      if block_given?
-        linkset.interpreter.eval(&block)
-        linkset.finalize!
-      end
+      linkset.create(&block) if block_given?
       linkset
     end
 
@@ -222,6 +214,22 @@ module SitemapGenerator
       finalize_sitemap_index!
     end
 
+    # Set each option on this instance using accessor methods.  This will affect
+    # both the sitemap and the sitemap index.
+    def set_options(opts={})
+      opts.each_pair do |key, value|
+        send("#{key}=", value)
+      end
+    end
+
+    # Return a hash of options which can be used to reconstruct this instance.
+    def get_options
+      [:include_root, :include_index, :filename, :sitemaps_path, :public_path, :sitemaps_host, :sitemap_index, :verbose, :default_host].inject({}) do |hash, key|
+        hash[key] = send(key)
+        hash
+      end
+    end
+
     protected
 
     # Add default links if those options are turned on.  Record the fact that we have done so
@@ -236,7 +244,7 @@ module SitemapGenerator
     # Do nothing if it has already been finalized.
     #
     # Don't finalize if the sitemap is empty and a group has been created.  The reason
-    # being that the group will have written out its sitemap.                   
+    # being that the group will have written out its sitemap.
     #
     # Add the default links if they have not been added yet and no groups have been created.
     # If the default links haven't been added we know that the sitemap is empty.
