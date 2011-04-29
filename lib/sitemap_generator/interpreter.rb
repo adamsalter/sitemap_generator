@@ -18,12 +18,12 @@ module SitemapGenerator
     #
     # === Options
     # * <tt>link_set</tt> - a LinkSet instance to use.  Default is SitemapGenerator::Sitemap.
-    # * <tt>verbose</tt> - set to false to prevent the sitemaps summary being
-    #   output.
+    #
+    # All other options are passed to the LinkSet by setting them using accessor methods.
     def initialize(opts={}, &block)
       opts.reverse_merge!(:link_set => SitemapGenerator::Sitemap)
-      @linkset = opts[:link_set]
-      @linkset.verbose = opts[:verbose] if opts.include?(:verbose)
+      @linkset = opts.delete :link_set
+      @linkset.set_options(opts)
       eval(&block) if block_given?
     end
 
