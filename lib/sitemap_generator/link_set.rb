@@ -1,6 +1,8 @@
 module SitemapGenerator
+  
   class LinkSet
-    attr_accessor :default_host, :yahoo_app_id, :links
+    
+    attr_accessor :default_host, :yahoo_app_id, :links, :s3_access_key_id, :s3_secret_access_key, :s3_bucket_name
     
     def initialize
       @links = []
@@ -24,5 +26,7 @@ module SitemapGenerator
     def add_link(link)
       @links << link
     end
+    
   end
+  
 end

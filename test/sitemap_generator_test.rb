@@ -6,12 +6,16 @@ class SitemapGeneratorTest < Test::Unit::TestCase
     context "when running the clean task" do
       setup do
         copy_sitemap_file_to_rails_app
-        FileUtils.touch(File.join(RAILS_ROOT, '/public/sitemap_index.xml.gz'))
-        Rake::Task['sitemap:clean'].invoke
+        ['public','tmp'].each do |dir|
+          FileUtils.touch(File.join(RAILS_ROOT, "/#{dir}/sitemap_index.xml.gz"))
+          Rake::Task['sitemap:clean'].invoke
+        end
       end
     
       should "the sitemap xml files be deleted" do
-        assert !File.exists?(File.join(RAILS_ROOT, '/public/sitemap_index.xml.gz'))
+        ['public','tmp'].each do |dir|
+          assert !File.exists?(File.join(RAILS_ROOT, '/public/sitemap_index.xml.gz'))
+        end
       end
     end
     
@@ -49,10 +53,11 @@ class SitemapGeneratorTest < Test::Unit::TestCase
         Rake::Task['sitemap:refresh'].invoke
       end  
           
-      should "not create sitemap xml files" do  
+      should "create sitemap xml files" do  
         assert File.exists?(File.join(RAILS_ROOT, '/public/sitemap_index.xml.gz'))
         assert File.exists?(File.join(RAILS_ROOT, '/public/sitemap1.xml.gz'))  
       end
+      
     end
   end
   
