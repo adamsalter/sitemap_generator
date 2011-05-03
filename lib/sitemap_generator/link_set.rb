@@ -26,6 +26,7 @@ module SitemapGenerator
       set_options(opts)
       start_time = Time.now if verbose
       interpreter.eval(:yield_sitemap => @yield_sitemap || SitemapGenerator.yield_sitemap?, &block)
+      debugger
       finalize!
       end_time = Time.now if verbose
       puts sitemap_index.stats_summary(:time_taken => end_time - start_time) if verbose
@@ -135,16 +136,15 @@ module SitemapGenerator
     # being <tt>:include_index</tt> and <tt>:include_root</tt> which default to +false+.
     #
     # Pass a block to add links to the new LinkSet.  If you pass a block the sitemaps will
-    # be finalized when the block returns.  The index will not be finalized.
+    # be finalized when the block returns.
+    #
+    # If you do not specify a <tt>:filename</tt> or a <tt>:sitemaps_path</tt> the filename
+    # will be next one in the series.
     def group(opts={}, &block)
       @created_group = true
-      opts.delete(:public_path)
-      opts.reverse_merge!(
-        :include_index => false,
-        :include_root => false,
-        :sitemap_index => sitemap_index
-      )
-      opts.reverse_merge!(get_options)
+      opts = options_for_group(opts)
+      if !empty?
+
       @group = SitemapGenerator::LinkSet.new(opts)
       @group.create(&block) if block_given?
       @group
@@ -221,6 +221,8 @@ module SitemapGenerator
       finalize_sitemap_index!
     end
 
+    protected
+
     # Set each option on this instance using accessor methods.  This will affect
     # both the sitemap and the sitemap index.
     def set_options(opts={})
@@ -237,7 +239,16 @@ module SitemapGenerator
       end
     end
 
-    protected
+    # Return a hash of options prepped for creating a new group from this LinkSet.
+    def options_for_group(opts)
+      opts.delete(:public_path)
+      opts.reverse_merge!(
+        :include_index => false,
+        :include_root => false,
+        :sitemap_index => sitemap_index
+      )
+      opts.reverse_merge!(get_options)
+    end
 
     # Add default links if those options are turned on.  Record the fact that we have done so
     # in an instance variable.
@@ -254,7 +265,8 @@ module SitemapGenerator
     # being that the group will have written out its sitemap.
     #
     # Add the default links if they have not been added yet and no groups have been created.
-    # If the default links haven't been added we know that the sitemap is empty.
+    # If the default links haven't been added we know that the sitemap is empty,
+    # because they are added on the first call to add().
     def finalize_sitemap!
       add_default_links if !@added_default_links && !@created_group
       return if sitemap.finalized? || sitemap.empty? && @created_group
@@ -320,6 +332,11 @@ module SitemapGenerator
       def filename=(value, opts={})
         @filename = value
         update_sitemap_info(:filename, value, opts)
+      end
+
+      # Return a boolean indicating whether the LinkSet is empty.
+      def empty?
+        !@sitemap_index || @sitemap_index.empty?
       end
 
       protected
