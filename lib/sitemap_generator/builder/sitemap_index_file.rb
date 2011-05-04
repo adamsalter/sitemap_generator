@@ -52,11 +52,11 @@ module SitemapGenerator
       def filename=(filename)
         @filename = @location[:filename] = "#{filename}_index.xml.gz"
       end
-      
+
       def filename
         @filename
       end
-      
+
       # Return a summary string
       def summary(opts={})
         uncompressed_size = number_to_human_size(@filesize) rescue "#{@filesize / 8} KB"

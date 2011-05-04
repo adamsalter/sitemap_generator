@@ -9,7 +9,7 @@ describe SitemapGenerator::SitemapLocation do
   it "should require a filename" do
     @l = SitemapGenerator::SitemapLocation.new
     lambda {
-      @l.filename.should be_nil  
+      @l.filename.should be_nil
     }.should raise_error
   end
 
@@ -20,11 +20,34 @@ describe SitemapGenerator::SitemapLocation do
     }.should raise_error
   end
 
+  it "should accept a Namer option" do
+    @namer = SitemapGenerator::SitemapNamer.new(:xxx)
+    @l = SitemapGenerator::SitemapLocation.new(:namer => @namer)
+    @l.filename.should == @namer.to_s
+  end
+
+  it "should protect the filename from further changes in the Namer" do
+    @namer = SitemapGenerator::SitemapNamer.new(:xxx)
+    @l = SitemapGenerator::SitemapLocation.new(:namer => @namer)
+    @l.filename.should == @namer.to_s
+    @namer.next
+    @l.filename.should == @namer.previous.to_s
+  end
+
+  it "should allow changing the namer" do
+    @namer1 = SitemapGenerator::SitemapNamer.new(:xxx)
+    @l = SitemapGenerator::SitemapLocation.new(:namer => @namer1)
+    @l.filename.should == @namer1.to_s
+    @namer2 = SitemapGenerator::SitemapNamer.new(:yyy)
+    @l[:namer] = @namer2
+    @l.filename.should == @namer2.to_s
+  end
+
   describe "testing options and #with" do
     before :all do
       @l = SitemapGenerator::SitemapLocation.new
     end
-    
+
     # Array of tuples with instance options and expected method return values
     tests = [
       [{

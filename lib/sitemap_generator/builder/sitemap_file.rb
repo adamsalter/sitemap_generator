@@ -27,8 +27,7 @@ module SitemapGenerator
         SitemapGenerator::Utilities.assert_valid_keys(opts, [:location, :filename, :namer])
 
         @location = opts.delete(:location) || SitemapGenerator::SitemapLocation.new
-        @namer = opts.delete(:namer) || new_namer(opts.delete(:filename))
-        @location[:filename] = @namer.current # FIXME
+        set_namer(opts.delete(:namer) || new_namer(opts.delete(:filename)))
         @link_count = 0
         @xml_content = '' # XML urlset content
         @xml_wrapper_start = <<-HTML
@@ -100,9 +99,6 @@ module SitemapGenerator
       def finalize!
         raise SitemapGenerator::SitemapFinalizedError if finalized?
 
-        # Set the filename on the location (Sitemap only)
-        @location[:filename] = filename if @namer
-
         # Ensure that the directory exists
         dir = @location.directory
         path = @location.path
@@ -129,7 +125,7 @@ module SitemapGenerator
 
       # Return a new instance of the sitemap file with the same options, and the next name in the sequence.
       def next
-        self.class.new(:location => @location.dup, :namer => @namer.increment)
+        self.class.new(:location => @location.dup, :namer => @namer.next)
       end
 
       # Return a summary string
@@ -143,11 +139,11 @@ module SitemapGenerator
       # It is a bit confusing because the setter takes a filename base whereas the getter
       # returns a full filename including extension.
       def filename=(base)
-        @namer = new_namer(base)
+        set_namer(new_namer(base))
       end
 
       def filename
-        @namer.current
+        @namer.to_s
       end
 
       protected
@@ -156,6 +152,10 @@ module SitemapGenerator
       # Default filename base is 'sitemap'.
       def new_namer(base=nil)
         SitemapGenerator::SitemapNamer.new(base ||= :sitemap)
+      end
+
+      def set_namer(namer)
+        @namer = @location[:namer] = namer
       end
 
       # Return the bytesize length of the string.  Ruby 1.8.6 compatible.

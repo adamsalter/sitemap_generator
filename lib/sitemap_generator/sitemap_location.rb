@@ -1,7 +1,7 @@
 module SitemapGenerator
   class SitemapLocation < Hash
 
-    [:filename, :host].each do |method|
+    [:host].each do |method|
       define_method(method) do
         raise SitemapGenerator::SitemapError, "No value set for #{method}" unless self[method]
         self[method]
@@ -27,13 +27,15 @@ module SitemapGenerator
     #   host          - host name for URLs.  The full URL to the file is then constructed from
     #                   the <tt>host</tt>, <tt>sitemaps_path</tt> and <tt>filename</tt>
     #   filename      - name of the file
+    #   namer         - a SitemapGenerator::SitemapNamer instance
     def initialize(opts={})
-      SitemapGenerator::Utilities.assert_valid_keys(opts, [:public_path, :sitemaps_path, :host, :filename])
+      SitemapGenerator::Utilities.assert_valid_keys(opts, [:public_path, :sitemaps_path, :host, :filename, :namer])
       opts.reverse_merge!(
         :sitemaps_path => nil,
         :public_path => SitemapGenerator.app.root + 'public/',
         :host => nil,
-        :filename => nil
+        :filename => nil,
+        :namer => nil
       )
       self.merge!(opts)
     end
@@ -66,6 +68,19 @@ module SitemapGenerator
     # Return the size of the file at <tt>path</tt>
     def filesize
       File.size?(path)
+    end
+
+    def filename
+      raise SitemapGenerator::SitemapError, "No filename or namer set" unless self[:filename] || self[:namer]
+      self[:filename] ||= self[:namer].to_s
+    end
+
+    def []=(key, value)
+      case key
+      when :namer
+        self[:filename] = nil
+      end
+      super
     end
   end
 end
