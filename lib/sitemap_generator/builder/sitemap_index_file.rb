@@ -1,14 +1,10 @@
 module SitemapGenerator
   module Builder
     class SitemapIndexFile < SitemapFile
+      DefaultNamer = SitemapGenerator::SitemapIndexNamer.new(:sitemap_index)
+
       def initialize(opts={})
-        @options = [:location, :filename]
-        SitemapGenerator::Utilities.assert_valid_keys(opts, @options)
-
-        @location = opts.delete(:location) || SitemapGenerator::SitemapLocation.new
-        @filename = "#{opts.fetch(:filename, :sitemap_index)}.xml.gz"
-        @location[:filename] = @filename
-
+        @location = opts.is_a?(Hash) ? SitemapGenerator::SitemapLocation.new(opts) : opts
         @link_count = 0
         @sitemaps_link_count = 0
         @xml_content = '' # XML urlset content
@@ -46,11 +42,6 @@ module SitemapGenerator
       # Return the total number of links in all sitemaps reference by this index file
       def total_link_count
         @sitemaps_link_count
-      end
-
-      # Set a new filename on the instance.  Should not include any extensions e.g. :sitemap_index
-      def filename=(filename)
-        @filename = @location[:filename] = "#{filename}_index.xml.gz"
       end
 
       # Return a summary string

@@ -6,9 +6,10 @@ describe SitemapGenerator::Builder::SitemapUrl do
     @loc = SitemapGenerator::SitemapLocation.new(
       :sitemaps_path => 'sitemaps/',
       :public_path => '/public',
-      :host => 'http://test.com' 
+      :host => 'http://test.com',
+      :namer => SitemapGenerator::SitemapNamer.new(:sitemap) 
     )
-    @s = SitemapGenerator::Builder::SitemapFile.new(:location => @loc)
+    @s = SitemapGenerator::Builder::SitemapFile.new(@loc)
   end
 
   it "should return the correct url" do

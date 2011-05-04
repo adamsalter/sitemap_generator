@@ -12,22 +12,17 @@ module SitemapGenerator
     #   sitemap.finalize!            <- write the sitemap file and freeze the object to protect it from further modification
     #
     class SitemapFile
+      DefaultNamer = SitemapGenerator::SitemapNamer.new(:sitemap)
       include ActionView::Helpers::NumberHelper
       include ActionView::Helpers::TextHelper   # Rails 2.2.2 fails with missing 'pluralize' otherwise
-      attr_reader :link_count, :filesize, :location, :namer
+      attr_reader :link_count, :filesize, :location
 
-      # Options:
+      # === Options
       #
-      # <tt>location</tt> a SitemapGenerator::SitemapLocation instance
-      #
-      # <tt>filename</tt> a symbol giving the base of the sitemap fileaname.  Default: :sitemap
-      #
-      # <tt>namer</tt> (optional) if provided is used to get the next sitemap filename, overriding :filename
+      # * <tt>location</tt> - a SitemapGenerator::SitemapLocation instance or a Hash of options
+      #   from which a SitemapLocation will be created for you.
       def initialize(opts={})
-        SitemapGenerator::Utilities.assert_valid_keys(opts, [:location, :filename, :namer])
-
-        @location = opts.delete(:location) || SitemapGenerator::SitemapLocation.new
-        set_namer(opts.delete(:namer) || new_namer(opts.delete(:filename)))
+        @location = opts.is_a?(Hash) ? SitemapGenerator::SitemapLocation.new(opts) : opts
         @link_count = 0
         @xml_content = '' # XML urlset content
         @xml_wrapper_start = <<-HTML
@@ -101,20 +96,25 @@ module SitemapGenerator
 
         # Ensure that the directory exists
         dir = @location.directory
-        path = @location.path
         if !File.exists?(dir)
           FileUtils.mkdir_p(dir)
         elsif !File.directory?(dir)
           raise SitemapError.new("#{dir} should be a directory!")
         end
 
-        open(path, 'wb') do |file|
+        # Write out the file
+        open(@location.path, 'wb') do |file|
           gz = Zlib::GzipWriter.new(file)
           gz.write @xml_wrapper_start
           gz.write @xml_content
           gz.write @xml_wrapper_end
           gz.close
         end
+
+        # Increment the namer (SitemapFile only)
+        @location.namer.next if @location.namer
+
+        # Cleanup and freeze the object
         @xml_content = @xml_wrapper_start = @xml_wrapper_end = ''
         freeze
       end
@@ -124,8 +124,8 @@ module SitemapGenerator
       end
 
       # Return a new instance of the sitemap file with the same options, and the next name in the sequence.
-      def next
-        self.class.new(:location => @location.dup, :namer => @namer.next)
+      def new
+        self.class.new(@location.dup)
       end
 
       # Return a summary string
@@ -135,24 +135,7 @@ module SitemapGenerator
         "+ #{'%-21s' % @location.path_in_public} #{'%13s' % @link_count} links / #{'%10s' % uncompressed_size} / #{'%10s' % compressed_size} gzipped"
       end
 
-      # Create a new namer given a filename base and set the filename of this sitemap from it.
-      # It is a bit confusing because the setter takes a filename base whereas the getter
-      # returns a full filename including extension.
-      def filename=(base)
-        set_namer(new_namer(base))
-      end
-
       protected
-
-      # Return a new namer given a filename base and set the filename of this sitemap from it.
-      # Default filename base is 'sitemap'.
-      def new_namer(base=nil)
-        SitemapGenerator::SitemapNamer.new(base ||= :sitemap)
-      end
-
-      def set_namer(namer)
-        @namer = @location[:namer] = namer
-      end
 
       # Return the bytesize length of the string.  Ruby 1.8.6 compatible.
       def bytesize(string)

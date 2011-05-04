@@ -2,8 +2,8 @@ require 'spec_helper'
 
 describe 'SitemapGenerator::Builder::SitemapFile' do
   before :each do
-    @loc = SitemapGenerator::SitemapLocation.new(:public_path => '/public/', :sitemaps_path => 'test/', :host => 'http://example.com/')
-    @s = SitemapGenerator::Builder::SitemapFile.new(:location => @loc)
+    @loc = SitemapGenerator::SitemapLocation.new(:namer => SitemapGenerator::SitemapNamer.new(:sitemap), :public_path => 'tmp/', :sitemaps_path => 'test/', :host => 'http://example.com/')
+    @s = SitemapGenerator::Builder::SitemapFile.new(@loc)
   end
 
   it "should return the name of the sitemap file" do
@@ -15,7 +15,7 @@ describe 'SitemapGenerator::Builder::SitemapFile' do
   end
 
   it "should return the path" do
-    @s.location.path.should == '/public/test/sitemap1.xml.gz'
+    @s.location.path.should == 'tmp/test/sitemap1.xml.gz'
   end
 
   it "should be empty" do
@@ -31,28 +31,36 @@ describe 'SitemapGenerator::Builder::SitemapFile' do
     @s.finalized?.should be_false
   end
 
-  it "should set the filename base" do
-    @s.filename = 'xxx'
-    @s.location.filename.should == 'xxx1.xml.gz'
+  it "should increment the namer after finalizing" do
+    @s.finalize!
+    @s.location.filename.should_not == @s.location.namer.to_s
   end
 
-  describe "next" do
+  describe "new" do
     before :each do
       @orig_s = @s
-      @s = @s.next
-    end
-
-    it "should have the next filename in the sequence" do
-      @s.location.filename.should == 'sitemap2.xml.gz'
+      @s = @s.new
     end
 
     it "should inherit the same options" do
-      @s.location.url.should == 'http://example.com/test/sitemap2.xml.gz'
-      @s.location.path.should == '/public/test/sitemap2.xml.gz'
+      # The name is the same because the original sitemap was not finalized
+      @s.location.url.should == 'http://example.com/test/sitemap1.xml.gz'
+      @s.location.path.should == 'tmp/test/sitemap1.xml.gz'
     end
 
-    it "should duplicate the location" do
+    it "should not share the same location instance" do
       @s.location.should_not be(@orig_s.location)
+    end
+
+    it "should inherit the same namer instance" do
+      @s.location.namer.should == @orig_s.location.namer
+    end
+  end
+
+  describe "default namer" do
+    it "should generate the correct names" do
+      n = SitemapGenerator::Builder::SitemapFile::DefaultNamer
+      n.to_s.should == 'sitemap1.xml.gz'
     end
   end
 end

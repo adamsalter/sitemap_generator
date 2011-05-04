@@ -27,7 +27,7 @@ module SitemapGenerator
     #   host          - host name for URLs.  The full URL to the file is then constructed from
     #                   the <tt>host</tt>, <tt>sitemaps_path</tt> and <tt>filename</tt>
     #   filename      - name of the file
-    #   namer         - a SitemapGenerator::SitemapNamer instance
+    #   namer         - a SitemapGenerator::SitemapNamer instance.  Can be passed instead of +filename+.
     def initialize(opts={})
       SitemapGenerator::Utilities.assert_valid_keys(opts, [:public_path, :sitemaps_path, :host, :filename, :namer])
       opts.reverse_merge!(
@@ -70,9 +70,16 @@ module SitemapGenerator
       File.size?(path)
     end
 
+    # Return the filename.  Raises an exception if no filename or namer is set.
+    # If using a namer once the filename has been retrieved from the namer its
+    # value is locked so that it is unaffected by further changes to the namer.
     def filename
       raise SitemapGenerator::SitemapError, "No filename or namer set" unless self[:filename] || self[:namer]
       self[:filename] ||= self[:namer].to_s
+    end
+
+    def namer
+      self[:namer]
     end
 
     def []=(key, value)

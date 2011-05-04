@@ -8,7 +8,7 @@ describe SitemapGenerator::Builder::SitemapIndexUrl do
       :public_path => '/public',
       :host => 'http://test.com' 
     )
-    @s = SitemapGenerator::Builder::SitemapIndexFile.new(:location => @loc)
+    @s = SitemapGenerator::Builder::SitemapIndexFile.new(@loc)
   end
 
   it "should return the correct url" do

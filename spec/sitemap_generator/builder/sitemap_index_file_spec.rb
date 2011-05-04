@@ -2,8 +2,8 @@ require 'spec_helper'
 
 describe 'SitemapGenerator::Builder::SitemapIndexFile' do
   before :each do
-    @loc = SitemapGenerator::SitemapLocation.new(:public_path => '/public/', :sitemaps_path => 'test/', :host => 'http://example.com/')
-    @s = SitemapGenerator::Builder::SitemapIndexFile.new(:location => @loc)
+    @loc = SitemapGenerator::SitemapLocation.new(:filename => 'sitemap_index.xml.gz', :public_path => '/public/', :sitemaps_path => 'test/', :host => 'http://example.com/')
+    @s = SitemapGenerator::Builder::SitemapIndexFile.new(@loc)
   end
 
   it "should return the URL" do
@@ -31,8 +31,10 @@ describe 'SitemapGenerator::Builder::SitemapIndexFile' do
     @s.location.filename.should == 'sitemap_index.xml.gz'
   end
 
-  it "should set the filename base" do
-    @s.filename = 'xxx'
-    @s.location.filename.should == 'xxx_index.xml.gz'
+  describe "default namer" do
+    it "should generate the correct names" do
+      n = SitemapGenerator::Builder::SitemapIndexFile::DefaultNamer
+      n.to_s.should == 'sitemap_index.xml.gz'
+    end
   end
 end

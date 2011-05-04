@@ -178,7 +178,7 @@ describe SitemapGenerator::LinkSet do
 
   describe "with a sitemap index specified" do
     before :each do
-      @index = SitemapGenerator::Builder::SitemapIndexFile.new(:location => SitemapGenerator::SitemapLocation.new(:host => @default_host))
+      @index = SitemapGenerator::Builder::SitemapIndexFile.new(:host => @default_host)
       @ls = SitemapGenerator::LinkSet.new(:sitemap_index => @index, :sitemaps_host => 'http://newhost.com')
     end
 

@@ -44,3 +44,13 @@ describe 'SitemapGenerator::SitemapNamer' do
     lambda { namer.previous }.should raise_error
   end
 end
+
+describe SitemapGenerator::SitemapIndexNamer do
+  it "should always return the same name" do
+    default = "sitemap_index.xml.gz"
+    namer = SitemapGenerator::SitemapIndexNamer.new(:sitemap_index)
+    namer.to_s.should == default
+    namer.next.to_s.should == default
+    namer.previous.to_s.should == default
+  end
+end

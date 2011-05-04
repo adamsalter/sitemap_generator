@@ -1,5 +1,5 @@
-require 'sitemap_generator/builder'
 require 'sitemap_generator/sitemap_namer'
+require 'sitemap_generator/builder'
 require 'sitemap_generator/link_set'
 require 'sitemap_generator/templates'
 require 'sitemap_generator/utilities'

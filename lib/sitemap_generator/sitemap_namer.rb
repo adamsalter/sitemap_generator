@@ -1,10 +1,10 @@
 module SitemapGenerator
-  # A poor excuse for an enumerator, but it will have to do.
-  # Return an object with a method `next` that generates sitemaps with the given name
-  # and an index appended.
+  # A class for generating sitemap names given the base for the filename.
   #
-  # For example:
-  #   SitemapNamer.new(:sitemap) generates 'sitemap1.xml.gz', 'sitemap2.xml.gz' etc
+  # === Example
+  # namer = SitemapNamer.new(:sitemap)
+  # namer.to_s => 'sitemap1.xml.gz'
+  # namer.next.to_s => 'sitemap2.xml.gz'
   class SitemapNamer
     NameError = Class.new(StandardError)
 
@@ -47,6 +47,13 @@ module SitemapGenerator
 
     def start?
       @count <= @options[:start]
+    end
+  end
+
+  # A Namer for Sitemap Indexes.  The name never changes.
+  class SitemapIndexNamer < SitemapNamer
+    def to_s
+      "#{@base}#{@options[:extension]}"
     end
   end
 end
