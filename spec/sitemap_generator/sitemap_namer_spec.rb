@@ -29,4 +29,18 @@ describe 'SitemapGenerator::SitemapNamer' do
     namer.next.should == "abc-def2.xml.gz"
     namer.next.should == "abc-def3.xml.gz"
   end
+  
+  it "should return previous name" do
+    namer = SitemapGenerator::SitemapNamer.new(:sitemap)
+    namer.next.should == "sitemap1.xml.gz"
+    namer.next.should == "sitemap2.xml.gz"
+    namer.previous.should == "sitemap1.xml.gz"
+    namer.next.should == "sitemap2.xml.gz"
+  end
+  
+  it "should raise if already at the start" do
+    namer = SitemapGenerator::SitemapNamer.new(:sitemap)
+    namer.next.should == "sitemap1.xml.gz"
+    lambda { namer.previous }.should raise_error
+  end
 end

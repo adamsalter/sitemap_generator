@@ -14,7 +14,7 @@ module SitemapGenerator
     class SitemapFile
       include ActionView::Helpers::NumberHelper
       include ActionView::Helpers::TextHelper   # Rails 2.2.2 fails with missing 'pluralize' otherwise
-      attr_reader :link_count, :filesize, :filename, :location, :namer
+      attr_reader :link_count, :filesize, :location, :namer
 
       # Options:
       #
@@ -28,7 +28,7 @@ module SitemapGenerator
 
         @location = opts.delete(:location) || SitemapGenerator::SitemapLocation.new
         @namer = opts.delete(:namer) || new_namer(opts.delete(:filename))
-        @filename = @location[:filename] = @namer.next
+        @location[:filename] = @namer.current # FIXME
         @link_count = 0
         @xml_content = '' # XML urlset content
         @xml_wrapper_start = <<-HTML
@@ -100,6 +100,9 @@ module SitemapGenerator
       def finalize!
         raise SitemapGenerator::SitemapFinalizedError if finalized?
 
+        # Set the filename on the location (Sitemap only)
+        @location[:filename] = filename if @namer
+
         # Ensure that the directory exists
         dir = @location.directory
         path = @location.path
@@ -126,7 +129,7 @@ module SitemapGenerator
 
       # Return a new instance of the sitemap file with the same options, and the next name in the sequence.
       def next
-        self.class.new(:location => @location.dup, :namer => @namer)
+        self.class.new(:location => @location.dup, :namer => @namer.increment)
       end
 
       # Return a summary string
@@ -141,7 +144,10 @@ module SitemapGenerator
       # returns a full filename including extension.
       def filename=(base)
         @namer = new_namer(base)
-        @filename = @location[:filename] = @namer.next
+      end
+
+      def filename
+        @namer.current
       end
 
       protected
