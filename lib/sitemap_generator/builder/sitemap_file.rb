@@ -142,10 +142,6 @@ module SitemapGenerator
         set_namer(new_namer(base))
       end
 
-      def filename
-        @namer.to_s
-      end
-
       protected
 
       # Return a new namer given a filename base and set the filename of this sitemap from it.

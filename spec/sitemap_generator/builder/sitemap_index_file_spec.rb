@@ -28,11 +28,11 @@ describe 'SitemapGenerator::Builder::SitemapIndexFile' do
   end
 
   it "filename should default to sitemap_index" do
-    @s.filename.should == 'sitemap_index.xml.gz'
+    @s.location.filename.should == 'sitemap_index.xml.gz'
   end
 
   it "should set the filename base" do
     @s.filename = 'xxx'
-    @s.filename.should == 'xxx_index.xml.gz'
+    @s.location.filename.should == 'xxx_index.xml.gz'
   end
 end

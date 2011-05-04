@@ -184,8 +184,8 @@ describe SitemapGenerator::LinkSet do
 
     it "should not modify the index" do
       @ls.filename = :newname
-      @ls.sitemap.filename.should =~ /newname/
-      @ls.sitemap_index.filename =~ /sitemap_index/
+      @ls.sitemap.location.filename.should =~ /newname/
+      @ls.sitemap_index.location.filename =~ /sitemap_index/
     end
 
     it "should not modify the index" do
@@ -243,7 +243,7 @@ describe SitemapGenerator::LinkSet do
 
     it "should set filename but not modify the index" do
       @ls.group(:filename => :newname).filename.should == :newname
-      @ls.sitemap_index.filename.should =~ /sitemap_index/
+      @ls.sitemap_index.location.filename.should =~ /sitemap_index/
     end
 
     it "should finalize the sitemaps if a block is passed" do

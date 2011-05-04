@@ -7,7 +7,7 @@ describe 'SitemapGenerator::Builder::SitemapFile' do
   end
 
   it "should return the name of the sitemap file" do
-    @s.filename.should == 'sitemap1.xml.gz'
+    @s.location.filename.should == 'sitemap1.xml.gz'
   end
 
   it "should return the URL" do
@@ -33,7 +33,7 @@ describe 'SitemapGenerator::Builder::SitemapFile' do
 
   it "should set the filename base" do
     @s.filename = 'xxx'
-    @s.filename.should == 'xxx1.xml.gz'
+    @s.location.filename.should == 'xxx1.xml.gz'
   end
 
   describe "next" do
@@ -43,7 +43,7 @@ describe 'SitemapGenerator::Builder::SitemapFile' do
     end
 
     it "should have the next filename in the sequence" do
-      @s.filename.should == 'sitemap2.xml.gz'
+      @s.location.filename.should == 'sitemap2.xml.gz'
     end
 
     it "should inherit the same options" do
