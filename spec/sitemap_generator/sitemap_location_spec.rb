@@ -10,15 +10,22 @@ describe SitemapGenerator::SitemapLocation do
     @l.public_path.should == SitemapGenerator.app.root + 'public/'
   end
 
-  it "should require a filename" do
+  it "should have a default namer" do
     @l = SitemapGenerator::SitemapLocation.new
+    @l[:namer].should_not be_nil
+    @l[:filename].should be_nil
+    @l.filename.should == 'sitemap1.xml.gz'
+  end
+
+  it "should require a filename" do
+    @l = SitemapGenerator::SitemapLocation.new(:filename => nil, :namer => nil)
     lambda {
       @l.filename.should be_nil
     }.should raise_error
   end
 
   it "should require a host" do
-    @l = SitemapGenerator::SitemapLocation.new
+    @l = SitemapGenerator::SitemapLocation.new(:filename => nil, :namer => nil)
     lambda {
       @l.host.should be_nil
     }.should raise_error
@@ -95,5 +102,14 @@ describe SitemapGenerator::SitemapLocation do
       dup.public_path.to_s.should == @l.public_path.to_s
       dup.public_path.should_not be(@l.public_path)
     end
+  end
+end
+
+describe SitemapGenerator::SitemapIndexLocation do
+  it "should have a default namer" do
+    @l = SitemapGenerator::SitemapIndexLocation.new
+    @l[:namer].should_not be_nil
+    @l[:filename].should be_nil
+    @l.filename.should == 'sitemap_index.xml.gz'
   end
 end

@@ -1,10 +1,13 @@
 module SitemapGenerator
   module Builder
     class SitemapIndexFile < SitemapFile
-      DefaultNamer = SitemapGenerator::SitemapIndexNamer.new(:sitemap_index)
 
+      # === Options
+      #
+      # * <tt>location</tt> - a SitemapGenerator::SitemapIndexLocation instance or a Hash of options
+      #   from which a SitemapLocation will be created for you.
       def initialize(opts={})
-        @location = opts.is_a?(Hash) ? SitemapGenerator::SitemapLocation.new(opts) : opts
+        @location = opts.is_a?(Hash) ? SitemapGenerator::SitemapIndexLocation.new(opts) : opts
         @link_count = 0
         @sitemaps_link_count = 0
         @xml_content = '' # XML urlset content

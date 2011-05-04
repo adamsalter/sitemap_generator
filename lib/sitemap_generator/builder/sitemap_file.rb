@@ -12,7 +12,6 @@ module SitemapGenerator
     #   sitemap.finalize!            <- write the sitemap file and freeze the object to protect it from further modification
     #
     class SitemapFile
-      DefaultNamer = SitemapGenerator::SitemapNamer.new(:sitemap)
       include ActionView::Helpers::NumberHelper
       include ActionView::Helpers::TextHelper   # Rails 2.2.2 fails with missing 'pluralize' otherwise
       attr_reader :link_count, :filesize, :location

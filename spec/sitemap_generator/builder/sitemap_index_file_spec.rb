@@ -31,10 +31,8 @@ describe 'SitemapGenerator::Builder::SitemapIndexFile' do
     @s.location.filename.should == 'sitemap_index.xml.gz'
   end
 
-  describe "default namer" do
-    it "should generate the correct names" do
-      n = SitemapGenerator::Builder::SitemapIndexFile::DefaultNamer
-      n.to_s.should == 'sitemap_index.xml.gz'
-    end
+  it "should have a default namer" do
+    @s = SitemapGenerator::Builder::SitemapIndexFile.new
+    @s.location.filename.should == 'sitemap_index.xml.gz'
   end
 end

@@ -2,13 +2,11 @@ require 'spec_helper'
 
 describe SitemapGenerator::Builder::SitemapIndexUrl do
   before :all do
-    @host = 'http://example.com/test/'
-    @loc = SitemapGenerator::SitemapLocation.new(
+    @s = SitemapGenerator::Builder::SitemapIndexFile.new(
       :sitemaps_path => 'sitemaps/',
-      :public_path => '/public',
-      :host => 'http://test.com' 
+      :host => 'http://test.com',
+      :filename => 'sitemap_index.xml.gz'
     )
-    @s = SitemapGenerator::Builder::SitemapIndexFile.new(@loc)
   end
 
   it "should return the correct url" do

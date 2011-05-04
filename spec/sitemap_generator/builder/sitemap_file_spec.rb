@@ -6,6 +6,11 @@ describe 'SitemapGenerator::Builder::SitemapFile' do
     @s = SitemapGenerator::Builder::SitemapFile.new(@loc)
   end
 
+  it "should have a default namer" do
+    @s = SitemapGenerator::Builder::SitemapFile.new
+    @s.location.filename.should == 'sitemap1.xml.gz'
+  end
+
   it "should return the name of the sitemap file" do
     @s.location.filename.should == 'sitemap1.xml.gz'
   end
@@ -54,13 +59,6 @@ describe 'SitemapGenerator::Builder::SitemapFile' do
 
     it "should inherit the same namer instance" do
       @s.location.namer.should == @orig_s.location.namer
-    end
-  end
-
-  describe "default namer" do
-    it "should generate the correct names" do
-      n = SitemapGenerator::Builder::SitemapFile::DefaultNamer
-      n.to_s.should == 'sitemap1.xml.gz'
     end
   end
 end

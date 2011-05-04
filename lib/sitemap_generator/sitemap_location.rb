@@ -14,29 +14,28 @@ module SitemapGenerator
       end
     end
 
-    # The filename is not required at initialization but must be set when calling
-    # methods that depend on it like <tt>path</tt>.
+    # If no +filename+ or +namer+ is provided, the default namer is used.  For sitemap
+    # files this generates names like <tt>sitemap1.xml.gz</tt>, <tt>sitemap2.xml.gz</tt> and so on,
     #
-    # All options are optional.  Supported options are:
-    #   public_path   - path to the "public" directory, or the directory you want to
-    #                   write sitemaps in.  Default is a directory <tt>public/</tt>
-    #                   in the current working directory, or relative to the Rails root
-    #                   directory if running under Rails.
-    #   sitemaps_path - gives the path relative to the <tt>public_path</tt> in which to
-    #                 write sitemaps e.g. <tt>sitemaps/</tt>.
-    #   host          - host name for URLs.  The full URL to the file is then constructed from
-    #                   the <tt>host</tt>, <tt>sitemaps_path</tt> and <tt>filename</tt>
-    #   filename      - name of the file
-    #   namer         - a SitemapGenerator::SitemapNamer instance.  Can be passed instead of +filename+.
+    # === Options
+    # * <tt>public_path</tt> - path to the "public" directory, or the directory you want to
+    #   write sitemaps in.  Default is a directory <tt>public/</tt>
+    #   in the current working directory, or relative to the Rails root
+    #   directory if running under Rails.
+    # * <tt>sitemaps_path</tt> - gives the path relative to the <tt>public_path</tt> in which to
+    #   write sitemaps e.g. <tt>sitemaps/</tt>.
+    # * <tt>host</tt> - host name for URLs.  The full URL to the file is then constructed from
+    #   the <tt>host</tt>, <tt>sitemaps_path</tt> and <tt>filename</tt>
+    # * <tt>filename</tt> - full name of the file e.g. <tt>'sitemap1.xml.gz'<tt>
+    # * <tt>namer</tt> - a SitemapGenerator::SitemapNamer instance.  Can be passed instead of +filename+.
     def initialize(opts={})
       SitemapGenerator::Utilities.assert_valid_keys(opts, [:public_path, :sitemaps_path, :host, :filename, :namer])
       opts.reverse_merge!(
-        :sitemaps_path => nil,
-        :public_path => SitemapGenerator.app.root + 'public/',
-        :host => nil,
-        :filename => nil,
-        :namer => nil
+        :public_path => SitemapGenerator.app.root + 'public/'
       )
+      if !opts.key?(:filename) && !opts.key?(:namer)
+        opts[:namer] = SitemapGenerator::SitemapNamer.new(:sitemap)
+      end
       self.merge!(opts)
     end
 
@@ -88,6 +87,15 @@ module SitemapGenerator
         self[:filename] = nil
       end
       super
+    end
+  end
+
+  class SitemapIndexLocation < SitemapLocation
+    def initialize(opts={})
+      if !opts.key?(:filename) && !opts.key?(:namer)
+        opts[:namer] = SitemapGenerator::SitemapIndexNamer.new(:sitemap_index)
+      end
+      super(opts)
     end
   end
 end
