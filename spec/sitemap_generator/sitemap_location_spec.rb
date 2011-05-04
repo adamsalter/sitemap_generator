@@ -18,12 +18,21 @@ describe SitemapGenerator::SitemapLocation do
   end
 
   it "should require a filename" do
-    @l = SitemapGenerator::SitemapLocation.new(:filename => nil, :namer => nil)
+    @l = SitemapGenerator::SitemapLocation.new
+    @l[:filename] = nil
     lambda {
       @l.filename.should be_nil
     }.should raise_error
   end
 
+  it "should require a namer" do
+    @l = SitemapGenerator::SitemapLocation.new
+    @l[:namer] = nil
+    lambda {
+      @l.filename.should be_nil
+    }.should raise_error
+  end
+  
   it "should require a host" do
     @l = SitemapGenerator::SitemapLocation.new(:filename => nil, :namer => nil)
     lambda {

@@ -33,7 +33,7 @@ module SitemapGenerator
       opts.reverse_merge!(
         :public_path => SitemapGenerator.app.root + 'public/'
       )
-      if !opts.key?(:filename) && !opts.key?(:namer)
+      if !opts[:filename] && !opts[:namer]
         opts[:namer] = SitemapGenerator::SitemapNamer.new(:sitemap)
       end
       self.merge!(opts)
@@ -81,10 +81,13 @@ module SitemapGenerator
       self[:namer]
     end
 
+    # If you set the filename, clear the namer and vice versa.
     def []=(key, value)
       case key
       when :namer
-        self[:filename] = nil
+        super(:filename, nil)
+      when :filename
+        super(:namer, nil)
       end
       super
     end
@@ -92,7 +95,7 @@ module SitemapGenerator
 
   class SitemapIndexLocation < SitemapLocation
     def initialize(opts={})
-      if !opts.key?(:filename) && !opts.key?(:namer)
+      if !opts[:filename] && !opts[:namer]
         opts[:namer] = SitemapGenerator::SitemapIndexNamer.new(:sitemap_index)
       end
       super(opts)
