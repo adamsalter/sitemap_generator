@@ -30,12 +30,8 @@ module SitemapGenerator
     # * <tt>namer</tt> - a SitemapGenerator::SitemapNamer instance.  Can be passed instead of +filename+.
     def initialize(opts={})
       SitemapGenerator::Utilities.assert_valid_keys(opts, [:public_path, :sitemaps_path, :host, :filename, :namer])
-      opts.reverse_merge!(
-        :public_path => SitemapGenerator.app.root + 'public/'
-      )
-      if !opts[:filename] && !opts[:namer]
-        opts[:namer] = SitemapGenerator::SitemapNamer.new(:sitemap)
-      end
+      opts[:public_path] ||= SitemapGenerator.app.root + 'public/'
+      opts[:namer] = SitemapGenerator::SitemapNamer.new(:sitemap) if !opts[:filename] && !opts[:namer]
       self.merge!(opts)
     end
 
@@ -46,12 +42,12 @@ module SitemapGenerator
 
     # Full path to the directory of the file.
     def directory
-      (public_path + sitemaps_path).to_s
+      (public_path + sitemaps_path).expand_path.to_s
     end
 
     # Full path of the file including the filename.
     def path
-      (public_path + sitemaps_path + filename).to_s
+      (public_path + sitemaps_path + filename).expand_path.to_s
     end
 
     # Relative path of the file (including the filename) relative to <tt>public_path</tt>
@@ -74,7 +70,10 @@ module SitemapGenerator
     # value is locked so that it is unaffected by further changes to the namer.
     def filename
       raise SitemapGenerator::SitemapError, "No filename or namer set" unless self[:filename] || self[:namer]
-      self[:filename] ||= self[:namer].to_s
+      unless self[:filename]
+        self.send(:[]=, :filename, self[:namer].to_s, :super => true)
+      end
+      self[:filename]
     end
 
     def namer
@@ -82,14 +81,16 @@ module SitemapGenerator
     end
 
     # If you set the filename, clear the namer and vice versa.
-    def []=(key, value)
-      case key
-      when :namer
-        super(:filename, nil)
-      when :filename
-        super(:namer, nil)
+    def []=(key, value, opts={})
+      if !opts[:super]
+        case key
+        when :namer
+          super(:filename, nil)
+        when :filename
+          super(:namer, nil)
+        end
       end
-      super
+      super(key, value)
     end
   end
 

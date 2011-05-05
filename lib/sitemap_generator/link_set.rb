@@ -5,7 +5,7 @@ require 'builder'
 module SitemapGenerator
   class LinkSet
 
-    attr_reader :default_host, :public_path, :sitemaps_path, :filename, :sitemap, :location
+    attr_reader :default_host, :sitemaps_path, :filename
     attr_accessor :verbose, :yahoo_app_id, :include_root, :include_index, :sitemaps_host
 
     # Main entry-point.  Pass a block which contains calls to your URL helper methods
@@ -26,7 +26,6 @@ module SitemapGenerator
       set_options(opts)
       start_time = Time.now if verbose
       interpreter.eval(:yield_sitemap => @yield_sitemap || SitemapGenerator.yield_sitemap?, &block)
-      debugger
       finalize!
       end_time = Time.now if verbose
       puts sitemap_index.stats_summary(:time_taken => end_time - start_time) if verbose
@@ -45,8 +44,9 @@ module SitemapGenerator
     # * <tt>:verbose</tt> - If +true+, output a summary line for each sitemap and sitemap
     #   index that is created.  Default is +false+.
     #
-    # * <tt>:public_path</tt> - full path to the directory to write sitemaps in.
-    #   Defaults to your Rails <tt>public/</tt> directory.
+    # * <tt>:public_path</tt> - Full or relative path to the directory to write sitemaps into.
+    #   Defaults to the <tt>public/</tt> directory in your application root directory or
+    #   the current working directory.
     #
     # * <tt>:sitemaps_path</tt> - path fragment within public to write sitemaps
     #   to e.g. 'en/'.  Sitemaps are written to <tt>public_path</tt> + <tt>sitemaps_path</tt>
@@ -55,8 +55,8 @@ module SitemapGenerator
     #   e.g. http://en.google.ca
     #
     # * <tt>:filename</tt> - symbol giving the base name for files (default <tt>:sitemap</tt>).
-    #   The sitemap names are generated like "#{@filename}1.xml.gzip", "#{@filename}2.xml.gzip"
-    #   and the index name is like "#{@filename}_index.xml.gzip".
+    #   The sitemap names are generated like "#{filename}1.xml.gz", "#{filename}2.xml.gz"
+    #   and the index name is like "#{filename}_index.xml.gz".
     #
     # * <tt>:include_root</tt> - whether to include the root url i.e. '/' in each group of sitemaps.
     #   Default is false.
@@ -69,38 +69,21 @@ module SitemapGenerator
     #
     # * <tt>:sitemap_index</tt> - The sitemap index to use.  The index will not have its options modified
     #   when options are set on the LinkSet.
-    def initialize(*args)
-
-      # Extract options
-      options = if (!args.first.nil? && !args.first.is_a?(Hash)) || args.size > 1
-        warn "Deprecated. Please call with an options hash instead."
-        [:public_path, :sitemaps_path, :default_host, :filename].each_with_index.inject({}) do |hash, arg|
-          hash[arg[0]] = args[arg[1]]
-          hash
-        end
-      else
-        args.first || {}
-      end
+    #
+    # * <tt>:sitemaps_namer</tt> - A +SitemapNamer+ instance for generating the sitemap names.
+    def initialize(options={})
 
       # Option defaults
       options.reverse_merge!({
         :include_root => true,
         :include_index => true,
         :filename => :sitemap,
-        :public_path => SitemapGenerator.app.root + 'public/',
-        :sitemaps_path => nil,
-        :sitemaps_host => nil,
         :verbose => false
       })
       options.each_pair { |k, v| instance_variable_set("@#{k}".to_sym, v) }
 
-      # Create a location object to store all the location options
-      @location = SitemapGenerator::SitemapLocation.new(
-        :sitemaps_path => @sitemaps_path,
-        :public_path => @public_path,
-        :host => @default_host
-      )
-
+      # If an index is passed in, protect it from modification.
+      # Sitemaps can be added to the index but nothing else can be changed.
       if options[:sitemap_index]
         @protect_index = true
       end
@@ -114,12 +97,12 @@ module SitemapGenerator
     #   host - host for the link, defaults to your <tt>default_host</tt>.
     def add(link, options={})
       add_default_links if !@added_default_links
-      sitemap.add(link, options.reverse_merge!(:host => @location.host))
+      sitemap.add(link, options.reverse_merge!(:host => @default_host))
     rescue SitemapGenerator::SitemapFullError
       finalize_sitemap!
       retry
     rescue SitemapGenerator::SitemapFinalizedError
-      @sitemap = sitemap.next
+      @sitemap = sitemap.new
       retry
     end
 
@@ -143,7 +126,12 @@ module SitemapGenerator
     def group(opts={}, &block)
       @created_group = true
       opts = options_for_group(opts)
-      if !empty?
+
+      # If no new filename or path is specified finalize the current sitemap
+      # so that we don't overwrite it.
+      if [:filename, :sitemaps_path, :sitemaps_namer].find { |key| opts.key?(key) }.nil?
+        finalize_sitemap! if @sitemap && !@sitemap.empty?
+      end
 
       @group = SitemapGenerator::LinkSet.new(opts)
       @group.create(&block) if block_given?
@@ -199,20 +187,31 @@ module SitemapGenerator
       @sitemaps_host || @default_host
     end
 
+    def sitemaps_namer
+      @sitemaps_namer ||= @sitemap && @sitemap.location.namer || SitemapGenerator::SitemapNamer.new(:sitemap)
+    end
+
+    def sitemap_index_namer
+      @sitemap_index_namer ||= @sitemap_index && @sitemap_index.location.namer || SitemapGenerator::SitemapIndexNamer.new(:sitemap_index)
+    end
+
     # Lazy-initialize a sitemap instance when it's accessed
-    def sitemap(opts={})
-      opts.reverse_merge!(
-        :location => @location.dup.with(:host => @sitemaps_host || @default_host),
-        :filename => @filename
+    def sitemap
+      @sitemap ||= SitemapGenerator::Builder::SitemapFile.new(
+        :host => sitemaps_host,
+        :namer => sitemaps_namer,
+        :public_path => public_path,
+        :sitemaps_path => @sitemaps_path
       )
-      @sitemap ||= SitemapGenerator::Builder::SitemapFile.new(opts)
     end
 
     # Lazy-initialize a sitemap index instance when it's accessed
     def sitemap_index
       @sitemap_index ||= SitemapGenerator::Builder::SitemapIndexFile.new(
-        :location => @location.dup.with(:host => @sitemaps_host || @default_host),
-        :filename => "#{@filename}_index"
+        :host => sitemaps_host,
+        :namer => sitemap_index_namer,
+        :public_path => public_path,
+        :sitemaps_path => @sitemaps_path
       )
     end
 
@@ -231,7 +230,7 @@ module SitemapGenerator
       end
     end
 
-    # Return a hash of options which can be used to reconstruct this instance.
+    # Return a hash of options which can be used to reconstruct this LinkSet instance.
     def get_options
       [:include_root, :include_index, :filename, :sitemaps_path, :public_path, :sitemaps_host, :verbose, :default_host].inject({}) do |hash, key|
         hash[key] = send(key)
@@ -239,7 +238,9 @@ module SitemapGenerator
       end
     end
 
-    # Return a hash of options prepped for creating a new group from this LinkSet.
+    # Given +opts+, return a hash of options prepped for creating a new group from this LinkSet.
+    # If <tt>:public_path</tt> is present in +opts+ it is removed because groups cannot
+    # change the public path.
     def options_for_group(opts)
       opts.delete(:public_path)
       opts.reverse_merge!(
@@ -253,7 +254,7 @@ module SitemapGenerator
     # Add default links if those options are turned on.  Record the fact that we have done so
     # in an instance variable.
     def add_default_links
-      sitemap.add('/', :lastmod => Time.now, :changefreq => 'always', :priority => 1.0, :host => @location.host) if include_root
+      sitemap.add('/', :lastmod => Time.now, :changefreq => 'always', :priority => 1.0, :host => @default_host) if include_root
       sitemap.add(sitemap_index, :lastmod => Time.now, :changefreq => 'always', :priority => 1.0) if include_index
       @added_default_links = true
     end
@@ -294,9 +295,9 @@ module SitemapGenerator
       # Set the host name, including protocol, that will be used by default on each
       # of your sitemap links.  You can pass a different host in your options to `add`
       # if you need to change it on a per-link basis.
-      def default_host=(value, opts={})
+      def default_host=(value)
         @default_host = value
-        update_location_info(:host, value, opts)
+        update_location_info(:host, value)
       end
 
       # Set the public_path.  This path gives the location of your public directory.
@@ -306,56 +307,66 @@ module SitemapGenerator
       # Example: 'tmp/' if you don't want to generate in public for some reason.
       #
       # Set to nil to use the current directory.
-      def public_path=(value, opts={})
-        @public_path = value
-        update_location_info(:public_path, value, opts)
+      def public_path=(value)
+        @public_path = Pathname.new(value.to_s)
+        @public_path = SitemapGenerator.app.root + @public_path if @public_path.relative?
+        update_location_info(:public_path, @public_path)
+        @public_path
+      end
+
+      # Return a Pathname with the full path to the public directory
+      def public_path
+        @public_path ||= self.send(:public_path=, 'public/')
       end
 
       # Set the sitemaps_path.  This path gives the location to write sitemaps to
       # relative to your public_path.
       # Example: 'sitemaps/' to generate your sitemaps in 'public/sitemaps/'.
-      def sitemaps_path=(value, opts={})
+      def sitemaps_path=(value)
         @sitemaps_path = value
-        update_location_info(:sitemaps_path, value, opts)
+        update_location_info(:sitemaps_path, value)
       end
 
       # Set the host name, including protocol, that will be used on all links to your sitemap
       # files.  Useful when the server that hosts the sitemaps is not on the same host as
       # the links in the sitemap.
-      def sitemaps_host=(value, opts={})
-        opts.reverse_merge!(:and_self => false)
+      def sitemaps_host=(value)
         @sitemaps_host = value
-        update_location_info(:host, value, opts)
+        update_location_info(:host, value)
       end
 
       # Set the filename base to use when generating sitemaps and sitemap indexes.
-      def filename=(value, opts={})
+      # The index name will be +value+ with <tt>_index.xml.gz</tt> appended.
+      # === Example
+      # <tt>filename = :sitemap</tt>
+      def filename=(value)
         @filename = value
-        update_sitemap_info(:filename, value, opts)
+        self.sitemaps_namer = SitemapGenerator::SitemapNamer.new(@filename)
+        self.sitemap_index_namer = SitemapGenerator::SitemapIndexNamer.new("#{@filename}_index")
       end
 
-      # Return a boolean indicating whether the LinkSet is empty.
-      def empty?
-        !@sitemap_index || @sitemap_index.empty?
+      # Set the namer to use when generating SitemapFiles (does not apply to the
+      # SitemapIndexFile)
+      def sitemaps_namer=(value)
+        @sitemaps_namer = value
+        @sitemap.location[:namer] = value if @sitemap && !@sitemap.finalized?
+      end
+
+      # Set the namer to use when generating SitemapFiles (does not apply to the
+      # SitemapIndexFile)
+      def sitemap_index_namer=(value)
+        @sitemap_index_namer = value
+        @sitemap_index.location[:namer] = value if @sitemap_index && !@sitemap_index.finalized? && !@protect_index
       end
 
       protected
 
-      # Update the given attribute on the current sitemap index and sitemap files.  But
-      # don't create the index or sitemap files yet if they are not already created.
-      def update_sitemap_info(attribute, value, opts={})
-        opts.reverse_merge!(:include_index => !@protect_index)
-        sitemap_index.send("#{attribute}=", value) if opts[:include_index] && @sitemap_index && !@sitemap_index.finalized?
-        sitemap.send("#{attribute}=", value) if @sitemap && !@sitemap.finalized?
-      end
-
       # Update the given attribute on the current sitemap index and sitemap file location objects.
       # But don't create the index or sitemap files yet if they are not already created.
       def update_location_info(attribute, value, opts={})
-        opts.reverse_merge!(:and_self => true, :include_index => !@protect_index)
-        @location.merge!(attribute => value) if opts[:and_self]
-        sitemap_index.location.merge!(attribute => value) if opts[:include_index] && @sitemap_index && !@sitemap_index.finalized?
-        sitemap.location.merge!(attribute => value) if @sitemap && !@sitemap.finalized?
+        opts.reverse_merge!(:include_index => !@protect_index)
+        @sitemap_index.location[attribute] = value if opts[:include_index] && @sitemap_index && !@sitemap_index.finalized?
+        @sitemap.location[attribute] = value if @sitemap && !@sitemap.finalized?
       end
     end
     include LocationHelpers

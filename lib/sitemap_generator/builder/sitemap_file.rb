@@ -124,7 +124,9 @@ module SitemapGenerator
 
       # Return a new instance of the sitemap file with the same options, and the next name in the sequence.
       def new
-        self.class.new(@location.dup)
+        location = @location.dup
+        location.delete(:filename) if location.namer
+        self.class.new(location)
       end
 
       # Return a summary string

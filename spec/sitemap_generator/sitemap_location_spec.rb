@@ -86,7 +86,7 @@ describe SitemapGenerator::SitemapLocation do
         :filename => 'sitemap1.xml.gz',
         :host => 'http://test.com/plus/extra/' },
       { :url => 'http://test.com/plus/extra/sitemaps/en/sitemap1.xml.gz',
-        :directory => '/public/system/sitemaps/en/',
+        :directory => '/public/system/sitemaps/en',
         :path => '/public/system/sitemaps/en/sitemap1.xml.gz',
         :path_in_public => 'sitemaps/en/sitemap1.xml.gz'
       }]

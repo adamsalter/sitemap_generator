@@ -1,5 +1,12 @@
 require 'spec_helper'
 
+def with_max_links(num)
+  original = SitemapGenerator::MAX_SITEMAP_LINKS
+  SitemapGenerator.const_set(:MAX_SITEMAP_LINKS, num)
+  yield
+  SitemapGenerator.const_set(:MAX_SITEMAP_LINKS, original)
+end
+
 describe "SitemapGenerator" do
 
   describe "root" do
@@ -50,13 +57,9 @@ describe "SitemapGenerator" do
 
   describe "generate sitemap" do
     before :each do
-      old_max_links = SitemapGenerator::MAX_SITEMAP_LINKS
-      begin
-        SitemapGenerator::MAX_SITEMAP_LINKS = 10
+      with_max_links(10) {
         Helpers.invoke_task('sitemap:refresh:no_ping')
-      ensure
-        SitemapGenerator::MAX_SITEMAP_LINKS = old_max_links
-      end
+      }
     end
 
     it "should create sitemaps" do

@@ -20,7 +20,7 @@ describe 'SitemapGenerator::Builder::SitemapFile' do
   end
 
   it "should return the path" do
-    @s.location.path.should == 'tmp/test/sitemap1.xml.gz'
+    @s.location.path.should == File.expand_path('tmp/test/sitemap1.xml.gz')
   end
 
   it "should be empty" do
@@ -41,6 +41,10 @@ describe 'SitemapGenerator::Builder::SitemapFile' do
     @s.location.filename.should_not == @s.location.namer.to_s
   end
 
+  it "should raise if no default host is set" do
+    lambda { SitemapGenerator::Builder::SitemapFile.new.location.url }.should raise_error(SitemapGenerator::SitemapError)
+  end
+
   describe "new" do
     before :each do
       @orig_s = @s
@@ -50,7 +54,7 @@ describe 'SitemapGenerator::Builder::SitemapFile' do
     it "should inherit the same options" do
       # The name is the same because the original sitemap was not finalized
       @s.location.url.should == 'http://example.com/test/sitemap1.xml.gz'
-      @s.location.path.should == 'tmp/test/sitemap1.xml.gz'
+      @s.location.path.should == File.expand_path('tmp/test/sitemap1.xml.gz')
     end
 
     it "should not share the same location instance" do
