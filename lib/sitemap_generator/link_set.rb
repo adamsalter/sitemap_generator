@@ -235,7 +235,6 @@ module SitemapGenerator
       current_settings = [
         :include_root,
         :include_index,
-        :filename,
         :sitemaps_path,
         :public_path,
         :sitemaps_host,
@@ -247,8 +246,7 @@ module SitemapGenerator
       end
       opts.reverse_merge!(current_settings)
 
-      # Set the sitemap namer if not filename or sitemaps_namer was passed
-      # opts[:sitemaps_namer] = sitemaps_namer unless opts[:filename] || opts[:sitemaps_namer]
+      # Set the sitemap namer if no filename or sitemaps_namer was passed
       opts[:sitemaps_namer] ||= sitemaps_namer unless opts[:filename]
       opts
     end
