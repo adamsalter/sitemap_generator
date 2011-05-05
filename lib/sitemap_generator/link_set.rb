@@ -187,14 +187,6 @@ module SitemapGenerator
       @sitemaps_host || @default_host
     end
 
-    def sitemaps_namer
-      @sitemaps_namer ||= @sitemap && @sitemap.location.namer || SitemapGenerator::SitemapNamer.new(:sitemap)
-    end
-
-    def sitemap_index_namer
-      @sitemap_index_namer ||= @sitemap_index && @sitemap_index.location.namer || SitemapGenerator::SitemapIndexNamer.new(:sitemap_index)
-    end
-
     # Lazy-initialize a sitemap instance when it's accessed
     def sitemap
       @sitemap ||= SitemapGenerator::Builder::SitemapFile.new(
@@ -230,14 +222,6 @@ module SitemapGenerator
       end
     end
 
-    # Return a hash of options which can be used to reconstruct this LinkSet instance.
-    def get_options
-      [:include_root, :include_index, :filename, :sitemaps_path, :public_path, :sitemaps_host, :verbose, :default_host].inject({}) do |hash, key|
-        hash[key] = send(key)
-        hash
-      end
-    end
-
     # Given +opts+, return a hash of options prepped for creating a new group from this LinkSet.
     # If <tt>:public_path</tt> is present in +opts+ it is removed because groups cannot
     # change the public path.
@@ -248,7 +232,25 @@ module SitemapGenerator
         :include_root => false,
         :sitemap_index => sitemap_index
       )
-      opts.reverse_merge!(get_options)
+      current_settings = [
+        :include_root,
+        :include_index,
+        :filename,
+        :sitemaps_path,
+        :public_path,
+        :sitemaps_host,
+        :verbose,
+        :default_host
+      ].inject({}) do |hash, key|
+        hash[key] = send(key)
+        hash
+      end
+      opts.reverse_merge!(current_settings)
+
+      # Set the sitemap namer if not filename or sitemaps_namer was passed
+      # opts[:sitemaps_namer] = sitemaps_namer unless opts[:filename] || opts[:sitemaps_namer]
+      opts[:sitemaps_namer] ||= sitemaps_namer unless opts[:filename]
+      opts
     end
 
     # Add default links if those options are turned on.  Record the fact that we have done so
@@ -352,11 +354,19 @@ module SitemapGenerator
         @sitemap.location[:namer] = value if @sitemap && !@sitemap.finalized?
       end
 
+      def sitemaps_namer
+        @sitemaps_namer ||= @sitemap && @sitemap.location.namer || SitemapGenerator::SitemapNamer.new(@filename)
+      end
+
       # Set the namer to use when generating SitemapFiles (does not apply to the
       # SitemapIndexFile)
       def sitemap_index_namer=(value)
         @sitemap_index_namer = value
         @sitemap_index.location[:namer] = value if @sitemap_index && !@sitemap_index.finalized? && !@protect_index
+      end
+
+      def sitemap_index_namer
+        @sitemap_index_namer ||= @sitemap_index && @sitemap_index.location.namer || SitemapGenerator::SitemapIndexNamer.new("#{@filename}_index")
       end
 
       protected
