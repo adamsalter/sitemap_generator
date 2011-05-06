@@ -8,27 +8,30 @@ module SitemapGenerator
     attr_reader :default_host, :sitemaps_path, :filename
     attr_accessor :verbose, :yahoo_app_id, :include_root, :include_index, :sitemaps_host
 
-    # Main entry-point.  Pass a block which contains calls to your URL helper methods
-    # and sitemap methods like:
-    #   +add+   - Add a link to the current sitemap
-    #   +group+ - Start a new group of sitemaps
+    # Add links to the link set by evaluating the block.  The block should
+    # contains calls to sitemap methods like:
+    # * +add+   - Add a link to the current sitemap
+    # * +group+ - Start a new group of sitemaps
     #
-    # The sitemaps are written as they get full and at the end of the block.
+    # == Options
     #
-    # All options are passed to this instance using accessor methods.  Any option
-    # supported by +new+ can be passed.
+    # Any option supported by +new+ can be passed.  The options will be
+    # set on the instance using the accessor methods.  This is provided mostly
+    # as a convenience.
     #
-    # If the sitemap or index is finalized, a new one is created.  Generally
-    # you shouldn't be calling +create+ more than once.
+    # In addition to the options to +new+, the following options are supported:
+    # * <tt>:finalize</tt> - The sitemaps are written as they get full and at the end
+    # of the block.  Pass +false+ as the value to prevent the sitemap or sitemap index
+    # from being finalized.  Default is +true+.
     def create(opts={}, &block)
       @sitemap_index = nil if @sitemap_index && @sitemap_index.finalized? && !@protect_index
       @sitemap = nil if @sitemap && @sitemap.finalized?
       set_options(opts)
-      start_time = Time.now if verbose
+      start_time = Time.now if @verbose
       interpreter.eval(:yield_sitemap => @yield_sitemap || SitemapGenerator.yield_sitemap?, &block)
       finalize!
-      end_time = Time.now if verbose
-      puts sitemap_index.stats_summary(:time_taken => end_time - start_time) if verbose
+      end_time = Time.now if @verbose
+      puts sitemap_index.stats_summary(:time_taken => end_time - start_time) if @verbose
     end
 
     # Dreprecated.  Use create.
@@ -41,22 +44,24 @@ module SitemapGenerator
     # Constructor
     #
     # == Options:
-    # * <tt>:verbose</tt> - If +true+, output a summary line for each sitemap and sitemap
-    #   index that is created.  Default is +false+.
+    # * <tt>:default_host</tt> - host including protocol to use in all sitemap links
+    #   e.g. http://en.google.ca
     #
     # * <tt>:public_path</tt> - Full or relative path to the directory to write sitemaps into.
     #   Defaults to the <tt>public/</tt> directory in your application root directory or
     #   the current working directory.
     #
+    # * <tt>:sitemaps_host</tt> - host (including protocol) to use in links to the sitemaps.  Useful if your sitemaps
+    #   are hosted o different server e.g. 'http://amazon.aws.com/'
+    #
     # * <tt>:sitemaps_path</tt> - path fragment within public to write sitemaps
     #   to e.g. 'en/'.  Sitemaps are written to <tt>public_path</tt> + <tt>sitemaps_path</tt>
-    #
-    # * <tt>:default_host</tt> - host including protocol to use in all sitemap links
-    #   e.g. http://en.google.ca
     #
     # * <tt>:filename</tt> - symbol giving the base name for files (default <tt>:sitemap</tt>).
     #   The sitemap names are generated like "#{filename}1.xml.gz", "#{filename}2.xml.gz"
     #   and the index name is like "#{filename}_index.xml.gz".
+    #
+    # * <tt>:sitemaps_namer</tt> - A +SitemapNamer+ instance for generating the sitemap names.
     #
     # * <tt>:include_root</tt> - whether to include the root url i.e. '/' in each group of sitemaps.
     #   Default is false.
@@ -64,16 +69,9 @@ module SitemapGenerator
     # * <tt>:include_index</tt> - whether to include the sitemap index URL in each group of sitemaps.
     #   Default is false.
     #
-    # * <tt>:sitemaps_host</tt> - host (including protocol) to use in links to the sitemaps.  Useful if your sitemaps
-    #   are hosted o different server e.g. 'http://amazon.aws.com/'
-    #
-    # * <tt>:sitemap_index</tt> - The sitemap index to use.  The index will not have its options modified
-    #   when options are set on the LinkSet.
-    #
-    # * <tt>:sitemaps_namer</tt> - A +SitemapNamer+ instance for generating the sitemap names.
+    # * <tt>:verbose</tt> - If +true+, output a summary line for each sitemap and sitemap
+    #   index that is created.  Default is +false+.
     def initialize(options={})
-
-      # Option defaults
       options.reverse_merge!({
         :include_root => true,
         :include_index => true,
@@ -121,20 +119,29 @@ module SitemapGenerator
     # Pass a block to add links to the new LinkSet.  If you pass a block the sitemaps will
     # be finalized when the block returns.
     #
-    # If you do not specify a <tt>:filename</tt> or a <tt>:sitemaps_path</tt> the filename
-    # will be next one in the series.
+    # If you are not changing any of the location settings like <tt>filename<tt>,
+    # <tt>sitemaps_path</tt>, <tt>sitemaps_host</tt> or <tt>sitemaps_namer</tt>
+    # the current sitemap will be used in the group.  All of the options you have
+    # specified which affect the way the links are generated will still be applied
+    # for the duration of the group.
     def group(opts={}, &block)
       @created_group = true
       opts = options_for_group(opts)
 
-      # If no new filename or path is specified finalize the current sitemap
-      # so that we don't overwrite it.
-      if [:filename, :sitemaps_path, :sitemaps_namer].find { |key| opts.key?(key) }.nil?
-        finalize_sitemap! if @sitemap && !@sitemap.empty?
-      end
-
+      # If the group is sharing the current sitemap, make sure that it
+      # has a new Location set on it for the duration of the group.
       @group = SitemapGenerator::LinkSet.new(opts)
-      @group.create(&block) if block_given?
+      if block_given?
+        if opts.key?(:sitemap)
+          @original_location = @sitemap.location.dup
+          @sitemap.location.merge!(@group.sitemap_location)
+          @group.interpreter.eval(:yield_sitemap => @yield_sitemap || SitemapGenerator.yield_sitemap?, &block)
+          @sitemap.location.merge!(@original_location)
+        else
+          @group.interpreter.eval(:yield_sitemap => @yield_sitemap || SitemapGenerator.yield_sitemap?, &block)
+          @group.finalize_sitemap!
+        end
+      end
       @group
     end
 
@@ -183,28 +190,20 @@ module SitemapGenerator
       sitemap_index.total_link_count
     end
 
+    # Return the host to use in links to the sitemap files.  This defaults to your
+    # +default_host+.
     def sitemaps_host
       @sitemaps_host || @default_host
     end
 
     # Lazy-initialize a sitemap instance when it's accessed
     def sitemap
-      @sitemap ||= SitemapGenerator::Builder::SitemapFile.new(
-        :host => sitemaps_host,
-        :namer => sitemaps_namer,
-        :public_path => public_path,
-        :sitemaps_path => @sitemaps_path
-      )
+      @sitemap ||= SitemapGenerator::Builder::SitemapFile.new(sitemap_location)
     end
 
     # Lazy-initialize a sitemap index instance when it's accessed
     def sitemap_index
-      @sitemap_index ||= SitemapGenerator::Builder::SitemapIndexFile.new(
-        :host => sitemaps_host,
-        :namer => sitemap_index_namer,
-        :public_path => public_path,
-        :sitemaps_path => @sitemaps_path
-      )
+      @sitemap_index ||= SitemapGenerator::Builder::SitemapIndexFile.new(sitemap_index_location)
     end
 
     def finalize!
@@ -232,6 +231,15 @@ module SitemapGenerator
         :include_root => false,
         :sitemap_index => sitemap_index
       )
+
+      # If no new filename or path is specified reuse the default sitemap file.
+      # A new location object will be set on it for the duration of the group.
+      opts[:sitemap] = sitemap if [:filename, :sitemaps_path, :sitemaps_namer, :sitemaps_host].find { |key| opts.key?(key) }.nil?
+
+      # Set the sitemap namer if no filename or sitemaps_namer was passed
+      opts[:sitemaps_namer] ||= sitemaps_namer unless opts[:filename]
+
+      # Reverse merge the current settings
       current_settings = [
         :include_root,
         :include_index,
@@ -245,9 +253,6 @@ module SitemapGenerator
         hash
       end
       opts.reverse_merge!(current_settings)
-
-      # Set the sitemap namer if no filename or sitemaps_namer was passed
-      opts[:sitemaps_namer] ||= sitemaps_namer unless opts[:filename]
       opts
     end
 
@@ -365,6 +370,26 @@ module SitemapGenerator
 
       def sitemap_index_namer
         @sitemap_index_namer ||= @sitemap_index && @sitemap_index.location.namer || SitemapGenerator::SitemapIndexNamer.new("#{@filename}_index")
+      end
+
+      # Return a new +SitemapLocation+ instance with the current options included
+      def sitemap_location
+        SitemapGenerator::SitemapLocation.new(
+          :host => sitemaps_host,
+          :namer => sitemaps_namer,
+          :public_path => public_path,
+          :sitemaps_path => @sitemaps_path
+        )
+      end
+
+      # Return a new +SitemapIndexLocation+ instance with the current options included
+      def sitemap_index_location
+        SitemapGenerator::SitemapLocation.new(
+          :host => sitemaps_host,
+          :namer => sitemap_index_namer,
+          :public_path => public_path,
+          :sitemaps_path => @sitemaps_path
+        )
       end
 
       protected

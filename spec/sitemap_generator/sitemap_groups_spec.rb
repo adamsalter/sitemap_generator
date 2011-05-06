@@ -83,14 +83,50 @@ describe "Sitemap Groups" do
     file_should_exist(SitemapGenerator.app.root + 'public/fr/sitemap_fr1.xml.gz')
   end
 
-  it "groups should not overwrite eachother" do
+  it "the sitemap shouldn't be finalized if the groups don't conflict" do
     @sm.create do
-      group { add '/one' }
-      group { add '/two' }
+      add 'one'
+      group(:filename => :first) { add '/two' }
+      add 'three'
+      group(:filename => :second) { add '/four' }
+      add 'five'
     end
-    @sm.link_count.should == 2
+    @sm.link_count.should == 7
+    file_should_exist(SitemapGenerator.app.root + 'public/sitemap_index.xml.gz')
+    file_should_exist(SitemapGenerator.app.root + 'public/sitemap1.xml.gz')
+    file_should_exist(SitemapGenerator.app.root + 'public/first1.xml.gz')
+    file_should_exist(SitemapGenerator.app.root + 'public/second1.xml.gz')
+  end
+
+  it "groups should share the sitemap if the sitemap location is unchanged" do
+    @sm.create do
+      add 'one'
+      group(:default_host => 'http://newhost.com') { add '/two' }
+      add 'three'
+      group(:default_host => 'http://betterhost.com') { add '/four' }
+      add 'five'
+    end
+    @sm.link_count.should == 7
+    file_should_exist(SitemapGenerator.app.root + 'public/sitemap_index.xml.gz')
+    file_should_exist(SitemapGenerator.app.root + 'public/sitemap1.xml.gz')
+    file_should_not_exist(SitemapGenerator.app.root + 'public/sitemap2.xml.gz')
+  end
+
+  it "sitemaps should be finalized if virtual location settings are changed" do
+    @sm.create do
+      add 'one'
+      group(:sitemaps_path => :en) { add '/two' }
+      add 'three'
+      group(:sitemaps_host => 'http://newhost.com') { add '/four' }
+      add 'five'
+    end
+    @sm.link_count.should == 7
     file_should_exist(SitemapGenerator.app.root + 'public/sitemap_index.xml.gz')
     file_should_exist(SitemapGenerator.app.root + 'public/sitemap1.xml.gz')
     file_should_exist(SitemapGenerator.app.root + 'public/sitemap2.xml.gz')
+    file_should_exist(SitemapGenerator.app.root + 'public/sitemap3.xml.gz')
+    file_should_exist(SitemapGenerator.app.root + 'public/sitemap4.xml.gz')
+    file_should_exist(SitemapGenerator.app.root + 'public/en/sitemap1.xml.gz')
+    file_should_not_exist(SitemapGenerator.app.root + 'public/sitemap5.xml.gz')
   end
 end
