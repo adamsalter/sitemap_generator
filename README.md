@@ -20,7 +20,7 @@ Contribute
 
 Does your website use SitemapGenerator to generate Sitemaps?  Where would you be without Sitemaps?  Probably still knocking rocks together.  Consider donating to the project to keep it up-to-date and open source.
 
-<a href='http://www.pledgie.com/campaigns/15267'><img alt='Click here to lend your support to: SitemapGenerator and make a donation at www.pledgie.com !' src='http://www.pledgie.com/campaigns/15267.png?skin_name=chrome' border='0' /></a>
+<a href='http://www.pledgie.com/campaigns/15267'><img alt='Click here to lend your support to: SitemapGenerator and make a donation at www.pledgie.com !' src='http://pledgie.com/campaigns/15267.png?skin_name=chrome' border='0' /></a>
 
 
 Changelog
