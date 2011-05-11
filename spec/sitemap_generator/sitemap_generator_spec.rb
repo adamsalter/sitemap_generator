@@ -17,7 +17,6 @@ describe "SitemapGenerator" do
 
   describe "clean task" do
     before :each do
-      copy_sitemap_file_to_rails_app
       FileUtils.touch(rails_path('public/sitemap_index.xml.gz'))
       Helpers.invoke_task('sitemap:clean')
     end
@@ -55,39 +54,42 @@ describe "SitemapGenerator" do
     end
   end
 
-  describe "generate sitemap" do
-    before :each do
-      with_max_links(10) {
-        Helpers.invoke_task('sitemap:refresh:no_ping')
-      }
-    end
+  [nil, :new].each do |extension|
+    describe "generate sitemap" do
+      before :each do
+        copy_sitemap_file_to_rails_app(extension)
+        with_max_links(10) {
+          Helpers.invoke_task('sitemap:refresh:no_ping')
+        }
+      end
 
-    it "should create sitemaps" do
-      file_should_exist(rails_path('public/sitemap_index.xml.gz'))
-      file_should_exist(rails_path('public/sitemap1.xml.gz'))
-      file_should_exist(rails_path('public/sitemap2.xml.gz'))
-      file_should_not_exist(rails_path('public/sitemap3.xml.gz'))
-    end
+      it "should create sitemaps" do
+        file_should_exist(rails_path('public/sitemap_index.xml.gz'))
+        file_should_exist(rails_path('public/sitemap1.xml.gz'))
+        file_should_exist(rails_path('public/sitemap2.xml.gz'))
+        file_should_not_exist(rails_path('public/sitemap3.xml.gz'))
+      end
 
-    it "should have 14 links" do
-      SitemapGenerator::Sitemap.link_count.should == 14
-    end
+      it "should have 14 links" do
+        SitemapGenerator::Sitemap.link_count.should == 14
+      end
 
-    it "index XML should validate" do
-      gzipped_xml_file_should_validate_against_schema rails_path('public/sitemap_index.xml.gz'), 'siteindex'
-    end
+      it "index XML should validate" do
+        gzipped_xml_file_should_validate_against_schema rails_path('public/sitemap_index.xml.gz'), 'siteindex'
+      end
 
-    it "sitemap XML should validate" do
-      gzipped_xml_file_should_validate_against_schema rails_path('public/sitemap1.xml.gz'), 'sitemap'
-      gzipped_xml_file_should_validate_against_schema rails_path('public/sitemap2.xml.gz'), 'sitemap'
-    end
+      it "sitemap XML should validate" do
+        gzipped_xml_file_should_validate_against_schema rails_path('public/sitemap1.xml.gz'), 'sitemap'
+        gzipped_xml_file_should_validate_against_schema rails_path('public/sitemap2.xml.gz'), 'sitemap'
+      end
 
-    it "index XML should not have excess whitespace" do
-      gzipped_xml_file_should_have_minimal_whitespace rails_path('public/sitemap_index.xml.gz')
-    end
+      it "index XML should not have excess whitespace" do
+        gzipped_xml_file_should_have_minimal_whitespace rails_path('public/sitemap_index.xml.gz')
+      end
 
-    it "sitemap XML should not have excess whitespace" do
-      gzipped_xml_file_should_have_minimal_whitespace rails_path('public/sitemap1.xml.gz')
+      it "sitemap XML should not have excess whitespace" do
+        gzipped_xml_file_should_have_minimal_whitespace rails_path('public/sitemap1.xml.gz')
+      end
     end
   end
 
@@ -168,8 +170,8 @@ describe "SitemapGenerator" do
     SitemapGenerator.app.root + file
   end
 
-  def copy_sitemap_file_to_rails_app
-    FileUtils.cp(File.join(SitemapGenerator.root, 'spec/sitemap.file'), SitemapGenerator.app.root + 'config/sitemap.rb')
+  def copy_sitemap_file_to_rails_app(extension=nil)
+    FileUtils.cp(File.join(SitemapGenerator.root, "spec/sitemap.file#{extension ? '.'+extension.to_s : '' }"), SitemapGenerator.app.root + 'config/sitemap.rb')
   end
 
   def delete_sitemap_file_from_rails_app
