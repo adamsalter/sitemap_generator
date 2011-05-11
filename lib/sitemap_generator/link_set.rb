@@ -126,18 +126,22 @@ module SitemapGenerator
     # for the duration of the group.
     def group(opts={}, &block)
       @created_group = true
+      original_opts = opts.dup
       opts = options_for_group(opts)
 
-      # If the group is sharing the current sitemap, make sure that it
-      # has a new Location set on it for the duration of the group.
       @group = SitemapGenerator::LinkSet.new(opts)
       if block_given?
+        # If the group is sharing the current sitemap, make sure that it
+        # has a new Location set on it for the duration of the group.
         if opts.key?(:sitemap)
           @original_location = @sitemap.location.dup
           @sitemap.location.merge!(@group.sitemap_location)
           @group.interpreter.eval(:yield_sitemap => @yield_sitemap || SitemapGenerator.yield_sitemap?, &block)
           @sitemap.location.merge!(@original_location)
         else
+          # A new sitemap must be written.  If it does not specify any location options,
+          # it means that we must finalize the current sitemap.
+          finalize_sitemap! if original_opts.key?(:sitemaps_host) && ![:sitemaps_namer, :filename, :sitemaps_path].find { |key| original_opts.key?(key) }
           @group.interpreter.eval(:yield_sitemap => @yield_sitemap || SitemapGenerator.yield_sitemap?, &block)
           @group.finalize_sitemap!
         end

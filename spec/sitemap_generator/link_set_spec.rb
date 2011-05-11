@@ -270,6 +270,24 @@ describe SitemapGenerator::LinkSet do
       @ls.sitemap.empty?.should be_true
       @ls.sitemap.finalized?.should be_false
     end
+
+    describe "sitemaps_host" do
+      it "should finalize the sitemap if it is the only option" do
+        @ls.expects(:finalize_sitemap!)
+        @ls.group(:sitemaps_host => 'http://test.com') {}
+      end
+
+      {
+        :sitemaps_path => 'en/',
+        :filename => :example,
+        :sitemaps_namer => SitemapGenerator::SitemapNamer.new(:sitemap)
+      }.each do |k, v|
+        it "should not finalize the sitemap if #{k} is present" do
+          @ls.expects(:finalize_sitemap!).never
+          @ls.group(k => v) { }
+        end
+      end
+    end
   end
 
   describe "after create" do
