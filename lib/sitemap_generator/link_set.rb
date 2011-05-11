@@ -127,8 +127,19 @@ module SitemapGenerator
     def group(opts={}, &block)
       @created_group = true
       original_opts = opts.dup
-      opts = options_for_group(opts)
 
+      if [:filename, :sitemaps_path, :sitemaps_namer, :sitemaps_host].find { |key| original_opts.key?(key) }.nil?
+        # If no new filename or path is specified reuse the default sitemap file.
+        # A new location object will be set on it for the duration of the group.
+        opts[:sitemap] = sitemap
+      elsif original_opts.key?(:sitemaps_host) && ![:filename, :sitemaps_path, :sitemaps_namer].find { |key| original_opts.key?(key) }
+        # If no location options are provided we are creating the next sitemap in the
+        # current series, so finalize and inherit the namer.
+        finalize_sitemap!
+        opts[:sitemaps_namer] = sitemaps_namer
+      end
+
+      opts = options_for_group(opts)
       @group = SitemapGenerator::LinkSet.new(opts)
       if block_given?
         # If the group is sharing the current sitemap, make sure that it
@@ -139,9 +150,6 @@ module SitemapGenerator
           @group.interpreter.eval(:yield_sitemap => @yield_sitemap || SitemapGenerator.yield_sitemap?, &block)
           @sitemap.location.merge!(@original_location)
         else
-          # A new sitemap must be written.  If it does not specify any location options,
-          # we must finalize the current sitemap.
-          finalize_sitemap! if original_opts.key?(:sitemaps_host) && ![:sitemaps_namer, :filename, :sitemaps_path].find { |key| original_opts.key?(key) }
           @group.interpreter.eval(:yield_sitemap => @yield_sitemap || SitemapGenerator.yield_sitemap?, &block)
           @group.finalize_sitemap!
         end
@@ -235,10 +243,6 @@ module SitemapGenerator
         :include_root => false,
         :sitemap_index => sitemap_index
       )
-
-      # If no new filename or path is specified reuse the default sitemap file.
-      # A new location object will be set on it for the duration of the group.
-      opts[:sitemap] = sitemap if [:filename, :sitemaps_path, :sitemaps_namer, :sitemaps_host].find { |key| opts.key?(key) }.nil?
 
       # Reverse merge the current settings
       current_settings = [

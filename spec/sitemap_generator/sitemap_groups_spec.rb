@@ -125,8 +125,7 @@ describe "Sitemap Groups" do
     file_should_exist(SitemapGenerator.app.root + 'public/sitemap1.xml.gz')
     file_should_exist(SitemapGenerator.app.root + 'public/sitemap2.xml.gz')
     file_should_exist(SitemapGenerator.app.root + 'public/sitemap3.xml.gz')
-    file_should_exist(SitemapGenerator.app.root + 'public/sitemap4.xml.gz')
+    file_should_not_exist(SitemapGenerator.app.root + 'public/sitemap4.xml.gz')
     file_should_exist(SitemapGenerator.app.root + 'public/en/sitemap1.xml.gz')
-    file_should_not_exist(SitemapGenerator.app.root + 'public/sitemap5.xml.gz')
   end
 end

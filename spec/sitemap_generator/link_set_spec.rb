@@ -277,6 +277,11 @@ describe SitemapGenerator::LinkSet do
         @ls.group(:sitemaps_host => 'http://test.com') {}
       end
 
+      it "should use the same sitemaps_namer" do
+        @group = @ls.group(:sitemaps_host => 'http://test.com') {}
+        @group.sitemap.location.namer.should == @ls.sitemap.location.namer
+      end
+
       {
         :sitemaps_path => 'en/',
         :filename => :example,
