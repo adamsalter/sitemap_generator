@@ -140,7 +140,7 @@ module SitemapGenerator
           @sitemap.location.merge!(@original_location)
         else
           # A new sitemap must be written.  If it does not specify any location options,
-          # it means that we must finalize the current sitemap.
+          # we must finalize the current sitemap.
           finalize_sitemap! if original_opts.key?(:sitemaps_host) && ![:sitemaps_namer, :filename, :sitemaps_path].find { |key| original_opts.key?(key) }
           @group.interpreter.eval(:yield_sitemap => @yield_sitemap || SitemapGenerator.yield_sitemap?, &block)
           @group.finalize_sitemap!
@@ -239,9 +239,6 @@ module SitemapGenerator
       # If no new filename or path is specified reuse the default sitemap file.
       # A new location object will be set on it for the duration of the group.
       opts[:sitemap] = sitemap if [:filename, :sitemaps_path, :sitemaps_namer, :sitemaps_host].find { |key| opts.key?(key) }.nil?
-
-      # Set the sitemap namer if no filename or sitemaps_namer was passed
-      opts[:sitemaps_namer] ||= sitemaps_namer unless opts[:filename]
 
       # Reverse merge the current settings
       current_settings = [
@@ -361,6 +358,9 @@ module SitemapGenerator
         @sitemap.location[:namer] = value if @sitemap && !@sitemap.finalized?
       end
 
+      # Return the current sitemaps namer object.  If it not set, looks for it on
+      # the current sitemap and if there is no sitemap, creates a new one using
+      # the current filename.
       def sitemaps_namer
         @sitemaps_namer ||= @sitemap && @sitemap.location.namer || SitemapGenerator::SitemapNamer.new(@filename)
       end
