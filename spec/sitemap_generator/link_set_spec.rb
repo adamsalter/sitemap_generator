@@ -293,6 +293,23 @@ describe SitemapGenerator::LinkSet do
         end
       end
     end
+
+    describe "should not share the current sitemap" do
+      {
+        :filename => :xxx,
+        :sitemaps_path => 'en/',
+        :filename => :example,
+        :sitemaps_namer => SitemapGenerator::SitemapNamer.new(:sitemap)
+      }.each do |key, value|
+        it "if #{key} is present" do
+          @ls.group(key => value).sitemap.should_not == @ls.sitemap
+        end
+      end
+    end
+
+    it "should share the current sitemap if only default_host is passed" do
+      @ls.group(:default_host => 'http://newhost.com').sitemap.should == @ls.sitemap
+    end
   end
 
   describe "after create" do
