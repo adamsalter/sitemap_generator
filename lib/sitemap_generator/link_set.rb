@@ -6,7 +6,7 @@ module SitemapGenerator
   class LinkSet
     @@requires_finalization_opts = [:filename, :sitemaps_path, :sitemaps_namer, :sitemaps_host]
     @@new_location_opts = [:filename, :sitemaps_path, :sitemaps_namer]
-    
+
     attr_reader :default_host, :sitemaps_path, :filename
     attr_accessor :verbose, :yahoo_app_id, :include_root, :include_index, :sitemaps_host
 
@@ -143,18 +143,18 @@ module SitemapGenerator
 
       opts = options_for_group(opts)
       @group = SitemapGenerator::LinkSet.new(opts)
-      if block_given?
-        # If the group is sharing the current sitemap, make sure that it
-        # has a new Location set on it for the duration of the group.
-        if opts.key?(:sitemap)
-          @original_location = @sitemap.location.dup
-          @sitemap.location.merge!(@group.sitemap_location)
+      if opts.key?(:sitemap)
+        # If the group is sharing the current sitemap, set the
+        # new location options on the location object.
+        @original_location = @sitemap.location.dup
+        @sitemap.location.merge!(@group.sitemap_location)
+        if block_given?
           @group.interpreter.eval(:yield_sitemap => @yield_sitemap || SitemapGenerator.yield_sitemap?, &block)
           @sitemap.location.merge!(@original_location)
-        else
-          @group.interpreter.eval(:yield_sitemap => @yield_sitemap || SitemapGenerator.yield_sitemap?, &block)
-          @group.finalize_sitemap!
         end
+      elsif block_given?
+        @group.interpreter.eval(:yield_sitemap => @yield_sitemap || SitemapGenerator.yield_sitemap?, &block)
+        @group.finalize_sitemap!
       end
       @group
     end
@@ -256,7 +256,9 @@ module SitemapGenerator
         :verbose,
         :default_host
       ].inject({}) do |hash, key|
-        hash[key] = send(key)
+        if value = instance_variable_get(:"@#{key}")
+          hash[key] = value 
+        end
         hash
       end
       opts.reverse_merge!(current_settings)

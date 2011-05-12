@@ -243,15 +243,6 @@ describe SitemapGenerator::LinkSet do
       @group.sitemap.finalized?.should be_false
     end
 
-    it "should set the sitemaps_path" do
-      @ls.group(:sitemaps_path => 'new/path/').sitemaps_path.should == 'new/path/'
-    end
-
-    it "should set the sitemaps_host" do
-      @host = 'http://sitemaphost.com'
-      @ls.group(:sitemaps_host => @host).sitemaps_host.should == @host
-    end
-
     it "should inherit the verbose option" do
       @ls = SitemapGenerator::LinkSet.new(:default_host => @default_host, :verbose => true)
       @ls.group.verbose.should be_true
@@ -261,17 +252,42 @@ describe SitemapGenerator::LinkSet do
       @ls.group(:verbose => !!@ls.verbose).verbose.should == !!@ls.verbose
     end
 
-    it "should set the default_host" do
-      @ls.group.default_host.should == @default_host
-    end
-
     it "should not finalize the sitemap if a group is created" do
       @ls.create { group {} }
       @ls.sitemap.empty?.should be_true
       @ls.sitemap.finalized?.should be_false
     end
 
+    describe "sitemaps_path" do
+      it "should set the sitemaps_path" do
+        path = 'new/path'
+        group = @ls.group(:sitemaps_path => path)
+        group.sitemaps_path.should == path
+        group.sitemap.location.sitemaps_path.to_s.should == path
+      end
+    end
+
+    describe "default_host" do
+      it "should inherit the default_host" do
+        @ls.group.default_host.should == @default_host
+      end
+
+      it "should set the default_host" do
+        host = 'http://defaulthost.com'
+        group = @ls.group(:default_host => host)
+        group.default_host.should == host
+        group.sitemap.location.host.should == host
+      end
+    end
+
     describe "sitemaps_host" do
+      it "should set the sitemaps host" do
+        @host = 'http://sitemaphost.com'
+        @group = @ls.group(:sitemaps_host => @host)
+        @group.sitemaps_host.should == @host
+        @group.sitemap.location.host.should == @host
+      end
+
       it "should finalize the sitemap if it is the only option" do
         @ls.expects(:finalize_sitemap!)
         @ls.group(:sitemaps_host => 'http://test.com') {}
