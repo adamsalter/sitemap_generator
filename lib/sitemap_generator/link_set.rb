@@ -4,7 +4,9 @@ require 'builder'
 # which lists all the sitemap files written.
 module SitemapGenerator
   class LinkSet
-
+    @@requires_finalization_opts = [:filename, :sitemaps_path, :sitemaps_namer, :sitemaps_host]
+    @@new_location_opts = [:filename, :sitemaps_path, :sitemaps_namer]
+    
     attr_reader :default_host, :sitemaps_path, :filename
     attr_accessor :verbose, :yahoo_app_id, :include_root, :include_index, :sitemaps_host
 
@@ -128,11 +130,11 @@ module SitemapGenerator
       @created_group = true
       original_opts = opts.dup
 
-      if [:filename, :sitemaps_path, :sitemaps_namer, :sitemaps_host].find { |key| original_opts.key?(key) }.nil?
+      if (@@requires_finalization_opts & original_opts.keys).empty?
         # If no new filename or path is specified reuse the default sitemap file.
         # A new location object will be set on it for the duration of the group.
         opts[:sitemap] = sitemap
-      elsif original_opts.key?(:sitemaps_host) && ![:filename, :sitemaps_path, :sitemaps_namer].find { |key| original_opts.key?(key) }
+      elsif original_opts.key?(:sitemaps_host) && (@@new_location_opts & original_opts.keys).empty?
         # If no location options are provided we are creating the next sitemap in the
         # current series, so finalize and inherit the namer.
         finalize_sitemap!
