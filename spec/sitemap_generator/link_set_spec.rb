@@ -278,12 +278,6 @@ describe SitemapGenerator::LinkSet do
         group.default_host.should == host
         group.sitemap.location.host.should == host
       end
-
-      it "should share the current sitemap if only default_host is passed" do
-        group = @ls.group(:default_host => 'http://newhost.com')
-        group.sitemap.should == @ls.sitemap
-        group.sitemap.location.host.should == 'http://newhost.com'
-      end
     end
 
     describe "sitemaps_host" do
@@ -303,16 +297,28 @@ describe SitemapGenerator::LinkSet do
         @group = @ls.group(:sitemaps_host => 'http://test.com') {}
         @group.sitemap.location.namer.should == @ls.sitemap.location.namer
       end
+    end
 
-      {
-        :sitemaps_path => 'en/',
-        :filename => :example,
-        :sitemaps_namer => SitemapGenerator::SitemapNamer.new(:sitemap)
-      }.each do |k, v|
-        it "should not finalize the sitemap if #{k} is present" do
-          @ls.expects(:finalize_sitemap!).never
-          @ls.group(k => v) { }
-        end
+    describe "sitemaps_namer" do
+      it "should inherit the value" do
+        @ls.group.sitemaps_namer.should == @ls.sitemaps_namer
+        @ls.group.sitemap.location.namer.should == @ls.sitemaps_namer
+      end
+
+      it "should set the value" do
+        namer = SitemapGenerator::SitemapNamer.new(:xxx)
+        group = @ls.group(:sitemaps_namer => namer)
+        group.sitemaps_namer.should == namer
+        group.sitemap.location.namer.should == namer
+        group.sitemap.location.filename.should =~ /xxx/
+      end
+    end
+
+    describe "should share the current sitemap" do
+      it "if only default_host is passed" do
+        group = @ls.group(:default_host => 'http://newhost.com')
+        group.sitemap.should == @ls.sitemap
+        group.sitemap.location.host.should == 'http://newhost.com'
       end
     end
 
@@ -344,6 +350,16 @@ describe SitemapGenerator::LinkSet do
         @ls.create { group {} }
         @ls.sitemap.empty?.should be_true
         @ls.sitemap.finalized?.should be_false
+      end
+
+      {:sitemaps_path => 'en/',
+        :filename => :example,
+        :sitemaps_namer => SitemapGenerator::SitemapNamer.new(:sitemap)}.each do |k, v|
+
+        it "should not finalize the sitemap if #{k} is present" do
+          @ls.expects(:finalize_sitemap!).never
+          @ls.group(k => v) { }
+        end
       end
     end
   end
