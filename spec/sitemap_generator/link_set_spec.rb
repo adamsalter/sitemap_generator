@@ -192,73 +192,73 @@ describe SitemapGenerator::LinkSet do
       @ls = SitemapGenerator::LinkSet.new(:default_host => @default_host)
     end
 
-    it "should return a LinkSet" do
-      @ls.group.should be_a(SitemapGenerator::LinkSet)
+    describe "general behaviour" do
+      it "should return a LinkSet" do
+        @ls.group.should be_a(SitemapGenerator::LinkSet)
+      end
+
+      it "should inherit the index" do
+        @ls.group.sitemap_index.should == @ls.sitemap_index
+      end
+
+      it "should protect the sitemap_index" do
+        @ls.group.instance_variable_get(:@protect_index).should be_true
+      end
+
+      it "should not allow chaning the public_path" do
+        @ls.group(:public_path => 'new/path/').public_path.to_s.should == @ls.public_path.to_s
+      end
     end
 
-    it "should share the sitemap_index" do
-      @ls.group.sitemap_index.should == @ls.sitemap_index
+    describe "include_index" do
+      it "should set the value" do
+        @ls.group(:include_index => !@ls.include_index).include_index.should_not == @ls.include_index
+      end
+
+      it "should default to false" do
+        @ls.group.include_index.should be_false
+      end
     end
 
-    it "should protect the sitemap_index" do
-      @ls.group.instance_variable_get(:@protect_index).should be_true
+    describe "include_root" do
+      it "should set the value" do
+        @ls.group(:include_root => !@ls.include_root).include_root.should_not == @ls.include_root
+      end
+
+      it "should default to false" do
+        @ls.group.include_root.should be_false
+      end
     end
 
-    it "should not set the public_path" do
-      @ls.group(:public_path => 'new/path/').public_path.to_s.should == @ls.public_path.to_s
+    describe "filename" do
+      it "should inherit the value" do
+        @ls.group.filename.should == :sitemap
+      end
+
+      it "should set the value" do
+        group = @ls.group(:filename => :xxx)
+        group.filename.should == :xxx
+        group.sitemap.location.filename.should =~ /xxx/
+      end
     end
 
-    it "include_root should default to false" do
-      @ls.group.include_root.should be_false
-    end
+    describe "verbose" do
+      it "should inherit the value" do
+        @ls.group.verbose.should == @ls.verbose
+      end
 
-    it "include_index should default to false" do
-      @ls.group.include_index.should be_false
-    end
-
-    it "should set include_root" do
-      @ls.group(:include_root => true).include_root.should be_true
-    end
-
-    it "should set include_index" do
-      @ls.group(:include_index => true).include_index.should be_true
-    end
-
-    it "filename should be inherited" do
-      @ls.group.filename.should == :sitemap
-    end
-
-    it "should set filename but not modify the index" do
-      @ls.group(:filename => :newname).filename.should == :newname
-      @ls.sitemap_index.location.filename.should =~ /sitemap_index/
-    end
-
-    it "should finalize the sitemaps if a block is passed" do
-      @group = @ls.group
-      @group.sitemap.finalized?.should be_false
-    end
-
-    it "should only finalize the sitemaps if a block is passed" do
-      @group = @ls.group
-      @group.sitemap.finalized?.should be_false
-    end
-
-    it "should inherit the verbose option" do
-      @ls = SitemapGenerator::LinkSet.new(:default_host => @default_host, :verbose => true)
-      @ls.group.verbose.should be_true
-    end
-
-    it "should set the verbose option" do
-      @ls.group(:verbose => !!@ls.verbose).verbose.should == !!@ls.verbose
-    end
-
-    it "should not finalize the sitemap if a group is created" do
-      @ls.create { group {} }
-      @ls.sitemap.empty?.should be_true
-      @ls.sitemap.finalized?.should be_false
+      it "should set the value" do
+        @ls.group(:verbose => !@ls.verbose).verbose.should_not == @ls.verbose
+      end
     end
 
     describe "sitemaps_path" do
+      it "should inherit the sitemaps_path" do
+        group = @ls.group
+        group.sitemaps_path.should == @ls.sitemaps_path
+        group.sitemap.location.sitemaps_path.should == @ls.sitemap.location.sitemaps_path
+      end
+
       it "should set the sitemaps_path" do
         path = 'new/path'
         group = @ls.group(:sitemaps_path => path)
@@ -277,6 +277,12 @@ describe SitemapGenerator::LinkSet do
         group = @ls.group(:default_host => host)
         group.default_host.should == host
         group.sitemap.location.host.should == host
+      end
+
+      it "should share the current sitemap if only default_host is passed" do
+        group = @ls.group(:default_host => 'http://newhost.com')
+        group.sitemap.should == @ls.sitemap
+        group.sitemap.location.host.should == 'http://newhost.com'
       end
     end
 
@@ -323,8 +329,22 @@ describe SitemapGenerator::LinkSet do
       end
     end
 
-    it "should share the current sitemap if only default_host is passed" do
-      @ls.group(:default_host => 'http://newhost.com').sitemap.should == @ls.sitemap
+    describe "finalizing" do
+      it "should finalize the sitemaps if a block is passed" do
+        @group = @ls.group
+        @group.sitemap.finalized?.should be_false
+      end
+
+      it "should only finalize the sitemaps if a block is passed" do
+        @group = @ls.group
+        @group.sitemap.finalized?.should be_false
+      end
+
+      it "should not finalize the sitemap if a group is created" do
+        @ls.create { group {} }
+        @ls.sitemap.empty?.should be_true
+        @ls.sitemap.finalized?.should be_false
+      end
     end
   end
 
