@@ -29,7 +29,8 @@ end
 module Helpers
   extend self
 
-  # Invoke and then re-enable the task so it can be called multiple times
+  # Invoke and then re-enable the task so it can be called multiple times.
+  # KJV: Tasks are only being run once despite being re-enabled.
   #
   # <tt>task</tt> task symbol/string
   def invoke_task(task)

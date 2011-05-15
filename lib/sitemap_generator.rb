@@ -24,7 +24,12 @@ module SitemapGenerator
     # Lazy-initialize the LinkSet instance
     Sitemap = (Class.new do
       def method_missing(*args, &block)
-        (@link_set ||= LinkSet.new).send(*args, &block)
+        (@link_set ||= reset!).send(*args, &block)
+      end
+
+      # Use a new LinkSet instance
+      def reset!
+        @link_set = LinkSet.new
       end
     end).new
   end
