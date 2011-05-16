@@ -385,4 +385,61 @@ describe SitemapGenerator::LinkSet do
       @ls.sitemap.finalized?.should be_false
     end
   end
+
+  describe "options to create" do
+    before :each do
+      @ls = SitemapGenerator::LinkSet.new(:default_host => @default_host)
+      @ls.expects(:finalize!)
+    end
+
+    it "should set include_index" do
+      original = @ls.include_index
+      @ls.create(:include_index => !original).include_index.should_not == original
+    end
+
+    it "should set include_root" do
+      original = @ls.include_root
+      @ls.create(:include_root => !original).include_root.should_not == original
+    end
+
+    it "should set the filename" do
+      ls = @ls.create(:filename => :xxx)
+      ls.filename.should == :xxx
+      ls.sitemap.location.filename.should =~ /xxx/
+    end
+
+    it "should set verbose" do
+      original = @ls.verbose
+      @ls.create(:verbose => !original).verbose.should_not == original
+    end
+
+    it "should set the sitemaps_path" do
+      path = 'new/path'
+      ls = @ls.create(:sitemaps_path => path)
+      ls.sitemaps_path.should == path
+      ls.sitemap.location.sitemaps_path.to_s.should == path
+    end
+
+    it "should set the default_host" do
+      host = 'http://defaulthost.com'
+      ls = @ls.create(:default_host => host)
+      ls.default_host.should == host
+      ls.sitemap.location.host.should == host
+    end
+
+    it "should set the sitemaps host" do
+      @host = 'http://sitemaphost.com'
+      ls = @ls.create(:sitemaps_host => @host)
+      ls.sitemaps_host.should == @host
+      ls.sitemap.location.host.should == @host
+    end
+
+    it "should set the sitemaps_namer" do
+      namer = SitemapGenerator::SitemapNamer.new(:xxx)
+      ls = @ls.create(:sitemaps_namer => namer)
+      ls.sitemaps_namer.should == namer
+      ls.sitemap.location.namer.should == namer
+      ls.sitemap.location.filename.should =~ /xxx/
+    end
+  end
 end
