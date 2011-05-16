@@ -34,6 +34,7 @@ module SitemapGenerator
       finalize!
       end_time = Time.now if @verbose
       puts sitemap_index.stats_summary(:time_taken => end_time - start_time) if @verbose
+      self
     end
 
     # Dreprecated.  Use create.
