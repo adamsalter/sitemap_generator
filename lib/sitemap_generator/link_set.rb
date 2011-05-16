@@ -257,7 +257,7 @@ module SitemapGenerator
         :default_host
       ].inject({}) do |hash, key|
         if value = instance_variable_get(:"@#{key}")
-          hash[key] = value 
+          hash[key] = value
         end
         hash
       end
@@ -281,7 +281,9 @@ module SitemapGenerator
     #
     # Add the default links if they have not been added yet and no groups have been created.
     # If the default links haven't been added we know that the sitemap is empty,
-    # because they are added on the first call to add().
+    # because they are added on the first call to add().  This ensure that if the
+    # block passed to create() is empty the default links are still included in the
+    # sitemap.
     def finalize_sitemap!
       add_default_links if !@added_default_links && !@created_group
       return if sitemap.finalized? || sitemap.empty? && @created_group

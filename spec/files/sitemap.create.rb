@@ -1,6 +1,6 @@
 SitemapGenerator::Sitemap.default_host = "http://www.example.com"
 SitemapGenerator::Sitemap.yahoo_app_id = false
-debugger
+
 SitemapGenerator::Sitemap.create do
   add contents_path, :priority => 0.7, :changefreq => 'daily'
 

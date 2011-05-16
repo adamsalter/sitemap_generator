@@ -1,5 +1,4 @@
 SitemapGenerator::Sitemap.default_host = "http://www.example.com"
-debugger
 SitemapGenerator::Sitemap.create(
     :include_root => true, :include_index => true,
     :filename => :new_sitemaps, :sitemaps_path => 'fr/') do
@@ -21,15 +20,17 @@ SitemapGenerator::Sitemap.create(
     add '/six'
   end
 
-  # This should be in a file of its own
-  group(:sitemaps_host => "http://exceptional.com") do
-    add '/seven'
-    add '/eight'
-  end
-
   add '/seven'
 
-  # Should add the default links only once
+  # This should be in a file of its own
+  group(:sitemaps_host => "http://exceptional.com") do
+    add '/eight'
+    add '/nine'
+  end
+
+  add '/ten'
+
+  # This should have no effect.  Already added default links.
   group(:include_root => true, :include_index => true) {}
 
   add "/merchant_path", :host => "https://www.merchanthost.com"

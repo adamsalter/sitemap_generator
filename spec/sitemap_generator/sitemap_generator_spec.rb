@@ -114,67 +114,65 @@ describe "SitemapGenerator" do
     end
   end
 
-  # describe "sitemap with groups" do
-  #   before :each do
-  #     clean_sitemap_files_from_rails_app
-  #     copy_sitemap_file_to_rails_app(:groups)
-  #     debugger
-  #     with_max_links(2) { execute_sitemap_config }
-  #     @expected = %w[
-  #       public/sitemap_index.xml.gz
-  #       public/fr/new_sitemaps1.xml.gz
-  #       public/fr/new_sitemaps2.xml.gz
-  #       public/fr/new_sitemaps3.xml.gz
-  #       public/fr/new_sitemaps4.xml.gz
-  #       public/en/xxx1.xml.gz
-  #       public/fr/abc3.xml.gz
-  #       public/fr/abc4.xml.gz]
-  #   end
-  #
-  #   it "should create sitemaps" do
-  #     debugger
-  #     @expected.each { |file| file_should_exist(rails_path(file)) }
-  #     file_should_not_exist(rails_path('public/fr/new_sitemaps5.xml.gz'))
-  #     file_should_not_exist(rails_path('public/en/xxx2.xml.gz'))
-  #     file_should_not_exist(rails_path('public/fr/abc5.xml.gz'))
-  #   end
-  #
-  #   it "should have 14 links" do
-  #     SitemapGenerator::Sitemap.link_count.should == 12
-  #   end
-  #
-  #   it "index XML should validate" do
-  #     gzipped_xml_file_should_validate_against_schema rails_path('public/sitemap_index.xml.gz'), 'siteindex'
-  #   end
-  #
-  #   it "index XML should not have excess whitespace" do
-  #     gzipped_xml_file_should_have_minimal_whitespace rails_path('public/sitemap_index.xml.gz')
-  #   end
-  #
-  #   it "sitemap XML should validate" do
-  #     @expected.each { |file| gzipped_xml_file_should_validate_against_schema(rails_path(file), 'sitemap') }
-  #   end
-  #
-  #   it "sitemap XML should not have excess whitespace" do
-  #     @expected.each { |file| gzipped_xml_file_should_have_minimal_whitespace(rails_path(file)) }
-  #   end
-  # end
+  describe "sitemap with groups" do
+    before :all do
+      SitemapGenerator::Sitemap.reset!
+      clean_sitemap_files_from_rails_app
+      copy_sitemap_file_to_rails_app(:groups)
+      with_max_links(2) { execute_sitemap_config }
+      @expected = %w[
+        public/en/xxx1.xml.gz
+        public/fr/abc3.xml.gz
+        public/fr/abc4.xml.gz
+        public/fr/new_sitemaps_index.xml.gz
+        public/fr/new_sitemaps1.xml.gz
+        public/fr/new_sitemaps2.xml.gz
+        public/fr/new_sitemaps3.xml.gz
+        public/fr/new_sitemaps4.xml.gz]
+      @sitemaps = (@expected - %w[public/fr/new_sitemaps_index.xml.gz])
+    end
+
+    it "should create sitemaps" do
+      @expected.each { |file| file_should_exist(rails_path(file)) }
+      file_should_not_exist(rails_path('public/fr/new_sitemaps5.xml.gz'))
+      file_should_not_exist(rails_path('public/en/xxx2.xml.gz'))
+      file_should_not_exist(rails_path('public/fr/abc5.xml.gz'))
+    end
+
+    it "should have 14 links" do
+      SitemapGenerator::Sitemap.link_count.should == 13
+    end
+
+    it "index XML should validate" do
+      gzipped_xml_file_should_validate_against_schema rails_path('public/fr/new_sitemaps_index.xml.gz'), 'siteindex'
+    end
+
+    it "index XML should not have excess whitespace" do
+      gzipped_xml_file_should_have_minimal_whitespace rails_path('public/fr/new_sitemaps_index.xml.gz')
+    end
+
+    it "sitemaps XML should validate" do
+      @sitemaps.each { |file| gzipped_xml_file_should_validate_against_schema(rails_path(file), 'sitemap') }
+    end
+
+    it "sitemap XML should not have excess whitespace" do
+      @sitemaps.each { |file| gzipped_xml_file_should_have_minimal_whitespace(rails_path(file)) }
+    end
+  end
 
   describe "sitemap path" do
     before :each do
+      clean_sitemap_files_from_rails_app
+      ::SitemapGenerator::Sitemap.reset!
       ::SitemapGenerator::Sitemap.default_host = 'http://test.local'
       ::SitemapGenerator::Sitemap.filename = 'sitemap'
-      clean_sitemap_files_from_rails_app
     end
 
     it "should allow changing of the filename" do
-      sm = ::SitemapGenerator::Sitemap
-      sm.filename = 'geo_sitemap'
-      sm.create do
+      ::SitemapGenerator::Sitemap.create(:filename => :geo_sitemap) do
         add '/goerss', :geo => { :format => 'georss' }
         add '/kml', :geo => { :format => 'kml' }
       end
-
       file_should_exist(rails_path('public/geo_sitemap_index.xml.gz'))
       file_should_exist(rails_path('public/geo_sitemap1.xml.gz'))
     end
