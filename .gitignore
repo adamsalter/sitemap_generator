@@ -7,3 +7,4 @@ spec/mock_rails3_gem/vendor/**/*
 spec/**/Gemfile.lock
 tmp/**/*
 *.bundle
+*.orig

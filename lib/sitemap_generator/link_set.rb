@@ -67,10 +67,10 @@ module SitemapGenerator
     # * <tt>:sitemaps_namer</tt> - A +SitemapNamer+ instance for generating the sitemap names.
     #
     # * <tt>:include_root</tt> - whether to include the root url i.e. '/' in each group of sitemaps.
-    #   Default is false.
+    #   Default is true.
     #
     # * <tt>:include_index</tt> - whether to include the sitemap index URL in each group of sitemaps.
-    #   Default is false.
+    #   Default is true.
     #
     # * <tt>:verbose</tt> - If +true+, output a summary line for each sitemap and sitemap
     #   index that is created.  Default is +false+.
