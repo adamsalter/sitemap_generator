@@ -165,6 +165,7 @@ module SitemapGenerator
     # @see http://en.wikipedia.org/wiki/Sitemap_index
     def ping_search_engines
       require 'open-uri'
+      require 'timeout'
 
       sitemap_index_url = CGI.escape(sitemap_index.location.url)
       search_engines = {
