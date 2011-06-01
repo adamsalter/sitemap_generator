@@ -28,14 +28,15 @@ namespace :sitemap do
     SitemapGenerator::Utilities.clean_files
   end
 
-  desc "Create Sitemap XML files in public/ directory (rake -s for no output)"
+  desc "Generate sitemaps and ping search engines."
   task :refresh => ['sitemap:create'] do
     SitemapGenerator::Sitemap.ping_search_engines
   end
 
-  desc "Create Sitemap XML files (don't ping search engines)"
+  desc "Generate sitemaps but don't ping search engines."
   task 'refresh:no_ping' => ['sitemap:create']
 
+  desc "Generate sitemaps but don't ping search engines.  Alias for refresh:no_ping."
   task :create => ['sitemap:require_environment'] do
     SitemapGenerator::Interpreter.run(:config_file => ENV["CONFIG_FILE"], :verbose => verbose)
   end
