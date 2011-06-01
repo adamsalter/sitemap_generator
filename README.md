@@ -26,6 +26,7 @@ Does your website use SitemapGenerator to generate Sitemaps?  Where would you be
 Changelog
 -------
 
+- v2.0.1: Minor improvements to verbose handling; prevent missing Timeout issue
 - **v2.0.0: Introducing a new simpler API, Sitemap Groups, Sitemap Namers and more!**
 - v1.5.0: New options `include_root`, `include_index`; Major testing & refactoring
 - v1.4.0: [Geo sitemap][geo_tags] support, multiple sitemap support via CONFIG_FILE rake option
