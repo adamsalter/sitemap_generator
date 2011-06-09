@@ -4,6 +4,7 @@ require 'sitemap_generator/link_set'
 require 'sitemap_generator/templates'
 require 'sitemap_generator/utilities'
 require 'sitemap_generator/application'
+require 'sitemap_generator/adapters'
 require 'sitemap_generator/sitemap_location'
 require 'active_support/core_ext/numeric'
 

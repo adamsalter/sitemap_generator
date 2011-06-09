@@ -47,6 +47,9 @@ module SitemapGenerator
     # Constructor
     #
     # == Options:
+    # * <tt>:adapter</tt> - subclass of SitemapGenerator::Adapter used for persisting the
+    #   sitemaps.  Default adapter is a SitemapGenerator::FileAdapter
+    #
     # * <tt>:default_host</tt> - host including protocol to use in all sitemap links
     #   e.g. http://en.google.ca
     #
@@ -394,7 +397,8 @@ module SitemapGenerator
           :host => sitemaps_host,
           :namer => sitemaps_namer,
           :public_path => public_path,
-          :sitemaps_path => @sitemaps_path
+          :sitemaps_path => @sitemaps_path,
+          :adapter => @adapter
         )
       end
 
@@ -404,7 +408,8 @@ module SitemapGenerator
           :host => sitemaps_host,
           :namer => sitemap_index_namer,
           :public_path => public_path,
-          :sitemaps_path => @sitemaps_path
+          :sitemaps_path => @sitemaps_path,
+          :adapter => @adapter
         )
       end
 

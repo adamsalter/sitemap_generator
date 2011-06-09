@@ -1,7 +1,7 @@
 module SitemapGenerator
   class SitemapLocation < Hash
 
-    [:host].each do |method|
+    [:host, :adapter].each do |method|
       define_method(method) do
         raise SitemapGenerator::SitemapError, "No value set for #{method}" unless self[method]
         self[method]
@@ -18,18 +18,20 @@ module SitemapGenerator
     # files this generates names like <tt>sitemap1.xml.gz</tt>, <tt>sitemap2.xml.gz</tt> and so on,
     #
     # === Options
+    # * <tt>adapter</tt> - SitemapGenerator::Adapter subclass
+    # * <tt>filename</tt> - full name of the file e.g. <tt>'sitemap1.xml.gz'<tt>
+    # * <tt>host</tt> - host name for URLs.  The full URL to the file is then constructed from
+    #   the <tt>host</tt>, <tt>sitemaps_path</tt> and <tt>filename</tt>
+    # * <tt>namer</tt> - a SitemapGenerator::SitemapNamer instance.  Can be passed instead of +filename+.
     # * <tt>public_path</tt> - path to the "public" directory, or the directory you want to
     #   write sitemaps in.  Default is a directory <tt>public/</tt>
     #   in the current working directory, or relative to the Rails root
     #   directory if running under Rails.
     # * <tt>sitemaps_path</tt> - gives the path relative to the <tt>public_path</tt> in which to
     #   write sitemaps e.g. <tt>sitemaps/</tt>.
-    # * <tt>host</tt> - host name for URLs.  The full URL to the file is then constructed from
-    #   the <tt>host</tt>, <tt>sitemaps_path</tt> and <tt>filename</tt>
-    # * <tt>filename</tt> - full name of the file e.g. <tt>'sitemap1.xml.gz'<tt>
-    # * <tt>namer</tt> - a SitemapGenerator::SitemapNamer instance.  Can be passed instead of +filename+.
     def initialize(opts={})
-      SitemapGenerator::Utilities.assert_valid_keys(opts, [:public_path, :sitemaps_path, :host, :filename, :namer])
+      SitemapGenerator::Utilities.assert_valid_keys(opts, [:adapter, :public_path, :sitemaps_path, :host, :filename, :namer])
+      opts[:adapter] ||= SitemapGenerator::FileAdapter.new
       opts[:public_path] ||= SitemapGenerator.app.root + 'public/'
       opts[:namer] = SitemapGenerator::SitemapNamer.new(:sitemap) if !opts[:filename] && !opts[:namer]
       self.merge!(opts)
@@ -91,6 +93,10 @@ module SitemapGenerator
         end
       end
       super(key, value)
+    end
+
+    def write(data)
+      adapter.write(self, data)
     end
   end
 

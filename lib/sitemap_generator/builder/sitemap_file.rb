@@ -93,22 +93,7 @@ module SitemapGenerator
       def finalize!
         raise SitemapGenerator::SitemapFinalizedError if finalized?
 
-        # Ensure that the directory exists
-        dir = @location.directory
-        if !File.exists?(dir)
-          FileUtils.mkdir_p(dir)
-        elsif !File.directory?(dir)
-          raise SitemapError.new("#{dir} should be a directory!")
-        end
-
-        # Write out the file
-        open(@location.path, 'wb') do |file|
-          gz = Zlib::GzipWriter.new(file)
-          gz.write @xml_wrapper_start
-          gz.write @xml_content
-          gz.write @xml_wrapper_end
-          gz.close
-        end
+        @location.write(@xml_wrapper_start + @xml_content + @xml_wrapper_end)
 
         # Increment the namer (SitemapFile only)
         @location.namer.next if @location.namer
