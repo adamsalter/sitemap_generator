@@ -10,7 +10,9 @@ require 'active_support/core_ext/numeric'
 
 module SitemapGenerator
   autoload(:Interpreter, 'sitemap_generator/interpreter')
-
+  autoload(:FileAdapter, 'sitemap_generator/adapters/file_adapter')
+  autoload(:WaveAdapter, 'sitemap_generator/adapters/wave_adapter')
+  
   SitemapError = Class.new(StandardError)
   SitemapFullError = Class.new(SitemapError)
   SitemapFinalizedError = Class.new(SitemapError)

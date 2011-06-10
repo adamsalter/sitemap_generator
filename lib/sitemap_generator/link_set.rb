@@ -8,7 +8,7 @@ module SitemapGenerator
     @@new_location_opts = [:filename, :sitemaps_path, :sitemaps_namer]
 
     attr_reader :default_host, :sitemaps_path, :filename
-    attr_accessor :verbose, :yahoo_app_id, :include_root, :include_index, :sitemaps_host
+    attr_accessor :verbose, :yahoo_app_id, :include_root, :include_index, :sitemaps_host, :adapter
 
     # Add links to the link set by evaluating the block.  The block should
     # contains calls to sitemap methods like:
