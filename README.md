@@ -26,6 +26,8 @@ Does your website use SitemapGenerator to generate Sitemaps?  Where would you be
 Changelog
 -------
 
+- v2.0.1.pre2: Fix uploading to the (bucket) root on a remote server
+- v2.0.1.pre1: Support read-only filesystems like Heroku by supporting uploading to remote server
 - v2.0.1: Minor improvements to verbose handling; prevent missing Timeout issue
 - **v2.0.0: Introducing a new simpler API, Sitemap Groups, Sitemap Namers and more!**
 - v1.5.0: New options `include_root`, `include_index`; Major testing & refactoring
