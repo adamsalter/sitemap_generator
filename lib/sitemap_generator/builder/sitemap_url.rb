@@ -43,15 +43,15 @@ module SitemapGenerator
             news_data = self[:news]
             builder.news:news do
               builder.news:publication do
-                builder.publication :name, news_data[:publication_name] if news_data[:publication_name]
-                builder.publication :language, news_data[:publication_language] if news_data[:publication_language]
+                builder.news :name, news_data[:publication_name] if news_data[:publication_name]
+                builder.news :language, news_data[:publication_language] if news_data[:publication_language]
               end
 
               builder.news :access, news_data[:access] if news_data[:access]
               builder.news :genres, news_data[:genres] if news_data[:genres]
               builder.news :publication_date, news_data[:publication_date] if news_data[:publication_date]
               builder.news :title, news_data[:title] if news_data[:title]
-              builder.news :keyword, news_data[:keyword] if news_data[:keywords]
+              builder.news :keywords, news_data[:keywords] if news_data[:keywords]
               builder.news :stock_tickers, news_data[:stock_tickers] if news_data[:stock_tickers]
             end
           end
