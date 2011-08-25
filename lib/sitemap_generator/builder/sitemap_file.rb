@@ -14,7 +14,7 @@ module SitemapGenerator
     class SitemapFile
       include ActionView::Helpers::NumberHelper
       include ActionView::Helpers::TextHelper   # Rails 2.2.2 fails with missing 'pluralize' otherwise
-      attr_reader :link_count, :filesize, :location
+      attr_reader :link_count, :filesize, :location, :news_count
 
       # === Options
       #
@@ -23,6 +23,7 @@ module SitemapGenerator
       def initialize(opts={})
         @location = opts.is_a?(Hash) ? SitemapGenerator::SitemapLocation.new(opts) : opts
         @link_count = 0
+        @news_count = 0
         @xml_content = '' # XML urlset content
         @xml_wrapper_start = <<-HTML
           <?xml version="1.0" encoding="UTF-8"?>
@@ -55,7 +56,7 @@ module SitemapGenerator
       # bytesize will be calculated for you.
       def file_can_fit?(bytes)
         bytes = bytes.is_a?(String) ? bytesize(bytes) : bytes
-        (@filesize + bytes) < SitemapGenerator::MAX_SITEMAP_FILESIZE && @link_count < SitemapGenerator::MAX_SITEMAP_LINKS
+        (@filesize + bytes) < SitemapGenerator::MAX_SITEMAP_FILESIZE && @link_count < SitemapGenerator::MAX_SITEMAP_LINKS && @news_count < SitemapGenerator::MAX_SITEMAP_NEWS
       end
 
       # Add a link to the sitemap file.
@@ -75,8 +76,15 @@ module SitemapGenerator
       #   path, options - a path for the URL and options hash
       def add(link, options={})
         raise SitemapGenerator::SitemapFinalizedError if finalized?
-        xml = (link.is_a?(SitemapUrl) ? link : SitemapUrl.new(link, options)).to_xml
+
+        sitemap_url = (link.is_a?(SitemapUrl) ? link : SitemapUrl.new(link, options) )
+
+        xml = sitemap_url.to_xml
         raise SitemapGenerator::SitemapFullError if !file_can_fit?(xml)
+
+        if sitemap_url.news?
+          @news_count += 1
+        end
 
         # Add the XML to the sitemap
         @xml_content << xml

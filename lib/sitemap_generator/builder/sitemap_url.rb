@@ -107,6 +107,10 @@ module SitemapGenerator
         builder << '' # Force to string
       end
 
+      def news?
+        self[:news].present?
+      end
+
       protected
 
       def prepare_news(news)
