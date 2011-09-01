@@ -6,7 +6,8 @@ SitemapGenerator generates Sitemaps for your Rails application.  The Sitemaps ad
 Features
 -------
 
-- Supports [Video sitemaps][sitemap_video], [Image sitemaps][sitemap_images], and [Geo sitemaps][geo_tags]
+- Supports [News sitemaps][sitemap_news], [Video sitemaps][sitemap_video], [Image sitemaps][sitemap_images], and [Geo sitemaps][sitemap_geo]
+- Supports read-only filesystems like Heroku via uploading to a remote host like Amazon S3
 - Compatible with Rails 2 & 3
 - Adheres to the [Sitemap 0.9 protocol][sitemap_protocol]
 - Handles millions of links
@@ -26,8 +27,9 @@ Does your website use SitemapGenerator to generate Sitemaps?  Where would you be
 Changelog
 -------
 
+- v2.0.2: [News sitemap][sitemap_news] support
 - v2.0.1.pre2: Fix uploading to the (bucket) root on a remote server
-- v2.0.1.pre1: Support read-only filesystems like Heroku by supporting uploading to remote server
+- v2.0.1.pre1: Support read-only filesystems like Heroku by supporting uploading to remote host
 - v2.0.1: Minor improvements to verbose handling; prevent missing Timeout issue
 - **v2.0.0: Introducing a new simpler API, Sitemap Groups, Sitemap Namers and more!**
 - v1.5.0: New options `include_root`, `include_index`; Major testing & refactoring
@@ -409,6 +411,35 @@ If you have changed your sitemaps physical location in a group, then the default
 Sitemap Extensions
 ===========
 
+News Sitemaps
+-----------
+
+A news item can be added to a sitemap URL by passing a `:news` hash to `add`.  The hash must  contain tags defined by the [News Sitemap][news_tags] specification.  For example:
+
+    SitemapGenerator::Sitemap.create do
+      add('/index.html', :news => {
+          :publication_name => "Example",
+          :publication_language => "en",
+          :title => "My Article",
+          :keywords => "my article, articles about myself",
+          :stock_tickers => "SAO:PETR3",
+          :publication_date => "2011-08-22",
+          :access => "Subscription",
+          :genres => "PressRelease"
+      })
+    end
+
+Supported news options include:
+
+* `publication_name`
+* `publication_language`
+* `publication_date`
+* `genres`
+* `access`
+* `title`
+* `keywords`
+* `stock_tickers`
+
 Image Sitemaps
 -----------
 
@@ -515,21 +546,21 @@ Known Bugs
 Wishlist & Coming Soon
 ========
 
-- Support for read-only filesystems like Heroku
 - Rails framework agnosticism; support for other frameworks like Merb
 
 Thanks (in no particular order)
 ========
 
-- [Alex Soto](http://github.com/apsoto) for video sitemaps
-- [Alexadre Bini](http://github.com/alexandrebini) for image sitemaps
+- [Rodrigo Flores](https://github.com/rodrigoflores) for News sitemaps
+- [Alex Soto](http://github.com/apsoto) for Video sitemaps
+- [Alexadre Bini](http://github.com/alexandrebini) for Image sitemaps
 - [Dan Pickett](http://github.com/dpickett)
 - [Rob Biedenharn](http://github.com/rab)
 - [Richie Vos](http://github.com/jerryvos)
 - [Adrian Mugnolo](http://github.com/xymbol)
 - [Jason Weathered](http://github.com/jasoncodes)
 - [Andy Stewart](http://github.com/airblade)
-- [Brian Armstrong](https://github.com/barmstrong) for geo sitemaps
+- [Brian Armstrong](https://github.com/barmstrong) for Geo sitemaps
 
 Copyright (c) 2009 Karl Varga released under the MIT license
 
@@ -540,7 +571,10 @@ Copyright (c) 2009 Karl Varga released under the MIT license
 [sitemap_generator_usage]:http://wiki.github.com/adamsalter/sitemap_generator/sitemapgenerator-usage "http://wiki.github.com/adamsalter/sitemap_generator/sitemapgenerator-usage"
 [sitemap_images]:http://www.google.com/support/webmasters/bin/answer.py?answer=178636
 [sitemap_video]:http://www.google.com/support/webmasters/bin/topic.py?topic=10079
+[sitemap_news]:http://www.google.com/support/webmasters/bin/topic.py?hl=en&topic=10078
+[sitemap_geo]:http://www.google.com/support/webmasters/bin/topic.py?hl=en&topic=14688
 [sitemap_protocol]:http://sitemaps.org/protocol.php
 [video_tags]:http://www.google.com/support/webmasters/bin/answer.py?hl=en&answer=80472#4
 [image_tags]:http://www.google.com/support/webmasters/bin/answer.py?hl=en&answer=178636
 [geo_tags]:http://www.google.com/support/webmasters/bin/answer.py?hl=en&answer=94555
+[news_tags]:http://www.google.com/support/news_pub/bin/answer.py?answer=74288
