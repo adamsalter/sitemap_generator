@@ -1,6 +1,6 @@
 require 'zlib'
-require 'action_view' # for number_to_human_size
 require 'fileutils'
+require 'sitemap_generator/helpers/number_helper'
 
 module SitemapGenerator
   module Builder
@@ -12,8 +12,7 @@ module SitemapGenerator
     #   sitemap.finalize!            <- write the sitemap file and freeze the object to protect it from further modification
     #
     class SitemapFile
-      include ActionView::Helpers::NumberHelper
-      include ActionView::Helpers::TextHelper   # Rails 2.2.2 fails with missing 'pluralize' otherwise
+      include SitemapGenerator::Helpers::NumberHelper
       attr_reader :link_count, :filesize, :location, :news_count
 
       # === Options

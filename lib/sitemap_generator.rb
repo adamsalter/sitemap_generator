@@ -1,3 +1,4 @@
+require 'sitemap_generator/core_ext'
 require 'sitemap_generator/sitemap_namer'
 require 'sitemap_generator/builder'
 require 'sitemap_generator/link_set'
@@ -6,15 +7,14 @@ require 'sitemap_generator/utilities'
 require 'sitemap_generator/application'
 require 'sitemap_generator/adapters'
 require 'sitemap_generator/sitemap_location'
-require 'active_support/core_ext/numeric'
 
 module SitemapGenerator
   autoload(:Interpreter, 'sitemap_generator/interpreter')
   autoload(:FileAdapter, 'sitemap_generator/adapters/file_adapter')
   autoload(:WaveAdapter, 'sitemap_generator/adapters/wave_adapter')
 
-  SitemapError = Class.new(StandardError)
-  SitemapFullError = Class.new(SitemapError)
+  SitemapError          = Class.new(StandardError)
+  SitemapFullError      = Class.new(SitemapError)
   SitemapFinalizedError = Class.new(SitemapError)
 
   silence_warnings do
@@ -48,9 +48,9 @@ module SitemapGenerator
     !!@yeild_sitemap
   end
 
-  self.root = File.expand_path(File.join(File.dirname(__FILE__), '../'))
+  self.root      = File.expand_path(File.join(File.dirname(__FILE__), '../'))
   self.templates = SitemapGenerator::Templates.new(self.root)
-  self.app = SitemapGenerator::Application.new
+  self.app       = SitemapGenerator::Application.new
 end
 
 require 'sitemap_generator/railtie' if SitemapGenerator.app.rails3?
