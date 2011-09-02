@@ -116,7 +116,7 @@ module SitemapGenerator
         }
         defaults = defaults.merge(precision_defaults)
 
-        options = SitemapGenerator::Utilities.reverse_merge(options, defaults)  # Allow the user to unset default values: Eg.: :significant => false
+        options = options.reverse_merge(defaults)  # Allow the user to unset default values: Eg.: :significant => false
         precision = options.delete :precision
         significant = options.delete :significant
         strip_insignificant_zeros = options.delete :strip_insignificant_zeros
