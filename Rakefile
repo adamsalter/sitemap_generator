@@ -1,7 +1,6 @@
 require "rubygems"
 require "bundler/setup"
 require 'rake'
-require 'rake/rdoctask'
 require 'spec/rake/spectask'
 require 'sitemap_generator/tasks'
 
@@ -105,14 +104,15 @@ Spec::Rake::SpecTask.new(:rcov) do |spec|
   spec.rcov = true
 end
 
-desc 'Generate documentation'
-Rake::RDocTask.new(:rdoc) do |rdoc|
-  rdoc.rdoc_dir = 'rdoc'
-  rdoc.title    = 'SitemapGenerator'
-  rdoc.options << '--line-numbers' << '--inline-source'
-  rdoc.rdoc_files.include('README.md')
-  rdoc.rdoc_files.include('lib/**/*.rb')
-end
+# require 'rdoc'
+# desc 'Generate documentation'
+# RDoc::Task.new(:rdoc) do |rdoc|
+#   rdoc.rdoc_dir = 'rdoc'
+#   rdoc.title    = 'SitemapGenerator'
+#   rdoc.options << '--line-numbers' << '--inline-source'
+#   rdoc.rdoc_files.include('README.md')
+#   rdoc.rdoc_files.include('lib/**/*.rb')
+# end
 
 namespace :release do
 
