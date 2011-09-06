@@ -9,3 +9,4 @@ spec/**/Gemfile.lock
 tmp/**/*
 *.bundle
 *.orig
+coverage
