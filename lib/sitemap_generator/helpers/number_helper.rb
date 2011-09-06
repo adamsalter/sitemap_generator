@@ -212,7 +212,7 @@ module SitemapGenerator
         storage_units_format = "%n %u"
 
         if number.to_i < 1024
-          unit = number.to_i > 1 ? 'Bytes' : 'Byte'
+          unit = number.to_i > 1 || number.to_i == 0 ? 'Bytes' : 'Byte'
           storage_units_format.gsub(/%n/, number.to_i.to_s).gsub(/%u/, unit)
         else
           max_exp  = STORAGE_UNITS.size - 1
