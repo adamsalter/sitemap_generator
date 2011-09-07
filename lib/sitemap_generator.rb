@@ -1,4 +1,4 @@
-require 'sitemap_generator/core_ext'
+require 'sitemap_generator/core_ext' unless defined?(Rails)
 require 'sitemap_generator/sitemap_namer'
 require 'sitemap_generator/builder'
 require 'sitemap_generator/link_set'
