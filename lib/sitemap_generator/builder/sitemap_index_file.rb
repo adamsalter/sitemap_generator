@@ -49,8 +49,8 @@ module SitemapGenerator
 
       # Return a summary string
       def summary(opts={})
-        uncompressed_size = number_to_human_size(@filesize) rescue "#{@filesize / 8} KB"
-        compressed_size =   number_to_human_size(@location.filesize) rescue "#{@location.filesize / 8} KB"
+        uncompressed_size = number_to_human_size(@filesize)
+        compressed_size =   number_to_human_size(@location.filesize)
         "+ #{'%-21s' % @location.path_in_public} #{'%10s' % @link_count} sitemaps / #{'%10s' % uncompressed_size} / #{'%10s' % compressed_size} gzipped"
       end
 
