@@ -2,12 +2,12 @@ source 'http://rubygems.org'
 
 gem 'sitemap_generator', :path => './'
 
-gem 'rails', '2.3.8'
-gem 'mocha', '0.9.10'
+# Rails
+# gem 'rails', '2.3.8'
+# gem 'rspec-rails', '~>1.3.2', :require => 'spec/rails'
+
+gem 'builder'
 gem 'rake', '>= 0.8.7'
-gem 'rspec', '1.3.1', :require => 'spec'
-gem 'rspec-rails', '~>1.3.2', :require => 'spec/rails'
-gem 'rcov'
 
 # Simplify these dependencies
 gem 'git', '1.2.5'
@@ -19,11 +19,10 @@ gem 'gemcutter', '0.6.1'
 gem 'nokogiri', '1.4.4'
 gem 'sqlite3-ruby', '1.3.1', :require => 'sqlite3'
 
-#group :test do
-#  gem 'ruby-debug', '~>0.10'
-#  gem 'ruby-debug-base', '~>0.10'
-#end
-# group :test do
-#  gem 'ruby-debug-base19', '0.11.26'
-#  gem 'ruby-debug19'
-# end
+group :test do
+  gem 'mocha', '0.9.10'
+  gem 'rcov'
+  gem 'rspec', '1.3.1', :require => 'spec'
+  gem 'ruby-debug', '0.10.3'
+  gem 'ruby-debug-base', '0.10.3'
+end

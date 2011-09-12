@@ -1,18 +1,21 @@
-sitemap_rails =
-  case ENV["SITEMAP_RAILS"]
-  when 'rails3'
-    "mock_rails3_gem"
-  when 'gem', 'plugin'
-    "mock_app_#{ENV["SITEMAP_RAILS"]}"
-  else
-    "mock_app_gem"
-  end
+ENV['RAILS_ENV'] ||= 'test'
+require "bundler/setup"
 
-ENV["RAILS_ENV"] ||= 'test'
-ENV['BUNDLE_GEMFILE'] = File.join(File.dirname(__FILE__), sitemap_rails, 'Gemfile')
-
-# Load the app's Rakefile so we know everything is being loaded correctly
-load(File.join(File.dirname(__FILE__), sitemap_rails, 'Rakefile'))
+# sitemap_rails =
+#   case ENV["SITEMAP_RAILS"]
+#   when 'rails3'
+#     "mock_rails3_gem"
+#   when 'gem', 'plugin'
+#     "mock_app_#{ENV["SITEMAP_RAILS"]}"
+#   else
+#     "mock_app_gem"
+#   end
+#
+# ENV["RAILS_ENV"] ||= 'test'
+# ENV['BUNDLE_GEMFILE'] = File.join(File.dirname(__FILE__), sitemap_rails, 'Gemfile')
+#
+# # Load the app's Rakefile so we know everything is being loaded correctly
+# load(File.join(File.dirname(__FILE__), sitemap_rails, 'Rakefile'))
 
 # Requires supporting files with custom matchers and macros, etc,
 # in ./support/ and its subdirectories.

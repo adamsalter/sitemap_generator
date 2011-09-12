@@ -36,44 +36,44 @@ describe "SitemapGenerator" do
     end
   end
 
-  describe "clean task" do
-    before :each do
-      FileUtils.touch(rails_path('public/sitemap_index.xml.gz'))
-      Helpers.invoke_task('sitemap:clean')
-    end
+  # describe "clean task" do
+  #   before :each do
+  #     FileUtils.touch(rails_path('public/sitemap_index.xml.gz'))
+  #     Helpers.invoke_task('sitemap:clean')
+  #   end
+  #
+  #   it "should delete the sitemaps" do
+  #     file_should_not_exist(rails_path('public/sitemap_index.xml.gz'))
+  #   end
+  # end
 
-    it "should delete the sitemaps" do
-      file_should_not_exist(rails_path('public/sitemap_index.xml.gz'))
-    end
-  end
+  # describe "fresh install" do
+  #   before :each do
+  #     delete_sitemap_file_from_rails_app
+  #     Helpers.invoke_task('sitemap:install')
+  #   end
+  #
+  #   it "should create config/sitemap.rb" do
+  #     file_should_exist(rails_path('config/sitemap.rb'))
+  #   end
+  #
+  #   it "should create config/sitemap.rb matching template" do
+  #     sitemap_template = SitemapGenerator.templates.template_path(:sitemap_sample)
+  #     files_should_be_identical(rails_path('config/sitemap.rb'), sitemap_template)
+  #   end
+  # end
 
-  describe "fresh install" do
-    before :each do
-      delete_sitemap_file_from_rails_app
-      Helpers.invoke_task('sitemap:install')
-    end
-
-    it "should create config/sitemap.rb" do
-      file_should_exist(rails_path('config/sitemap.rb'))
-    end
-
-    it "should create config/sitemap.rb matching template" do
-      sitemap_template = SitemapGenerator.templates.template_path(:sitemap_sample)
-      files_should_be_identical(rails_path('config/sitemap.rb'), sitemap_template)
-    end
-  end
-
-  describe "install multiple times" do
-    before :each do
-      copy_sitemap_file_to_rails_app(:deprecated)
-      Helpers.invoke_task('sitemap:install')
-    end
-
-    it "should not overwrite config/sitemap.rb" do
-      sitemap_file = File.join(SitemapGenerator.root, 'spec/files/sitemap.deprecated.rb')
-      files_should_be_identical(sitemap_file, rails_path('config/sitemap.rb'))
-    end
-  end
+  # describe "install multiple times" do
+  #   before :each do
+  #     copy_sitemap_file_to_rails_app(:deprecated)
+  #     Helpers.invoke_task('sitemap:install')
+  #   end
+  #
+  #   it "should not overwrite config/sitemap.rb" do
+  #     sitemap_file = File.join(SitemapGenerator.root, 'spec/files/sitemap.deprecated.rb')
+  #     files_should_be_identical(sitemap_file, rails_path('config/sitemap.rb'))
+  #   end
+  # end
 
   [:deprecated, :create].each do |extension|
     describe "generate sitemap" do
@@ -253,11 +253,6 @@ describe "SitemapGenerator" do
   # Better would be to just invoke the environment task and use
   # the interpreter.
   def execute_sitemap_config
-    if Holder.executed
-      SitemapGenerator::Interpreter.run
-    else
-      Holder.executed = true
-      Helpers.invoke_task('sitemap:refresh:no_ping')
-    end
+   SitemapGenerator::Interpreter.run
   end
 end
