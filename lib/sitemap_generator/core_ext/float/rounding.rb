@@ -14,5 +14,5 @@ class Float
         super
       end
     end
-  end unless method_defined?(:precisionless_round)
+  end
 end

@@ -1,6 +1,18 @@
 require 'spec_helper'
 
 describe SitemapGenerator::Application do
+  before :all do
+    silence_warnings do
+      Object.const_set(:Rails, Object.new)
+    end
+  end
+
+  after :all do
+    silence_warnings do
+      Object.const_set(:Rails, nil)
+    end
+  end
+
   before :each do
     @app = SitemapGenerator::Application.new
   end
