@@ -26,6 +26,7 @@ Does your website use SitemapGenerator to generate Sitemaps?  Where would you be
 Changelog
 -------
 
+- v2.1.2: Support multiple videos per url using the new `videos` option to `add()`.
 - v2.1.1: Support calling `create()` multiple times in a sitemap config.  Support host names with path segments so you can use a `default_host` like `'http://mysite.com/subdirectory/'`.  Turn off `include_index` when the `sitemaps_host` differs from `default_host`.  Add docs about how to upload to remote hosts.
 - v2.1.0: [News sitemap][sitemap_news] support
 - v2.0.1.pre2: Fix uploading to the (bucket) root on a remote server
@@ -512,7 +513,13 @@ Supported image options include:
 Video Sitemaps
 -----------
 
-A video can be added to a sitemap URL by passing a `:video` Hash to `add`.  The Hash can contain tags defined by the [Video Sitemap specification][video_tags].  To associate more than one `tag` with a video, pass the tags as an array with the key `:tags`.
+A video can be added to a sitemap URL by passing a `:video` Hash to `add`.  The Hash can contain tags defined by the [Video Sitemap specification][video_tags].
+
+To add more than one video to a url, pass an array of video hashes using the `:videos` option.
+
+To associate more than one `tag` with a video, pass the tags as an array with the key `:tags`.
+
+Example:
 
     add('/index.html', :video => {
       :thumbnail_loc => 'http://www.example.com/video1_thumbnail.png',
@@ -541,6 +548,8 @@ Supported video options include:
 * `category`
 * `gallery_loc`
 * `uploader` (use `uploader_info` to set the info attribute)
+
+
 
 Geo Sitemaps
 -----------

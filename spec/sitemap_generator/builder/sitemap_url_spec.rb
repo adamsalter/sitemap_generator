@@ -32,4 +32,19 @@ describe SitemapGenerator::Builder::SitemapUrl do
       SitemapGenerator::Builder::SitemapUrl.new(nil, :host => 'http://example.com')[:loc].should == 'http://example.com'
     end.should_not raise_error
   end
+
+  it "should support a :videos option" do
+    loc = SitemapGenerator::Builder::SitemapUrl.new('', :host => 'http://test.com', :videos => [1,2,3])
+    loc[:videos].should == [1,2,3]
+  end
+
+  it "should support a singular :video option" do
+    loc = SitemapGenerator::Builder::SitemapUrl.new('', :host => 'http://test.com', :video => 1)
+    loc[:videos].should == [1]
+  end
+
+  it "should support an array :video option" do
+    loc = SitemapGenerator::Builder::SitemapUrl.new('', :host => 'http://test.com', :video => [1,2], :videos => [3,4])
+    loc[:videos].should == [3,4,1,2]
+  end
 end

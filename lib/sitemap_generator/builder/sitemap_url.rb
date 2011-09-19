@@ -21,7 +21,7 @@ module SitemapGenerator
       # * +changefreq+
       # * +lastmod+
       # * +images+
-      # * +video+
+      # * +video+/+videos+
       # * +geo+
       # * +news+
       def initialize(path, options={})
@@ -30,8 +30,11 @@ module SitemapGenerator
           path = sitemap.location.path_in_public
         end
 
-        SitemapGenerator::Utilities.assert_valid_keys(options, :priority, :changefreq, :lastmod, :host, :images, :video, :geo, :news)
-        options.reverse_merge!(:priority => 0.5, :changefreq => 'weekly', :lastmod => Time.now, :images => [], :news => {})
+        SitemapGenerator::Utilities.assert_valid_keys(options, :priority, :changefreq, :lastmod, :host, :images, :video, :geo, :news, :videos)
+        options.reverse_merge!(:priority => 0.5, :changefreq => 'weekly', :lastmod => Time.now, :images => [], :news => {}, :videos => [])
+        if video = options.delete(:video)
+          options[:videos] = video.is_a?(Array) ? options[:videos].concat(video) : options[:videos] << video
+        end
         raise "Cannot generate a url without a host" unless options[:host].present?
         self.merge!(
           :path       => path,
@@ -42,7 +45,7 @@ module SitemapGenerator
           :loc        => URI.join(options[:host], path.to_s.sub(/^\//, '')).to_s, # support host with subdirectory
           :images     => prepare_images(options[:images], options[:host]),
           :news       => prepare_news(options[:news]),
-          :video      => options[:video],
+          :videos     => options[:videos],
           :geo        => options[:geo]
         )
       end
@@ -73,21 +76,17 @@ module SitemapGenerator
             end
           end
 
-
-          unless self[:images].blank?
-            self[:images].each do |image|
-              builder.image:image do
-                builder.image :loc, image[:loc]
-                builder.image :caption, image[:caption]             if image[:caption]
-                builder.image :geo_location, image[:geo_location]   if image[:geo_location]
-                builder.image :title, image[:title]                 if image[:title]
-                builder.image :license, image[:license]             if image[:license]
-              end
+          self[:images].each do |image|
+            builder.image:image do
+              builder.image :loc, image[:loc]
+              builder.image :caption, image[:caption]             if image[:caption]
+              builder.image :geo_location, image[:geo_location]   if image[:geo_location]
+              builder.image :title, image[:title]                 if image[:title]
+              builder.image :license, image[:license]             if image[:license]
             end
           end
 
-          unless self[:video].blank?
-            video = self[:video]
+          self[:videos].each do |video|
             builder.video :video do
               builder.video :thumbnail_loc, video[:thumbnail_loc]
               builder.video :title, video[:title]
