@@ -34,16 +34,16 @@ module SitemapGenerator
         options.reverse_merge!(:priority => 0.5, :changefreq => 'weekly', :lastmod => Time.now, :images => [], :news => {})
         raise "Cannot generate a url without a host" unless options[:host].present?
         self.merge!(
-          :path => path,
-          :priority => options[:priority],
+          :path       => path,
+          :priority   => options[:priority],
           :changefreq => options[:changefreq],
-          :lastmod => options[:lastmod],
-          :host => options[:host],
-          :loc => URI.join(options[:host], path).to_s,
-          :images => prepare_images(options[:images], options[:host]),
-          :news => prepare_news(options[:news]),
-          :video => options[:video],
-          :geo => options[:geo]
+          :lastmod    => options[:lastmod],
+          :host       => options[:host],
+          :loc        => URI.join(options[:host], path.to_s.sub(/^\//, '')).to_s, # support host with subdirectory
+          :images     => prepare_images(options[:images], options[:host]),
+          :news       => prepare_news(options[:news]),
+          :video      => options[:video],
+          :geo        => options[:geo]
         )
       end
 
