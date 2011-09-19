@@ -34,9 +34,7 @@ module SitemapGenerator
 
         SitemapGenerator::Utilities.assert_valid_keys(options, :priority, :changefreq, :lastmod, :host, :images, :video, :geo, :news, :videos)
         SitemapGenerator::Utilities.reverse_merge!(options, :priority => 0.5, :changefreq => 'weekly', :lastmod => Time.now, :images => [], :news => {}, :videos => [])
-        if options[:host].blank?
-          raise "Cannot generate a url without a host"
-        end
+        raise "Cannot generate a url without a host" unless SitemapGenerator::Utilities.present?(options[:host])
         if video = options.delete(:video)
           options[:videos] = video.is_a?(Array) ? options[:videos].concat(video) : options[:videos] << video
         end
