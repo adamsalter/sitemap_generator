@@ -19,6 +19,6 @@ gem 'nokogiri', '1.4.4'
 gem 'sqlite3-ruby', '1.3.1', :require => 'sqlite3'
 
 group :test do
-  gem 'ruby-debug', '0.10.3'
-  gem 'ruby-debug-base', '0.10.3'
+  gem 'ruby-debug', '~>0.10'
+  gem 'ruby-debug-base', '~>0.10'
 end
