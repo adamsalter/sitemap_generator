@@ -23,10 +23,10 @@ Does your website use SitemapGenerator to generate Sitemaps?  Where would you be
 
 <a href='http://www.pledgie.com/campaigns/15267'><img alt='Click here to lend your support to: SitemapGenerator and make a donation at www.pledgie.com !' src='http://pledgie.com/campaigns/15267.png?skin_name=chrome' border='0' /></a>
 
-
 Changelog
 -------
 
+- v2.1.1: Support calling `create()` multiple times in a sitemap config.  Support host names with path segments so you can use a `default_host` like `'http://mysite.com/subdirectory/'`.  Turn off `include_index` when the `sitemaps_host` differs from `default_host`.  Add docs about how to upload to remote hosts.
 - v2.1.0: [News sitemap][sitemap_news] support
 - v2.0.1.pre2: Fix uploading to the (bucket) root on a remote server
 - v2.0.1.pre1: Support read-only filesystems like Heroku by supporting uploading to remote host
@@ -154,6 +154,47 @@ To ensure that your application's sitemaps are available after a deployment you 
         task :refresh_sitemaps do
           run "cd #{latest_release} && RAILS_ENV=#{rails_env} rake sitemap:refresh"
         end
+
+Upload Sitemaps to a Remote Host
+----------
+
+Sometimes it is desirable to host your sitemap files on a remote server and point robots
+and search engines to the remote files.  For example if you are using a host like Heroku
+which doesn't allow writing to the local filesystem.  You still require *some* write access
+because the sitemap files need to be written out before uploading, so generally a host will
+give you write access to a temporary directory.  On Heroku this is `tmp/` in your application
+directory.
+
+Sitemap Generator uses CarrierWave to support uploading to Amazon S3 store, Rackspace Cloud Files store, and MongoDB's GridF - whatever CarrierWave supports.
+
+1. Please see [this wiki page][remote_hosts] for more information about setting up CarrierWave, SitemapGenerator and Rails.
+
+2. Once you have CarrierWave setup and configured all you need to do is set some options in your sitemap config, such as:
+
+   * `default_host` - your website host name
+   * `sitemaps_host` - the remote host where your sitemaps will be hosted
+   * `public_path` - the directory to write sitemaps to locally e.g. `tmp/`
+   * `sitemaps_path` - set to a directory/path if you don't want to upload to the root of your `sitemaps_host`
+   * `adapter` - instance of `SitemapGenerator::WaveAdapter`
+
+   For Example:
+
+        SitemapGenerator::Sitemap.default_host = "http://www.example.com"
+        SitemapGenerator::Sitemap.sitemaps_host = "http://s3.amazonaws.com/sitemap-generator/"
+        SitemapGenerator::Sitemap.public_path = 'tmp/'
+        SitemapGenerator::Sitemap.sitemaps_path = 'sitemaps/'
+        SitemapGenerator::Sitemap.adapter = SitemapGenerator::WaveAdapter.new
+
+3. Update your `robots.txt` file to point robots to the remote sitemap index file, e.g:
+
+        Sitemap: http://s3.amazonaws.com/sitemap-generator/sitemaps/sitemap_index.xml.gz
+
+You generate your sitemaps as usual using `rake sitemap:refresh`.
+
+Note that SitemapGenerator will automatically turn off `include_index` in this case because
+the `sitemaps_host` does not match the `default_host`.  The link to the sitemap index file
+that would otherwise be included would point to a different host than the rest of the links
+in the sitemap, something that the sitemap rules forbid.
 
 Sitemap Configuration
 ======
@@ -344,19 +385,28 @@ The following options are supported:
 
 * `filename` - Symbol.  The **base name for the files** that will be generated.  The default value is `:sitemap`.  This yields sitemaps with names like `sitemap1.xml.gz`, `sitemap2.xml.gz`, `sitemap3.xml.gz` etc, and a sitemap index named `sitemap_index.xml.gz`.  If we now set the value to `:geo` the sitemaps would be named `geo1.xml.gz`, `geo2.xml.gz`, `geo3.xml.gz` etc, and the sitemap index would be named `geo_index.xml.gz`.
 
-* `include_index` - Boolean.  Whether to **add a link to the sitemap index** to the current sitemap.  This points search engines to your Sitemap Index to include it in the indexing of your site.  Default is `true`.
+* `include_index` - Boolean.  Whether to **add a link to the sitemap index** to the current sitemap.  This points search engines to your Sitemap Index to include it in the indexing of your site.  Default is `true`.  Turned off when `sitemaps_host` is set or within a `group()` block.
 
-* `include_root` - Boolean.  Whether to **add the root** url i.e. '/' to the current sitemap.  Default is `true`.
+* `include_root` - Boolean.  Whether to **add the root** url i.e. '/' to the current sitemap.  Default is `true`.  Turned off within a `group()` block.
 
 * `public_path` - String.  A **full or relative path** to the `public` directory or the directory you want to write sitemaps into.  Defaults to `public/` under your application root or relative to the current working directory.
 
-* `sitemaps_host` - String.  **Host including protocol** to use when generating a link to a sitemap file i.e. the hostname of the server where the sitemaps are hosted.  The value will differ from the hostname in your sitemap links.  For example: `'http://amazon.aws.com/'`
+* `sitemaps_host` - String.  **Host including protocol** to use when generating a link to a sitemap file i.e. the hostname of the server where the sitemaps are hosted.  The value will differ from the hostname in your sitemap links.  For example: `'http://amazon.aws.com/'`.  Note that `include_index` is
+automatically turned off when the `sitemaps_host` does not match `default_host`.
+Because the link to the sitemap index file that would otherwise be added would point to a
+different host than the rest of the links in the sitemap.  Something that the sitemap rules forbid.
 
 * `sitemaps_namer` - A `SitemapGenerator::SitemapNamer` instance **for generating sitemap names**.  You can read about Sitemap Namers by reading the API docs.  Sitemap Namers don't apply to the sitemap index.  You can only modify the name of the index file using the `filename` option.  Sitemap Namers allow you to set the name, extension and number sequence for sitemap files.
 
 * `sitemaps_path` - String. A **relative path** giving a directory under your `public_path` at which to write sitemaps.  The difference between the two options is that the `sitemaps_path` is used when generating a link to a sitemap file.  For example, if we set `SitemapGenerator::Sitemap.sitemaps_path = 'en/'` and use the default `public_path` sitemaps will be written to `public/en/`.  And when the sitemap index is added to our sitemap it would have a URL like `http://example.com/en/sitemap_index.xml.gz`.
 
 * `verbose` - Boolean.  Whether to **output a sitemap summary** describing the sitemap files and giving statistics about your sitemap.  Default is `false`.  When using the Rake tasks `verbose` will be `true` unless you pass the `-s` option.
+
+* `adapter` - Instance.  The default adapter is a `SitemapGenerator::FileAdapter`
+  which simply writes files to the filesystem.  You can use a `SitemapGenerator::WaveAdapter`
+  for uploading sitemaps to remote servers - useful for read-only hosts such as Heroku.  Or
+  you can provide an instance of your own class to provide custom behavior.  Your class must
+  define a write method which takes a `SitemapGenerator::Location` and raw XML data.
 
 Sitemap Groups
 =======
@@ -578,3 +628,4 @@ Copyright (c) 2009 Karl Varga released under the MIT license
 [image_tags]:http://www.google.com/support/webmasters/bin/answer.py?hl=en&answer=178636
 [geo_tags]:http://www.google.com/support/webmasters/bin/answer.py?hl=en&answer=94555
 [news_tags]:http://www.google.com/support/news_pub/bin/answer.py?answer=74288
+[remote_hosts]:https://github.com/kjvarga/sitemap_generator/wiki/Generate-Sitemaps-on-read-only-filesystems-like-Heroku
