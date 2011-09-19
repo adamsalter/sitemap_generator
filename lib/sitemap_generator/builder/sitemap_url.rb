@@ -3,11 +3,27 @@ require 'uri'
 
 module SitemapGenerator
   module Builder
+    # A Hash-like class for holding information about a sitemap URL and
+    # generating an XML <url> element suitable for sitemaps.
     class SitemapUrl < Hash
 
-      # Call with:
-      #   sitemap - a Sitemap instance, or
-      #   path, options - a path for the URL and options hash
+      # Return a new instance with options configured on it.
+      #
+      # == Arguments
+      # * sitemap - a Sitemap instance, or
+      # * path, options - a path string and options hash
+      #
+      # == Options
+      # Requires a host to be set.  If passing a sitemap, the sitemap must have a +default_host+
+      # configured.  If calling with a path and options, you must include the <tt>:host</tt> option.
+      #
+      # * +priority+
+      # * +changefreq+
+      # * +lastmod+
+      # * +images+
+      # * +video+
+      # * +geo+
+      # * +news+
       def initialize(path, options={})
         if sitemap = path.is_a?(SitemapGenerator::Builder::SitemapFile) && path
           options.reverse_merge!(:host => sitemap.location.host, :lastmod => sitemap.lastmod)
@@ -16,6 +32,7 @@ module SitemapGenerator
 
         SitemapGenerator::Utilities.assert_valid_keys(options, :priority, :changefreq, :lastmod, :host, :images, :video, :geo, :news)
         options.reverse_merge!(:priority => 0.5, :changefreq => 'weekly', :lastmod => Time.now, :images => [], :news => {})
+        raise "Cannot generate a url without a host" unless options[:host].present?
         self.merge!(
           :path => path,
           :priority => options[:priority],
