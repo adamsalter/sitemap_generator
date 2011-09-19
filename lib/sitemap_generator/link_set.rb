@@ -10,8 +10,8 @@ module SitemapGenerator
     attr_reader :default_host, :sitemaps_path, :filename
     attr_accessor :verbose, :yahoo_app_id, :include_root, :include_index, :sitemaps_host, :adapter
 
-    # Add links to the link set by evaluating the block.  The block should
-    # contains calls to sitemap methods like:
+    # Create a new sitemap index and sitemap files.  Pass a block calls to the following
+    # methods:
     # * +add+   - Add a link to the current sitemap
     # * +group+ - Start a new group of sitemaps
     #
@@ -25,9 +25,12 @@ module SitemapGenerator
     # * <tt>:finalize</tt> - The sitemaps are written as they get full and at the end
     # of the block.  Pass +false+ as the value to prevent the sitemap or sitemap index
     # from being finalized.  Default is +true+.
+    #
+    # If you are calling +create+ more than once in your sitemap configuration file,
+    # make sure that you set a different +sitemaps_path+ or +filename+ for each call otherwise
+    # the sitemaps may be overwritten.
     def create(opts={}, &block)
-      @sitemap_index = nil if @sitemap_index && @sitemap_index.finalized? && !@protect_index
-      @sitemap = nil if @sitemap && @sitemap.finalized?
+      reset!
       set_options(opts)
       start_time = Time.now if @verbose
       interpreter.eval(:yield_sitemap => @yield_sitemap || SitemapGenerator.yield_sitemap?, &block)
@@ -110,10 +113,10 @@ module SitemapGenerator
       retry
     end
 
-    # Create a new group of sitemaps.  Returns a new LinkSet instance with options set on it.
+    # Create a new group of sitemap files.
     #
-    # All groups share this LinkSet's sitemap index, which is not modified by any of the options
-    # passed to +group+.
+    # Returns a new LinkSet instance with the options passed in set on it.  All groups
+    # share the sitemap index, which is not affected by any of the options passed here.
     #
     # === Options
     # Any of the options to LinkSet.new.  Except for <tt>:public_path</tt> which is shared
@@ -127,9 +130,13 @@ module SitemapGenerator
     #
     # If you are not changing any of the location settings like <tt>filename<tt>,
     # <tt>sitemaps_path</tt>, <tt>sitemaps_host</tt> or <tt>sitemaps_namer</tt>
-    # the current sitemap will be used in the group.  All of the options you have
-    # specified which affect the way the links are generated will still be applied
-    # for the duration of the group.
+    # links you add within the group will be added to the current sitemap file (e.g. sitemap1.xml).
+    # If one of these options is specified, the current sitemap file is finalized
+    # and a new sitemap file started.
+    #
+    # Options like <tt>:default_host</tt> can be used and it will only affect the links
+    # within the group.  Links added outside of the group will revert to the previous
+    # +default_host+.
     def group(opts={}, &block)
       @created_group = true
       original_opts = opts.dup
@@ -308,6 +315,15 @@ module SitemapGenerator
     def interpreter
       require 'sitemap_generator/interpreter'
       @interpreter ||= SitemapGenerator::Interpreter.new(:link_set => self)
+    end
+
+    # Reset this instance.  Keep the same options, but return to the same state
+    # as before an sitemaps were created.
+    def reset!
+      @sitemap_index = nil if @sitemap_index && @sitemap_index.finalized? && !@protect_index
+      @sitemap = nil if @sitemap && @sitemap.finalized?
+      self.sitemaps_namer.reset # start from 1
+      @added_default_links = false
     end
 
     module LocationHelpers

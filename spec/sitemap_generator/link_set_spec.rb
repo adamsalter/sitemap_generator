@@ -442,4 +442,17 @@ describe SitemapGenerator::LinkSet do
       ls.sitemap.location.filename.should =~ /xxx/
     end
   end
+
+  describe "reset!" do
+    it "should reset the sitemap namer" do
+      SitemapGenerator::Sitemap.sitemaps_namer.expects(:reset)
+      SitemapGenerator::Sitemap.create(:default_host => 'http://cnn.com')
+    end
+
+    it "should reset the default link variable" do
+      SitemapGenerator::Sitemap.instance_variable_set(:@added_default_links, true)
+      SitemapGenerator::Sitemap.create(:default_host => 'http://cnn.com')
+      SitemapGenerator::Sitemap.instance_variable_set(:@added_default_links, false)
+    end
+  end
 end
