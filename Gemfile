@@ -23,6 +23,6 @@ group :test do
   gem 'mocha', '0.9.10'
   gem 'rcov'
   gem 'rspec', '1.3.1', :require => 'spec'
-  gem 'ruby-debug', '0.10.3'
-  gem 'ruby-debug-base', '0.10.3'
+  gem 'ruby-debug', '~>0.10'
+  gem 'ruby-debug-base', '~>0.10'
 end
