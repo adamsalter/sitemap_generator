@@ -455,4 +455,53 @@ describe SitemapGenerator::LinkSet do
       SitemapGenerator::Sitemap.instance_variable_set(:@added_default_links, false)
     end
   end
+
+  describe "include_root?" do
+    it "should return false" do
+      @ls.include_root = false
+      @ls.include_root.should be_false
+    end
+
+    it "should return true" do
+      @ls.include_root = true
+      @ls.include_root.should be_true
+    end
+  end
+
+  describe "include_index?" do
+    let(:sitemaps_host)  { 'http://amazon.com' }
+
+    before :each do
+      @ls.default_host = @default_host
+    end
+
+    it "should be true if no sitemaps_host set, or it is the same" do
+      @ls.include_index = true
+      @ls.sitemaps_host = @default_host
+      @ls.include_index?.should be_true
+
+      @ls.sitemaps_host = nil
+      @ls.include_index?.should be_true
+    end
+
+    it "should be false if include_index is false or sitemaps_host differs" do
+      @ls.include_index = false
+      @ls.sitemaps_host = @default_host
+      @ls.include_index?.should be_false
+
+      @ls.include_index = true
+      @ls.sitemaps_host = sitemaps_host
+      @ls.include_index?.should be_false
+    end
+
+    it "should return false" do
+      ls = SitemapGenerator::LinkSet.new(:default_host => @default_host, :sitemaps_host => sitemaps_host)
+      ls.include_index?.should be_false
+    end
+
+    it "should return true" do
+      ls = SitemapGenerator::LinkSet.new(:default_host => @default_host, :sitemaps_host => @default_host)
+      ls.include_index?.should be_true
+    end
+  end
 end

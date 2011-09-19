@@ -50,8 +50,11 @@ module SitemapGenerator
     # Constructor
     #
     # == Options:
-    # * <tt>:adapter</tt> - subclass of SitemapGenerator::Adapter used for persisting the
-    #   sitemaps.  Default adapter is a SitemapGenerator::FileAdapter
+    # * <tt>:adapter</tt> - instance of a class with a write method which takes a SitemapGenerator::Location
+    #   and raw XML data and persists it.  The default adapter is a SitemapGenerator::FileAdapter
+    #   which simply writes files to the filesystem.  You can use a SitemapGenerator::WaveAdapter
+    #   for uploading sitemaps to remote servers - useful for read-only hosts such as Heroku.  Or
+    #   you can provide an instance of your own class to provide custom behavior.
     #
     # * <tt>:default_host</tt> - host including protocol to use in all sitemap links
     #   e.g. http://en.google.ca
@@ -60,8 +63,15 @@ module SitemapGenerator
     #   Defaults to the <tt>public/</tt> directory in your application root directory or
     #   the current working directory.
     #
-    # * <tt>:sitemaps_host</tt> - host (including protocol) to use in links to the sitemaps.  Useful if your sitemaps
-    #   are hosted o different server e.g. 'http://amazon.aws.com/'
+    # * <tt>:sitemaps_host</tt> - String.  <b>Host including protocol</b> to use when generating
+    #   a link to a sitemap file i.e. the hostname of the server where the sitemaps are hosted.
+    #   The value will differ from the hostname in your sitemap links.
+    #   For example: `'http://amazon.aws.com/'`.
+    #
+    #   Note that `include_index` is automatically turned off when the `sitemaps_host` does
+    #   not match `default_host`.  Because the link to the sitemap index file that would
+    #   otherwise be added would point to a different host than the rest of the links in
+    #   the sitemap.  Something that the sitemap rules forbid.
     #
     # * <tt>:sitemaps_path</tt> - path fragment within public to write sitemaps
     #   to e.g. 'en/'.  Sitemaps are written to <tt>public_path</tt> + <tt>sitemaps_path</tt>
@@ -72,11 +82,13 @@ module SitemapGenerator
     #
     # * <tt>:sitemaps_namer</tt> - A +SitemapNamer+ instance for generating the sitemap names.
     #
-    # * <tt>:include_root</tt> - whether to include the root url i.e. '/' in each group of sitemaps.
-    #   Default is true.
+    # * <tt>include_index</tt> - Boolean.  Whether to <b>add a link to the sitemap index<b>
+    #   to the current sitemap.  This points search engines to your Sitemap Index to
+    #   include it in the indexing of your site.  Default is `true`.  Turned off when
+    #  `sitemaps_host` is set or within a `group()` block.
     #
-    # * <tt>:include_index</tt> - whether to include the sitemap index URL in each group of sitemaps.
-    #   Default is true.
+    # * <tt>include_root</tt> - Boolean.  Whether to **add the root** url i.e. '/' to the
+    #   current sitemap.  Default is `true`.  Turned off within a `group()` block.
     #
     # * <tt>:verbose</tt> - If +true+, output a summary line for each sitemap and sitemap
     #   index that is created.  Default is +false+.
@@ -237,6 +249,24 @@ module SitemapGenerator
       finalize_sitemap_index!
     end
 
+    # Return a boolean indicating hether to add a link to the sitemap index file
+    # to the current sitemap.  This points search engines to your Sitemap Index so
+    # they include it in the indexing of your site, but is not strictly neccessary.
+    # Default is `true`.  Turned off when `sitemaps_host` is set or within a `group()` block.
+    def include_index?
+      if default_host && sitemaps_host && sitemaps_host != default_host
+        false
+      else
+        @include_index
+      end
+    end
+
+    # Return a boolean indicating whether to automatically add the root url i.e. '/' to the
+    # current sitemap.  Default is `true`.  Turned off within a `group()` block.
+    def include_root?
+      !!@include_root
+    end
+
     protected
 
     # Set each option on this instance using accessor methods.  This will affect
@@ -280,8 +310,12 @@ module SitemapGenerator
     # Add default links if those options are turned on.  Record the fact that we have done so
     # in an instance variable.
     def add_default_links
-      sitemap.add('/', :lastmod => Time.now, :changefreq => 'always', :priority => 1.0, :host => @default_host) if include_root
-      sitemap.add(sitemap_index, :lastmod => Time.now, :changefreq => 'always', :priority => 1.0) if include_index
+      if include_root?
+        sitemap.add('/', :lastmod => Time.now, :changefreq => 'always', :priority => 1.0, :host => @default_host)
+      end
+      if include_index?
+        sitemap.add(sitemap_index, :lastmod => Time.now, :changefreq => 'always', :priority => 1.0)
+      end
       @added_default_links = true
     end
 
@@ -367,6 +401,9 @@ module SitemapGenerator
       # Set the host name, including protocol, that will be used on all links to your sitemap
       # files.  Useful when the server that hosts the sitemaps is not on the same host as
       # the links in the sitemap.
+      #
+      # Note that `include_index` will be turned off to avoid adding a link to a sitemap with
+      # a different host than the other links.
       def sitemaps_host=(value)
         @sitemaps_host = value
         update_location_info(:host, value)
