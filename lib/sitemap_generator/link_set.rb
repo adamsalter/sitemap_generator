@@ -271,7 +271,15 @@ module SitemapGenerator
 
     # Set each option on this instance using accessor methods.  This will affect
     # both the sitemap and the sitemap index.
+    #
+    # If both `filename` and `sitemaps_namer` are passed, set filename first so it
+    # doesn't override the latter.
     def set_options(opts={})
+      %w(filename sitemaps_namer).each do |key|
+        if value = opts.delete(key.to_sym)
+          send("#{key}=", value)
+        end
+      end
       opts.each_pair do |key, value|
         send("#{key}=", value)
       end

@@ -43,6 +43,11 @@ describe 'SitemapGenerator::SitemapNamer' do
     namer.to_s.should == "sitemap1.xml.gz"
     lambda { namer.previous }.should raise_error
   end
+
+  it "should handle names with underscores" do
+    namer = SitemapGenerator::SitemapNamer.new("sitemap1_")
+    namer.to_s.should == "sitemap1_1.xml.gz"
+  end
 end
 
 describe SitemapGenerator::SitemapIndexNamer do

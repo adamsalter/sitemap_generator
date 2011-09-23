@@ -441,6 +441,25 @@ describe SitemapGenerator::LinkSet do
       ls.sitemap.location.namer.should == namer
       ls.sitemap.location.filename.should =~ /xxx/
     end
+
+    it "should support both sitemaps_namer and filename options" do
+      namer = SitemapGenerator::SitemapNamer.new("sitemap1_")
+      ls = @ls.create(:sitemaps_namer => namer, :filename => "sitemap1")
+      ls.sitemaps_namer.should == namer
+      ls.sitemap.location.namer.should == namer
+      ls.sitemap.location.filename.should =~ /sitemap1_1/
+      ls.sitemap_index.location.filename.should =~ /sitemap1_index/
+    end
+
+    it "should support both sitemaps_namer and filename options no matter the order" do
+      namer = SitemapGenerator::SitemapNamer.new("sitemap1_")
+      options = ActiveSupport::OrderedHash.new
+      options[:sitemaps_namer] = namer
+      options[:filename] = "sitemap1"
+      ls = @ls.create(options)
+      ls.sitemap.location.filename.should =~ /sitemap1_1/
+      ls.sitemap_index.location.filename.should =~ /sitemap1_index/
+    end
   end
 
   describe "reset!" do

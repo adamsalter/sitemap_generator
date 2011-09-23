@@ -26,6 +26,7 @@ Does your website use SitemapGenerator to generate Sitemaps?  Where would you be
 Changelog
 -------
 
+- v2.1.3: Fix calling create with both `filename` and `sitemaps_namer` options
 - v2.1.2: Support multiple videos per url using the new `videos` option to `add()`.
 - v2.1.1: Support calling `create()` multiple times in a sitemap config.  Support host names with path segments so you can use a `default_host` like `'http://mysite.com/subdirectory/'`.  Turn off `include_index` when the `sitemaps_host` differs from `default_host`.  Add docs about how to upload to remote hosts.
 - v2.1.0: [News sitemap][sitemap_news] support
@@ -197,6 +198,65 @@ the `sitemaps_host` does not match the `default_host`.  The link to the sitemap 
 that would otherwise be included would point to a different host than the rest of the links
 in the sitemap, something that the sitemap rules forbid.
 
+Generating Multiple Sitemaps
+----------
+
+Each call to `create` creates a new sitemap index and associated sitemaps.  You can call `create` as many times as you want within your sitemap configuration.
+
+You must remember to use a different filename or location for each set of sitemaps, otherwise they will
+overwrite each other.  You can use the `filename`, `sitemaps_namer` and `sitemaps_path` options for this.
+
+In the following example we generate three sitemaps each in its own subdirectory:
+
+    %w(google yahoo apple).each do |subdomain|
+      SitemapGenerator::Sitemap.default_host = "https://#{subdomain}.mysite.com"
+      SitemapGenerator::Sitemap.sitemaps_path = "sitemaps/#{subdomain}"
+      SitemapGenerator::Sitemap.create do
+        add '/home'
+      end
+    end
+
+Outputs:
+
+    + sitemaps/google/sitemap1.xml.gz             2 links /  822 Bytes /  328 Bytes gzipped
+    + sitemaps/google/sitemap_index.xml.gz          1 sitemaps /  389 Bytes /  217 Bytes gzipped
+    Sitemap stats: 2 links / 1 sitemaps / 0m00s
+    + sitemaps/yahoo/sitemap1.xml.gz             2 links /  820 Bytes /  330 Bytes gzipped
+    + sitemaps/yahoo/sitemap_index.xml.gz          1 sitemaps /  388 Bytes /  217 Bytes gzipped
+    Sitemap stats: 2 links / 1 sitemaps / 0m00s
+    + sitemaps/apple/sitemap1.xml.gz             2 links /  820 Bytes /  330 Bytes gzipped
+    + sitemaps/apple/sitemap_index.xml.gz          1 sitemaps /  388 Bytes /  214 Bytes gzipped
+    Sitemap stats: 2 links / 1 sitemaps / 0m00s
+
+If you don't want to have to generate all the sitemaps at once, or you want to refresh some more often than others, you can split them up into their own configuration files.  Using the above example we would have:
+
+    # config/google_sitemap.rb
+    SitemapGenerator::Sitemap.default_host = "https://google.mysite.com"
+    SitemapGenerator::Sitemap.sitemaps_path = "sitemaps/google"
+    SitemapGenerator::Sitemap.create do
+      add '/home'
+    end
+
+    # config/apple_sitemap.rb
+    SitemapGenerator::Sitemap.default_host = "https://apple.mysite.com"
+    SitemapGenerator::Sitemap.sitemaps_path = "sitemaps/apple"
+    SitemapGenerator::Sitemap.create do
+      add '/home'
+    end
+
+    # config/yahoo_sitemap.rb
+    SitemapGenerator::Sitemap.default_host = "https://yahoo.mysite.com"
+    SitemapGenerator::Sitemap.sitemaps_path = "sitemaps/yahoo"
+    SitemapGenerator::Sitemap.create do
+      add '/home'
+    end
+
+To generate each one specify the configuration file to run by passing the `CONFIG_FILE` option to `rake sitemap:refresh`, e.g.:
+
+    rake sitemap:refresh CONFIG_FILE="config/google_sitemap.rb"
+    rake sitemap:refresh CONFIG_FILE="config/apple_sitemap.rb"
+    rake sitemap:refresh CONFIG_FILE="config/yahoo_sitemap.rb"
+
 Sitemap Configuration
 ======
 
@@ -334,13 +394,6 @@ Speeding Things Up
 ----------
 
 For large ActiveRecord collections with thousands of records it is advisable to iterate through them in batches to avoid loading all records into memory at once.  For this reason in the example above we use `Content.find_each` which is a batched iterator available since Rails 2.3.2, rather than `Content.all`.
-
-Generating Multiple Sitemap Indexes
-----------
-
-Each sitemap configuration corresponds to one sitemap index.  To generate multiple sets of sitemaps you can create multiple configuration files.  Each should specify a different location or filename to avoid overwriting each other.  To generate your sitemaps, specify the configuration file to run in your call to `rake sitemap:refresh` using the `CONFIG_FILE` argument like in the following example:
-
-    rake sitemap:refresh CONFIG_FILE="config/geo_sitemap.rb"
 
 Customizing your Sitemaps
 =======
