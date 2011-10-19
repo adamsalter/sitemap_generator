@@ -26,6 +26,7 @@ Does your website use SitemapGenerator to generate Sitemaps?  Where would you be
 Changelog
 -------
 
+- v2.1.4: Allow special characters in URLs (don't use URI.join to construct URLs)
 - v2.1.3: Fix calling create with both `filename` and `sitemaps_namer` options
 - v2.1.2: Support multiple videos per url using the new `videos` option to `add()`.
 - v2.1.1: Support calling `create()` multiple times in a sitemap config.  Support host names with path segments so you can use a `default_host` like `'http://mysite.com/subdirectory/'`.  Turn off `include_index` when the `sitemaps_host` differs from `default_host`.  Add docs about how to upload to remote hosts.
