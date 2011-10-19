@@ -21,6 +21,10 @@ describe SitemapGenerator::Builder::SitemapUrl do
     url[:loc].should == 'http://example.com/subdir/profile'
     url = SitemapGenerator::Builder::SitemapUrl.new('/deep/profile/', :host => 'http://example.com/subdir/')
     url[:loc].should == 'http://example.com/subdir/deep/profile/'
+    url = SitemapGenerator::Builder::SitemapUrl.new('/deep/profile', :host => 'http://example.com/subdir')
+    url[:loc].should == 'http://example.com/subdir/deep/profile'
+    url = SitemapGenerator::Builder::SitemapUrl.new('deep/profile', :host => 'http://example.com/subdir')
+    url[:loc].should == 'http://example.com/subdir/deep/profile'
     url = SitemapGenerator::Builder::SitemapUrl.new('deep/profile/', :host => 'http://example.com/subdir/')
     url[:loc].should == 'http://example.com/subdir/deep/profile/'
     url = SitemapGenerator::Builder::SitemapUrl.new('/', :host => 'http://example.com/subdir/')
@@ -46,5 +50,11 @@ describe SitemapGenerator::Builder::SitemapUrl do
   it "should support an array :video option" do
     loc = SitemapGenerator::Builder::SitemapUrl.new('', :host => 'http://test.com', :video => [1,2], :videos => [3,4])
     loc[:videos].should == [3,4,1,2]
+  end
+
+  it "should not fail if invalid characters are used in the URL" do
+    special = ':$&+,;:=?@'
+    url = SitemapGenerator::Builder::SitemapUrl.new("/#{special}", :host => "http://example.com/#{special}/")
+    url[:loc].should == "http://example.com/#{special}/#{special}"
   end
 end
