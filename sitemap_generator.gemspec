@@ -5,7 +5,7 @@
 
 Gem::Specification.new do |s|
   s.name = %q{sitemap_generator}
-  s.version = "2.1.4"
+  s.version = "2.1.5"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Karl Varga", "Adam Salter"]
