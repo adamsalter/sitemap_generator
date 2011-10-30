@@ -26,6 +26,7 @@ Does your website use SitemapGenerator to generate Sitemaps?  Where would you be
 Changelog
 -------
 
+- v2.1.6: Fix the lastmod value on sitemap file links
 - v2.1.5: Fix verbose setting in the rake tasks; should default to true
 - v2.1.4: Allow special characters in URLs (don't use URI.join to construct URLs)
 - v2.1.3: Fix calling create with both `filename` and `sitemaps_namer` options

@@ -1,7 +1,7 @@
 PATH
   remote: ./
   specs:
-    sitemap_generator (2.1.5)
+    sitemap_generator (2.1.6)
 
 GEM
   remote: http://rubygems.org/
