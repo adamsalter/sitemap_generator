@@ -2,7 +2,6 @@ require 'spec_helper'
 
 describe 'SitemapGenerator::Builder::SitemapFile' do
   before :each do
-    FileUtils.rm_rf("tmp/test/")
     @loc = SitemapGenerator::SitemapLocation.new(:namer => SitemapGenerator::SitemapNamer.new(:sitemap), :public_path => 'tmp/', :sitemaps_path => 'test/', :host => 'http://example.com/')
     @s = SitemapGenerator::Builder::SitemapFile.new(@loc)
   end
@@ -29,10 +28,6 @@ describe 'SitemapGenerator::Builder::SitemapFile' do
     @s.link_count.should == 0
   end
 
-  it "should not have a last modification data" do
-    @s.lastmod.should be_nil
-  end
-
   it "should not be finalized" do
     @s.finalized?.should be_false
   end
@@ -44,6 +39,19 @@ describe 'SitemapGenerator::Builder::SitemapFile' do
 
   it "should raise if no default host is set" do
     lambda { SitemapGenerator::Builder::SitemapFile.new.location.url }.should raise_error(SitemapGenerator::SitemapError)
+  end
+
+  describe "lastmod" do
+    it "should be the file last modified time" do
+      lastmod = 2.weeks.ago
+      File.expects(:mtime).with(@s.location.path).returns(lastmod)
+      @s.lastmod.should == lastmod
+    end
+
+    it "should be nil if the file DNE" do
+      File.expects(:mtime).raises(Errno::ENOENT)
+      @s.lastmod.should be_nil
+    end
   end
 
   describe "new" do

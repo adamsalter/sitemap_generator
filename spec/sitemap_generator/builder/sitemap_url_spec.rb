@@ -8,10 +8,18 @@ describe SitemapGenerator::Builder::SitemapUrl do
       :host => 'http://test.com',
       :namer => SitemapGenerator::SitemapNamer.new(:sitemap)
     )}
+  let(:sitemap_file) { SitemapGenerator::Builder::SitemapFile.new(loc) }
 
   it "should build urls for sitemap files" do
-    url = SitemapGenerator::Builder::SitemapUrl.new(SitemapGenerator::Builder::SitemapFile.new(loc))
+    url = SitemapGenerator::Builder::SitemapUrl.new(sitemap_file)
     url[:loc].should == 'http://test.com/sitemaps/sitemap1.xml.gz'
+  end
+
+  it "lastmod should default to the last modified date for sitemap files" do
+    lastmod = 2.weeks.ago
+    sitemap_file.expects(:lastmod).returns(lastmod)
+    url = SitemapGenerator::Builder::SitemapUrl.new(sitemap_file)
+    url[:lastmod].should == lastmod
   end
 
   it "should support subdirectory routing" do
