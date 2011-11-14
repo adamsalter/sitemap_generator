@@ -192,7 +192,7 @@ module SitemapGenerator
       sitemap_index_url = CGI.escape(sitemap_index.location.url)
       search_engines = {
         :google         => "http://www.google.com/webmasters/sitemaps/ping?sitemap=#{sitemap_index_url}",
-        :yahoo          => "http://search.yahooapis.com/SiteExplorerService/V1/ping?sitemap=#{sitemap_index_url}&appid=#{yahoo_app_id}",
+        :yahoo          => "http://search.yahooapis.com/SiteExplorerService/V1/updateNotification?appid=#{yahoo_app_id}&url=#{sitemap_index_url}",
         :ask            => "http://submissions.ask.com/ping?sitemap=#{sitemap_index_url}",
         :bing           => "http://www.bing.com/webmaster/ping.aspx?siteMap=#{sitemap_index_url}",
         :sitemap_writer => "http://www.sitemapwriter.com/notify.php?crawler=all&url=#{sitemap_index_url}"
