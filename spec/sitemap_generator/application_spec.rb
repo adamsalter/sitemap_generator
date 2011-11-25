@@ -2,13 +2,13 @@ require 'spec_helper'
 
 describe SitemapGenerator::Application do
   before :all do
-    silence_warnings do
+    with_warnings(nil) do
       Object.const_set(:Rails, Object.new)
     end
   end
 
   after :all do
-    silence_warnings do
+    with_warnings(nil) do
       Object.const_set(:Rails, nil)
     end
   end

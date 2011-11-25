@@ -15,7 +15,7 @@ module SitemapGenerator
     #   :extension - Default: '.xml.gz'. File extension to append.
     #   :start     - Default: 1. Index at which to start counting.
     def initialize(base, options={});
-      @options = options.reverse_merge(
+      @options = SitemapGenerator::Utilities.reverse_merge(options,
         :extension => '.xml.gz',
         :start => 1
       )

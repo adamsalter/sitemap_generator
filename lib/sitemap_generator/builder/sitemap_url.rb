@@ -28,12 +28,12 @@ module SitemapGenerator
       # * +news+
       def initialize(path, options={})
         if sitemap = path.is_a?(SitemapGenerator::Builder::SitemapFile) && path
-          options.reverse_merge!(:host => sitemap.location.host, :lastmod => sitemap.lastmod)
+          SitemapGenerator::Utilities.reverse_merge!(options, :host => sitemap.location.host, :lastmod => sitemap.lastmod)
           path = sitemap.location.path_in_public
         end
 
         SitemapGenerator::Utilities.assert_valid_keys(options, :priority, :changefreq, :lastmod, :host, :images, :video, :geo, :news, :videos)
-        options.reverse_merge!(:priority => 0.5, :changefreq => 'weekly', :lastmod => Time.now, :images => [], :news => {}, :videos => [])
+        SitemapGenerator::Utilities.reverse_merge!(options, :priority => 0.5, :changefreq => 'weekly', :lastmod => Time.now, :images => [], :news => {}, :videos => [])
         if options[:host].blank?
           raise "Cannot generate a url without a host"
         end
@@ -65,7 +65,7 @@ module SitemapGenerator
           builder.changefreq self[:changefreq]             if self[:changefreq]
           builder.priority   format_float(self[:priority]) if self[:priority]
 
-          unless self[:news].blank?
+          unless SitemapGenerator::Utilities.blank?(self[:news])
             news_data = self[:news]
             builder.news:news do
               builder.news:publication do
@@ -117,7 +117,7 @@ module SitemapGenerator
             end
           end
 
-          unless self[:geo].blank?
+          unless SitemapGenerator::Utilities.blank?(self[:geo])
             geo = self[:geo]
             builder.geo :geo do
               builder.geo :format, geo[:format] if geo[:format]
@@ -128,7 +128,7 @@ module SitemapGenerator
       end
 
       def news?
-        self[:news].present?
+        SitemapGenerator::Utilities.present?(self[:news])
       end
 
       protected
