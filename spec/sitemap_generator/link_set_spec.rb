@@ -511,7 +511,7 @@ describe SitemapGenerator::LinkSet do
 
     it "should support both sitemaps_namer and filename options no matter the order" do
       namer = SitemapGenerator::SitemapNamer.new("sitemap1_")
-      options = ActiveSupport::OrderedHash.new
+      options = {} #ActiveSupport::OrderedHash.new
       options[:sitemaps_namer] = namer
       options[:filename] = "sitemap1"
       ls = @ls.create(options)

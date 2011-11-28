@@ -96,7 +96,7 @@ module SitemapGenerator
     # * <tt>:verbose</tt> - If +true+, output a summary line for each sitemap and sitemap
     #   index that is created.  Default is +false+.
     def initialize(options={})
-      options.reverse_merge!({
+      SitemapGenerator::Utilities.reverse_merge!(options,
         :include_root => true,
         :include_index => true,
         :filename => :sitemap,
@@ -125,7 +125,7 @@ module SitemapGenerator
     #   host - host for the link, defaults to your <tt>default_host</tt>.
     def add(link, options={})
       add_default_links if !@added_default_links
-      sitemap.add(link, options.reverse_merge!(:host => @default_host))
+      sitemap.add(link, SitemapGenerator::Utilities.reverse_merge!(options, :host => @default_host))
     rescue SitemapGenerator::SitemapFullError
       finalize_sitemap!
       retry
@@ -319,7 +319,7 @@ module SitemapGenerator
     # change the public path.
     def options_for_group(opts)
       opts.delete(:public_path)
-      opts.reverse_merge!(
+      SitemapGenerator::Utilities.reverse_merge!(opts,
         :include_index => false,
         :include_root => false,
         :sitemap_index => sitemap_index
@@ -340,7 +340,7 @@ module SitemapGenerator
         end
         hash
       end
-      opts.reverse_merge!(current_settings)
+      SitemapGenerator::Utilities.reverse_merge!(opts, current_settings)
       opts
     end
 
@@ -522,7 +522,7 @@ module SitemapGenerator
       # Update the given attribute on the current sitemap index and sitemap file location objects.
       # But don't create the index or sitemap files yet if they are not already created.
       def update_location_info(attribute, value, opts={})
-        opts.reverse_merge!(:include_index => !@protect_index)
+        SitemapGenerator::Utilities.reverse_merge!(opts, :include_index => !@protect_index)
         @sitemap_index.location[attribute] = value if opts[:include_index] && @sitemap_index && !@sitemap_index.finalized?
         @sitemap.location[attribute] = value if @sitemap && !@sitemap.finalized?
       end

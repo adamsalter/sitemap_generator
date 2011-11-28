@@ -21,7 +21,7 @@ module SitemapGenerator
     #
     # All other options are passed to the LinkSet by setting them using accessor methods.
     def initialize(opts={}, &block)
-      opts.reverse_merge!(:link_set => SitemapGenerator::Sitemap)
+      SitemapGenerator::Utilities.reverse_merge!(opts, :link_set => SitemapGenerator::Sitemap)
       @linkset = opts.delete :link_set
       @linkset.send(:set_options, opts)
       eval(&block) if block_given?

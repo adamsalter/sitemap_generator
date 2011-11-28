@@ -39,7 +39,7 @@ module SitemapGenerator
       #  number_with_delimiter(98765432.98, :delimiter => " ", :separator => ",")
       #  # => 98 765 432,98
       def number_with_delimiter(number, options = {})
-        options.symbolize_keys!
+        SitemapGenerator::Utilities.symbolize_keys!(options)
 
         begin
           Float(number)
@@ -92,7 +92,7 @@ module SitemapGenerator
       #  number_with_precision(1111.2345, :precision => 2, :separator => ',', :delimiter => '.')
       #  # => 1.111,23
       def number_with_precision(number, options = {})
-        options.symbolize_keys!
+        SitemapGenerator::Utilities.symbolize_keys!(options)
 
         number = begin
           Float(number)
@@ -116,7 +116,7 @@ module SitemapGenerator
         }
         defaults = defaults.merge(precision_defaults)
 
-        options = options.reverse_merge(defaults)  # Allow the user to unset default values: Eg.: :significant => false
+        options = SitemapGenerator::Utilities.reverse_merge(options, defaults)  # Allow the user to unset default values: Eg.: :significant => false
         precision = options.delete :precision
         significant = options.delete :significant
         strip_insignificant_zeros = options.delete :strip_insignificant_zeros
