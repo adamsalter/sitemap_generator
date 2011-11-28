@@ -26,6 +26,8 @@ Does your website use SitemapGenerator to generate Sitemaps?  Where would you be
 Changelog
 -------
 
+- v2.1.7: Improve format of float priorities; Remove Yahoo from ping - the Yahoo
+          service has been shut down.
 - v2.1.6: Fix the lastmod value on sitemap file links
 - v2.1.5: Fix verbose setting in the rake tasks; should default to true
 - v2.1.4: Allow special characters in URLs (don't use URI.join to construct URLs)
