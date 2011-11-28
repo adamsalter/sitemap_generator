@@ -110,7 +110,7 @@ module SitemapGenerator
       when Hash, Array
         object.empty?
       when Object
-        respond_to?(:empty?) ? empty? : !object
+        object.respond_to?(:empty?) ? object.empty? : !object
       end
     end
 
