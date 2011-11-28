@@ -23,7 +23,7 @@ describe SitemapGenerator::Builder::SitemapUrl do
   end
 
   it "lastmod should default to the last modified date for sitemap files" do
-    lastmod = 2.weeks.ago
+    lastmod = (Time.now - 1209600)
     sitemap_file.expects(:lastmod).returns(lastmod)
     url = SitemapGenerator::Builder::SitemapUrl.new(sitemap_file)
     url[:lastmod].should == lastmod

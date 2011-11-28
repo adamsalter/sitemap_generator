@@ -43,7 +43,7 @@ describe 'SitemapGenerator::Builder::SitemapFile' do
 
   describe "lastmod" do
     it "should be the file last modified time" do
-      lastmod = 2.weeks.ago
+      lastmod = (Time.now - 1209600)
       File.expects(:mtime).with(@s.location.path).returns(lastmod)
       @s.lastmod.should == lastmod
     end
