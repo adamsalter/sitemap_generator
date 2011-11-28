@@ -192,7 +192,6 @@ module SitemapGenerator
       sitemap_index_url = CGI.escape(sitemap_index.location.url)
       search_engines = {
         :google         => "http://www.google.com/webmasters/sitemaps/ping?sitemap=#{sitemap_index_url}",
-        :yahoo          => "http://search.yahooapis.com/SiteExplorerService/V1/updateNotification?appid=#{yahoo_app_id}&url=#{sitemap_index_url}",
         :ask            => "http://submissions.ask.com/ping?sitemap=#{sitemap_index_url}",
         :bing           => "http://www.bing.com/webmaster/ping.aspx?siteMap=#{sitemap_index_url}",
         :sitemap_writer => "http://www.sitemapwriter.com/notify.php?crawler=all&url=#{sitemap_index_url}"
@@ -200,7 +199,6 @@ module SitemapGenerator
 
       puts "\n" if verbose
       search_engines.each do |engine, link|
-        next if engine == :yahoo && !self.yahoo_app_id
         begin
           Timeout::timeout(10) {
             open(link)
@@ -209,17 +207,6 @@ module SitemapGenerator
         rescue Timeout::Error, StandardError => e
           puts "Ping failed for #{engine.to_s.titleize}: #{e.inspect} (URL #{link})" if verbose
         end
-      end
-
-      if !self.yahoo_app_id && verbose
-        puts "\n"
-        puts <<-END.gsub(/^\s+/, '')
-          To ping Yahoo you require a Yahoo AppID.  Add it to your config/sitemap.rb with:
-
-          SitemapGenerator::Sitemap.yahoo_app_id = "my_app_id"
-
-          For more information see http://developer.yahoo.com/search/siteexplorer/V1/updateNotification.html
-        END
       end
     end
 
