@@ -19,7 +19,7 @@ gem 'gemcutter', '0.6.1'
 gem 'nokogiri', '1.4.4'
 gem 'sqlite3-ruby', '1.3.1', :require => 'sqlite3'
 
-group :test do
+group :test, :development do
   gem 'mocha', '0.9.10'
   gem 'rcov'
   gem 'rspec', '1.3.1', :require => 'spec'
