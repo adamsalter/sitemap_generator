@@ -1,8 +1,7 @@
 require 'spec_helper'
 require 'bigdecimal'
-require 'sitemap_generator/core_ext/big_decimal/conversions'
 
-describe BigDecimal do
+describe SitemapGenerator::BigDecimal do
   describe "to_yaml" do
     it "should serialize correctly" do
       BigDecimal.new('100000.30020320320000000000000000000000000000001').to_yaml.should == "--- 100000.30020320320000000000000000000000000000001\n"

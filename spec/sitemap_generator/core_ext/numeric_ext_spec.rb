@@ -1,7 +1,6 @@
 require 'spec_helper'
-require 'sitemap_generator/core_ext/numeric/bytes'
 
-describe Numeric do
+describe SitemapGenerator::Numeric do
   describe "bytes" do
     it "should define equality of different units" do
       relationships = {

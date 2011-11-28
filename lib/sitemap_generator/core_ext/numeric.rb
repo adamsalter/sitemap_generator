@@ -1,4 +1,4 @@
-class SGNumeric
+class SitemapGenerator::Numeric
   KILOBYTE = 1024
   MEGABYTE = KILOBYTE * 1024
   GIGABYTE = MEGABYTE * 1024

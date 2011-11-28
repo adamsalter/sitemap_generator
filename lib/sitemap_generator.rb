@@ -1,4 +1,3 @@
-require 'sitemap_generator/core_ext'
 require 'sitemap_generator/sitemap_namer'
 require 'sitemap_generator/builder'
 require 'sitemap_generator/link_set'
@@ -12,18 +11,20 @@ module SitemapGenerator
   autoload(:Interpreter, 'sitemap_generator/interpreter')
   autoload(:FileAdapter, 'sitemap_generator/adapters/file_adapter')
   autoload(:WaveAdapter, 'sitemap_generator/adapters/wave_adapter')
+  autoload(:BigDecimal,  'sitemap_generator/core_ext/big_decimal')
+  autoload(:Numeric,     'sitemap_generator/core_ext/numeric')
 
   SitemapError          = Class.new(StandardError)
   SitemapFullError      = Class.new(SitemapError)
   SitemapFinalizedError = Class.new(SitemapError)
 
-  with_warnings(nil) do
+  Utilities.with_warnings(nil) do
     VERSION = File.read(File.dirname(__FILE__) + "/../VERSION").strip
     MAX_SITEMAP_FILES    = 50_000        # max sitemap links per index file
     MAX_SITEMAP_LINKS    = 50_000        # max links per sitemap
     MAX_SITEMAP_IMAGES   = 1_000         # max images per url
     MAX_SITEMAP_NEWS     = 1_000         # max news sitemap per index_file
-    MAX_SITEMAP_FILESIZE = SGNumeric.new(10).megabytes  # bytes
+    MAX_SITEMAP_FILESIZE = SitemapGenerator::Numeric.new(10).megabytes  # bytes
 
     # Lazy-initialize the LinkSet instance
     Sitemap = (Class.new do

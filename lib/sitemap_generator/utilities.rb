@@ -37,7 +37,7 @@ module SitemapGenerator
     # Return a new hash with all keys converted to symbols, as long as
     # they respond to +to_sym+.
     def symbolize_keys(hash)
-      hash.dup.symbolize_keys!
+      symbolize_keys!(hash.dup)
     end
 
     # Destructively convert all keys to symbols, as long as they respond
@@ -117,6 +117,14 @@ module SitemapGenerator
     # An object is present if it's not blank.
     def present?(object)
       !blank?(object)
+    end
+
+    # Sets $VERBOSE for the duration of the block and back to its original value afterwards.
+    def with_warnings(flag)
+      old_verbose, $VERBOSE = $VERBOSE, flag
+      yield
+    ensure
+      $VERBOSE = old_verbose
     end
   end
 end
