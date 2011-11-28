@@ -8,7 +8,7 @@ end
 require 'yaml'
 
 # Define our own class rather than modify the global class
-class SGBigDecimal < BigDecimal
+class SitemapGenerator::BigDecimal < BigDecimal
   YAML_TAG = 'tag:yaml.org,2002:float'
   YAML_MAPPING = { 'Infinity' => '.Inf', '-Infinity' => '-.Inf', 'NaN' => '.NaN' }
 
