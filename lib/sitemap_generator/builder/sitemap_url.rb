@@ -97,19 +97,19 @@ module SitemapGenerator
               builder.video :description, video[:description]
               builder.video :content_loc, video[:content_loc]           if video[:content_loc]
               if video[:player_loc]
-                builder.video :player_loc, video[:player_loc], :allow_embed => (video[:allow_embed] ? 'yes' : 'no'), :autoplay => video[:autoplay]
+                builder.video :player_loc, video[:player_loc], :allow_embed => yes_or_no_with_default(video[:allow_embed], true), :autoplay => video[:autoplay]
               end
 
               builder.video :rating, video[:rating]                     if video[:rating]
               builder.video :view_count, video[:view_count]             if video[:view_count]
-              builder.video :publication_date, video[:publication_date] if video[:publication_date]
-              builder.video :expiration_date, video[:expiration_date]   if video[:expiration_date]
-              builder.video :family_friendly, (video[:family_friendly] ? 'yes' : 'no')  if video[:family_friendly]
+              builder.video :publication_date, w3c_date(video[:publication_date]) if video[:publication_date]
+              builder.video :expiration_date,  w3c_date(video[:expiration_date])  if video[:expiration_date]
+              builder.video :family_friendly,  yes_or_no_with_default(video[:family_friendly], true) if video.has_key?(:family_friendly)
               builder.video :duration, video[:duration]                 if video[:duration]
               video[:tags].each {|tag| builder.video :tag, tag }        if video[:tags]
               builder.video :tag, video[:tag]                           if video[:tag]
               builder.video :category, video[:category]                 if video[:category]
-              builder.video :gallery_loc, video[:gallery_loc]           if video[:gallery_loc]
+              builder.video :gallery_loc, video[:gallery_loc], :title => video[:gallery_title] if video[:gallery_loc]
 
               if video[:uploader]
                 builder.video :uploader, video[:uploader], video[:uploader_info] ? { :info => video[:uploader_info] } : {}
@@ -149,7 +149,31 @@ module SitemapGenerator
       end
 
       def w3c_date(date)
-         date.utc.strftime("%Y-%m-%dT%H:%M:%S+00:00")
+        if date.is_a?(String)
+          date
+        elsif date.respond_to?(:iso8601)
+          date.iso8601
+        elsif date.is_a?(Date)
+          date.strftime("%Y-%m-%d")
+        else
+          date.utc.strftime("%Y-%m-%dT%H:%M:%SZ")
+        end
+      end
+
+      # Accept a string or boolean and return 'yes' or 'no'.  If a string, the
+      # value must be 'yes' or 'no'.  Pass the default value as a boolean using `default`.
+      def yes_or_no(value)
+        if value.is_a?(String)
+          value =~ /yes|no/ ? value : raise(Exception.new("Unrecognized value for yes/no field: #{value.inspect}"))
+        else
+          value ? 'yes' : 'no'
+        end
+      end
+
+      # If the value is nil, return `default` converted to either 'yes' or 'no'.
+      # If the value is set, return its value converted to 'yes' or 'no'.
+      def yes_or_no_with_default(value, default)
+        yes_or_no(value.nil? ? default) : value)
       end
     end
   end
