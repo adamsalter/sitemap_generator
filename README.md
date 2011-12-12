@@ -521,7 +521,9 @@ Sitemap Extensions
 News Sitemaps
 -----------
 
-A news item can be added to a sitemap URL by passing a `:news` hash to `add`.  The hash must  contain tags defined by the [News Sitemap][news_tags] specification.  For example:
+A news item can be added to a sitemap URL by passing a `:news` hash to `add`.  The hash must  contain tags defined by the [News Sitemap][news_tags] specification.
+
+### Example
 
     SitemapGenerator::Sitemap.create do
       add('/index.html', :news => {
@@ -536,7 +538,7 @@ A news item can be added to a sitemap URL by passing a `:news` hash to `add`.  T
       })
     end
 
-Supported news options include:
+### Supported options
 
 * `publication_name`
 * `publication_language`
@@ -547,10 +549,13 @@ Supported news options include:
 * `keywords`
 * `stock_tickers`
 
+* * *
 Image Sitemaps
 -----------
 
-Images can be added to a sitemap URL by passing an `:images` array to `add`.  Each item in the array must be a Hash containing tags defined by the [Image Sitemap][image_tags] specification.  For example:
+Images can be added to a sitemap URL by passing an `:images` array to `add`.  Each item in the array must be a Hash containing tags defined by the [Image Sitemap][image_tags] specification.
+
+### Example
 
     SitemapGenerator::Sitemap.create do
       add('/index.html', :images => [{
@@ -558,7 +563,7 @@ Images can be added to a sitemap URL by passing an `:images` array to `add`.  Ea
         :title => 'Image' }])
     end
 
-Supported image options include:
+### Supported options
 
 * `loc` Required, location of the image
 * `caption`
@@ -566,16 +571,15 @@ Supported image options include:
 * `title`
 * `license`
 
+* * *
 Video Sitemaps
 -----------
 
-A video can be added to a sitemap URL by passing a `:video` Hash to `add`.  The Hash can contain tags defined by the [Video Sitemap specification][video_tags].
+A video can be added to a sitemap URL by passing a `:video` Hash to `add()`.  The Hash can contain tags defined by the [Video Sitemap specification][video_tags].
 
 To add more than one video to a url, pass an array of video hashes using the `:videos` option.
 
-To associate more than one `tag` with a video, pass the tags as an array with the key `:tags`.
-
-Example:
+### Example
 
     add('/index.html', :video => {
       :thumbnail_loc => 'http://www.example.com/video1_thumbnail.png',
@@ -586,35 +590,97 @@ Example:
       :category => 'Category'
     })
 
-Supported video options include:
+### Supported options
 
-* `thumbnail_loc` Required
-* `title` Required
-* `description` Required
-* `content_loc` Depends.  At least one of `player_loc` or `content_loc` is required
-* `player_loc` Depends. At least one of `player_loc` or `content_loc` is required
-* `expiration_date` Recommended
-* `duration` Recommended
-* `rating`
-* `view_count`
-* `publication_date`
-* `family_friendly`
-* `tags` A list of tags if more than one tag.
-* `tag` A single tag.  See `tags`
-* `category`
-* `gallery_loc`
-* `uploader` (use `uploader_info` to set the info attribute)
+* `:thumbnail_loc` - Required, string.
 
+  A URL pointing to the URL for the video thumbnail image file. We can accept most image sizes/types but recommend your thumbs are at least at least 640x480 pixels in .jpg, .png, or. gif formats. The max size is 1920 x 1080 pixels.
 
+* `:title` - Required, string.
 
+  The title of the video. Limited to 100 characters.
+
+* `:description` - Required, string.
+
+  The description of the video. Descriptions longer than 2048 characters will be truncated.
+
+* `:content_loc` - String. **At least one of `player_loc` or `content_loc` is required.**
+
+  The URL should point to a .mpg, .mpeg, .mp4, .m4v, .mov, .wmv, .asf, .avi, .ra, .ram, .rm, .flv, or other video file format, and can be omitted if `:player_loc` is specified. However, because Google needs to be able to check that the Flash object is actually a player for video (as opposed to some other use of Flash, e.g. games and animations), it's helpful to provide both.
+
+* `:player_loc` - String. **At least one of `player_loc` or `content_loc` is required.**
+
+  A URL pointing to a Flash player for a specific video. In general, this is the information in the src element of an &lt;embed> tag and should not be the same as the content of the &lt;loc> tag. ​Since each video is uniquely identified by its content URL (the location of the actual video file) or, if a content URL is not present, a player URL (a URL pointing to a player for the video), you must include either the `:player_loc` or `:content_loc` options. If these options are omitted and we can't find this information, we'll be unable to index your video.
+
+  Attributes:
+  * `:allow_embed` - Optional.  Values: boolean, or string 'yes' or 'no'.  Default: 'yes'.
+
+     Specifies whether Google can embed the video in search results.
+  * `:autoplay` - String, user defined.
+
+     A user-defined string that Google may append (if appropriate) to the flashvars parameter to enable autoplay of the video. For example: &lt;embed src="http://www.example.com/videoplayer.swf?video=123" autoplay="ap=1"/>
+
+* `:expiration_date` - Recommended.  Values: Date, DateTime, Time or String.
+
+  The date after which the video will no longer be available.  Don't supply this information if your video does not expire.  Ruby date and time objects will be formatted for you in the appropriate W3C format.  However, if you are passing a string, follow these guidelines: acceptable values are complete date (YYYY-MM-DD) and complete date plus hours, minutes and seconds, and timezone (YYYY-MM-DDThh:mm:ss+TZD). For example, 2007-07-16T19:20:30+08:00.
+
+* `:duration` - Recommended. Integer.
+
+  The duration of the clip in seconds.
+
+* `:rating` - Optional.  The value must be a float or integer between 0.0 and 5.0.
+
+  The rating of the video.
+
+* `:view_count` - Optional, integer.
+
+  The number of times the video has been viewed.
+
+* `:publication_date` - Optional. Values: Date, DateTime, Time or String.
+
+  The date the video was first published. Ruby date and time objects will be formatted for you in the appropriate W3C format.  However, if you are passing a string, follow these guidelines: acceptable values are complete date (YYYY-MM-DD) and complete date plus hours, minutes and seconds, and timezone (YYYY-MM-DDThh:mm:ss+TZD). For example, 2007-07-16T19:20:30+08:00.
+
+* `:family_friendly` - Optional.  Values: boolean, or string 'yes' or 'no'.
+
+  Whether the video is suitable for viewing by children.  If `No` the video is only available to users with SafeSearch turned off.
+
+* `:tags` - Optional. A list of one or more string tags.  A maximum of 32 tags is permitted.
+
+* `:tag` - Optional.  String.  A single tag.  If the video has more than one tag, use `:tags`.
+
+  A tag associated with the video. Tags are generally very short descriptions of key concepts associated with a video or piece of content. A single video could have several tags, although it might belong to only one category. For example, a video about grilling food may belong in the Grilling category, but could be tagged "steak", "meat", "summer", and "outdoor".
+
+* `:category` - Optional, string.
+
+  The video's category. For example, cooking. The value should be a string no longer than 256 characters. In general, categories are broad groupings of content by subject. Usually a video will belong to a single category. For example, a site about cooking could have categories for Broiling, Baking, and Grilling.
+
+* `:gallery_loc` - Optional, string.
+
+  A link to the gallery (collection of videos) in which this video appears. Only one &lt;video:gallery_loc> tag can be listed for each video.
+
+  Attributes:
+  * `:gallery_title` - Optional, string.  The title of the gallery.  Sets the `title` attribute of the &lt;video:gallery_loc> tag.
+
+* `:uploader` - Optional, string.
+
+  A name or handle of the video’s uploader. Only one &lt;video:uploader> is allowed per video.
+
+  Attributes:
+  * `:uploader_info` - Optional, string.  Specifies the URL of a webpage with additional information about this uploader. This URL must be on the same domain as the &lt;loc> tag. Sets the `info` attribute of the &lt;video:uploader_info> tag.
+
+* * *
 Geo Sitemaps
 -----------
 
 Pages with geo data can be added by passing a `:geo` Hash to `add`.  The Hash only supports one tag of `:format`.  Google provides an [example of a geo sitemap link here][geo_tags].  Note that the sitemap does not actually contain your KML or GeoRSS.  It merely links to a page that has this content.
 
-    add('/stores/1234.xml', :geo => { :format => 'kml' })
+### Example:
 
-Supported geo options include:
+    SitemapGenerator::Sitemap.create do
+      add('/stores/1234.xml', :geo => { :format => 'kml' })
+    end
+
+### Supported options
 
 * `format` Required, either 'kml' or 'georss'
 
