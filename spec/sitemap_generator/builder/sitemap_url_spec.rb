@@ -10,6 +10,13 @@ describe SitemapGenerator::Builder::SitemapUrl do
     )}
   let(:sitemap_file) { SitemapGenerator::Builder::SitemapFile.new(loc) }
 
+  def new_url(*args)
+    if args.empty?
+      args = ['/home', { :host => 'http://example.com' }]
+    end
+    SitemapGenerator::Builder::SitemapUrl.new(*args)
+  end
+
   it "should build urls for sitemap files" do
     url = SitemapGenerator::Builder::SitemapUrl.new(sitemap_file)
     url[:loc].should == 'http://test.com/sitemaps/sitemap1.xml.gz'
@@ -64,5 +71,70 @@ describe SitemapGenerator::Builder::SitemapUrl do
     special = ':$&+,;:=?@'
     url = SitemapGenerator::Builder::SitemapUrl.new("/#{special}", :host => "http://example.com/#{special}/")
     url[:loc].should == "http://example.com/#{special}/#{special}"
+  end
+
+  describe "w3c_date" do
+    it "should convert dates and times to W3C format" do
+      url = new_url
+      url.send(:w3c_date, Date.new(0)).should == '0000-01-01'
+      url.send(:w3c_date, Time.at(0).utc).should == '1970-01-01T00:00:00Z'
+      url.send(:w3c_date, DateTime.new(0)).should == '0000-01-01T00:00:00Z'
+    end
+
+    it "should return strings unmodified" do
+      new_url.send(:w3c_date, '2010-01-01').should == '2010-01-01'
+    end
+
+    it "should try to convert to utc" do
+      time = Time.at(0)
+      time.expects(:respond_to?).times(2).returns(false, true) # iso8601, utc
+      new_url.send(:w3c_date, time).should == '1970-01-01T00:00:00Z'
+    end
+
+    it "should include timezone for objects which do not respond to iso8601 or utc" do
+      time = Time.at(0)
+      time.expects(:respond_to?).times(2).returns(false, false) # iso8601, utc
+      time.expects(:strftime).times(2).returns('+0800', '1970-01-01T00:00:00')
+      new_url.send(:w3c_date, time).should == '1970-01-01T00:00:00+08:00'
+    end
+  end
+
+  describe "yes_or_no" do
+    it "should recognize truthy values" do
+      new_url.send(:yes_or_no, 1).should == 'yes'
+      new_url.send(:yes_or_no, 0).should == 'yes'
+      new_url.send(:yes_or_no, 'yes').should == 'yes'
+      new_url.send(:yes_or_no, 'Yes').should == 'yes'
+      new_url.send(:yes_or_no, 'YES').should == 'yes'
+      new_url.send(:yes_or_no, true).should == 'yes'
+      new_url.send(:yes_or_no, Object.new).should == 'yes'
+    end
+
+    it "should recognize falsy values" do
+      new_url.send(:yes_or_no, nil).should   == 'no'
+      new_url.send(:yes_or_no, 'no').should  == 'no'
+      new_url.send(:yes_or_no, 'No').should  == 'no'
+      new_url.send(:yes_or_no, 'NO').should  == 'no'
+      new_url.send(:yes_or_no, false).should == 'no'
+    end
+
+    it "should raise on unrecognized strings" do
+      lambda { new_url.send(:yes_or_no, 'dunno')  }.should raise_error(ArgumentError)
+      lambda { new_url.send(:yes_or_no, 'yessir') }.should raise_error(ArgumentError)
+    end
+  end
+
+  describe "yes_or_no_with_default" do
+    it "should use the default if the value is nil" do
+      url = new_url
+      url.expects(:yes_or_no).with(true).returns('surely')
+      url.send(:yes_or_no_with_default, nil, true).should == 'surely'
+    end
+
+    it "should use the value if it is not nil" do
+      url = new_url
+      url.expects(:yes_or_no).with('surely').returns('absolutely')
+      url.send(:yes_or_no_with_default, 'surely', true).should == 'absolutely'
+    end
   end
 end

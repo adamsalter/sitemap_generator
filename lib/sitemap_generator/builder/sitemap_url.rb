@@ -1,5 +1,7 @@
 require 'builder'
 require 'uri'
+require 'time'
+require 'date'
 
 module SitemapGenerator
   module Builder
@@ -153,10 +155,23 @@ module SitemapGenerator
           date
         elsif date.respond_to?(:iso8601)
           date.iso8601
-        elsif date.is_a?(Date)
+        elsif date.is_a?(Date) && !date.is_a?(DateTime)
           date.strftime("%Y-%m-%d")
         else
-          date.utc.strftime("%Y-%m-%dT%H:%M:%SZ")
+          zulutime = if date.is_a?(DateTime)
+            date.new_offset(0)
+          elsif date.respond_to?(:utc)
+            date.utc
+          else
+            nil
+          end
+          
+          if zulutime
+            zulutime.strftime("%Y-%m-%dT%H:%M:%SZ")
+          else
+            zone = date.strftime('%z').insert(-3, ':')
+            date.strftime("%Y-%m-%dT%H:%M:%S") + zone
+          end
         end
       end
 
@@ -164,7 +179,8 @@ module SitemapGenerator
       # value must be 'yes' or 'no'.  Pass the default value as a boolean using `default`.
       def yes_or_no(value)
         if value.is_a?(String)
-          value =~ /yes|no/ ? value : raise(Exception.new("Unrecognized value for yes/no field: #{value.inspect}"))
+          raise ArgumentError.new("Unrecognized value for yes/no field: #{value.inspect}") unless value =~ /^(yes|no)$/i
+          value.downcase
         else
           value ? 'yes' : 'no'
         end
@@ -173,7 +189,7 @@ module SitemapGenerator
       # If the value is nil, return `default` converted to either 'yes' or 'no'.
       # If the value is set, return its value converted to 'yes' or 'no'.
       def yes_or_no_with_default(value, default)
-        yes_or_no(value.nil? ? default) : value)
+        yes_or_no(value.nil? ? default : value)
       end
     end
   end

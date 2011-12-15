@@ -620,7 +620,7 @@ To add more than one video to a url, pass an array of video hashes using the `:v
 
      A user-defined string that Google may append (if appropriate) to the flashvars parameter to enable autoplay of the video. For example: &lt;embed src="http://www.example.com/videoplayer.swf?video=123" autoplay="ap=1"/>
 
-* `:expiration_date` - Recommended.  Values: Date, DateTime, Time or String.
+* `:expiration_date` - Recommended.  Values: Date, DateTime, Time, ActiveSupport::TimeWithZone or String.
 
   The date after which the video will no longer be available.  Don't supply this information if your video does not expire.  Ruby date and time objects will be formatted for you in the appropriate W3C format.  However, if you are passing a string, follow these guidelines: acceptable values are complete date (YYYY-MM-DD) and complete date plus hours, minutes and seconds, and timezone (YYYY-MM-DDThh:mm:ss+TZD). For example, 2007-07-16T19:20:30+08:00.
 
@@ -636,7 +636,7 @@ To add more than one video to a url, pass an array of video hashes using the `:v
 
   The number of times the video has been viewed.
 
-* `:publication_date` - Optional. Values: Date, DateTime, Time or String.
+* `:publication_date` - Optional. Values: Date, DateTime, Time, ActiveSupport::TimeWithZone or String.
 
   The date the video was first published. Ruby date and time objects will be formatted for you in the appropriate W3C format.  However, if you are passing a string, follow these guidelines: acceptable values are complete date (YYYY-MM-DD) and complete date plus hours, minutes and seconds, and timezone (YYYY-MM-DDThh:mm:ss+TZD). For example, 2007-07-16T19:20:30+08:00.
 
