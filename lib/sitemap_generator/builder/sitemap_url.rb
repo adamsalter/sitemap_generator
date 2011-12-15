@@ -101,18 +101,16 @@ module SitemapGenerator
               if video[:player_loc]
                 builder.video :player_loc, video[:player_loc], :allow_embed => yes_or_no_with_default(video[:allow_embed], true), :autoplay => video[:autoplay]
               end
-
+              builder.video :duration, video[:duration]                 if video[:duration]
+              builder.video :expiration_date,  w3c_date(video[:expiration_date])  if video[:expiration_date]
               builder.video :rating, video[:rating]                     if video[:rating]
               builder.video :view_count, video[:view_count]             if video[:view_count]
               builder.video :publication_date, w3c_date(video[:publication_date]) if video[:publication_date]
-              builder.video :expiration_date,  w3c_date(video[:expiration_date])  if video[:expiration_date]
-              builder.video :family_friendly,  yes_or_no_with_default(video[:family_friendly], true) if video.has_key?(:family_friendly)
-              builder.video :duration, video[:duration]                 if video[:duration]
               video[:tags].each {|tag| builder.video :tag, tag }        if video[:tags]
               builder.video :tag, video[:tag]                           if video[:tag]
               builder.video :category, video[:category]                 if video[:category]
+              builder.video :family_friendly,  yes_or_no_with_default(video[:family_friendly], true) if video.has_key?(:family_friendly)
               builder.video :gallery_loc, video[:gallery_loc], :title => video[:gallery_title] if video[:gallery_loc]
-
               if video[:uploader]
                 builder.video :uploader, video[:uploader], video[:uploader_info] ? { :info => video[:uploader_info] } : {}
               end
@@ -165,7 +163,7 @@ module SitemapGenerator
           else
             nil
           end
-          
+
           if zulutime
             zulutime.strftime("%Y-%m-%dT%H:%M:%SZ")
           else

@@ -16,6 +16,7 @@ describe "SitemapGenerator" do
     category = 'cat1'
     uploader = 'sokrates'
     uploader_info = 'http://sokrates.example.com'
+    expiration_date = publication_date = Time.at(0)
 
     video_xml_fragment = SitemapGenerator::Builder::SitemapUrl.new('cool_video.html', {
       :host => 'http://www.example.com',
@@ -26,12 +27,14 @@ describe "SitemapGenerator" do
         :gallery_loc => gallery_loc,
         :player_loc => player_loc,
         :description => description,
-        :allow_embed => allow_embed,
+        :allow_embed => nil,
         :autoplay => autoplay,
         :tags => tags,
         :category => category,
         :uploader => uploader,
-        :uploader_info => uploader_info
+        :uploader_info => uploader_info,
+        :expiration_date => expiration_date,
+        :publication_date => publication_date
       }
     }).to_xml
 
@@ -49,6 +52,8 @@ describe "SitemapGenerator" do
     video.at_xpath("video:content_loc").text.should == content_loc
     video.xpath("video:tag").size.should == 3
     video.xpath("video:category").size.should == 1
+    video.xpath("video:expiration_date").text.should == expiration_date.iso8601
+    video.xpath("video:publication_date").text.should == publication_date.iso8601
 
     # Google's documentation and published schema don't match some valid elements may
     # not validate.
@@ -57,7 +62,7 @@ describe "SitemapGenerator" do
     player_loc_node = video.at_xpath("video:player_loc")
     player_loc_node.should_not be_nil
     player_loc_node.text.should == player_loc
-    player_loc_node.attribute('allow_embed').text.should == (allow_embed ? 'yes' : 'no')
+    player_loc_node.attribute('allow_embed').text.should == 'yes' # should default to true
     player_loc_node.attribute('autoplay').text.should == autoplay
 
     video.xpath("video:uploader").text.should == uploader
