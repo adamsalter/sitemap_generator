@@ -11,14 +11,18 @@ gem 'rspec-rails', '~>1.3.2', :require => 'spec/rails'
 # Simplify these dependencies
 gem 'git', '1.2.5'
 gem 'jeweler', '=1.4.0'
-gem 'github', '0.4.5'
+gem 'github', '0.4.5' # comment out to test on 1.9; removed in framework_agnostic
 gem 'gemcutter', '0.6.1'
 
 # These seem to be dependencies of jeweler or one of the other gems
 gem 'nokogiri', '1.4.4'
 gem 'sqlite3-ruby', '1.3.1', :require => 'sqlite3'
 
-group :test do
-  gem 'ruby-debug', '~>0.10'
-  gem 'ruby-debug-base', '~>0.10'
-end
+#group :test do
+#  gem 'ruby-debug', '~>0.10'
+#  gem 'ruby-debug-base', '~>0.10'
+#end
+# group :test do
+#  gem 'ruby-debug-base19', '0.11.26'
+#  gem 'ruby-debug19'
+# end
