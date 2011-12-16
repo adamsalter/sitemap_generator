@@ -61,9 +61,9 @@ module SitemapGenerator
         builder = ::Builder::XmlMarkup.new if builder.nil?
         builder.url do
           builder.loc        self[:loc]
-          builder.lastmod    w3c_date(self[:lastmod])   if self[:lastmod]
-          builder.changefreq self[:changefreq]          if self[:changefreq]
-          builder.priority   '%0.1f'%self[:priority]    if self[:priority]
+          builder.lastmod    w3c_date(self[:lastmod])      if self[:lastmod]
+          builder.changefreq self[:changefreq]             if self[:changefreq]
+          builder.priority   format_float(self[:priority]) if self[:priority]
 
           unless self[:news].blank?
             news_data = self[:news]
@@ -103,7 +103,7 @@ module SitemapGenerator
               end
               builder.video :duration, video[:duration]                 if video[:duration]
               builder.video :expiration_date,  w3c_date(video[:expiration_date])  if video[:expiration_date]
-              builder.video :rating, video[:rating]                     if video[:rating]
+              builder.video :rating, format_float(video[:rating])       if video[:rating]
               builder.video :view_count, video[:view_count]             if video[:view_count]
               builder.video :publication_date, w3c_date(video[:publication_date]) if video[:publication_date]
               video[:tags].each {|tag| builder.video :tag, tag }        if video[:tags]
@@ -152,7 +152,7 @@ module SitemapGenerator
         if date.is_a?(String)
           date
         elsif date.respond_to?(:iso8601)
-          date.iso8601
+          date.iso8601.sub(/Z$/i, '+00:00')
         elsif date.is_a?(Date) && !date.is_a?(DateTime)
           date.strftime("%Y-%m-%d")
         else
@@ -165,7 +165,7 @@ module SitemapGenerator
           end
 
           if zulutime
-            zulutime.strftime("%Y-%m-%dT%H:%M:%SZ")
+            zulutime.strftime("%Y-%m-%dT%H:%M:%S+00:00")
           else
             zone = date.strftime('%z').insert(-3, ':')
             date.strftime("%Y-%m-%dT%H:%M:%S") + zone
@@ -188,6 +188,12 @@ module SitemapGenerator
       # If the value is set, return its value converted to 'yes' or 'no'.
       def yes_or_no_with_default(value, default)
         yes_or_no(value.nil? ? default : value)
+      end
+
+      # Format a float to to one decimal precision.
+      # TODO: Use rounding with precision once merged with framework_agnostic.
+      def format_float(value)
+        value.is_a?(String) ? value : ('%0.1f' % value)
       end
     end
   end

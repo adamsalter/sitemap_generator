@@ -1,130 +1,103 @@
 require 'spec_helper'
 
 describe "SitemapGenerator" do
-
-  it "should add the video sitemap element" do
-    loc = 'http://www.example.com/cool_video.html'
-    thumbnail_loc = 'http://www.example.com/video1_thumbnail.png'
-    title = 'Cool Video'
-    content_loc = 'http://www.example.com/cool_video.mpg'
-    player_loc = 'http://www.example.com/cool_video_player.swf'
-    gallery_loc = 'http://www.example.com/cool_video_gallery'
-    allow_embed = true
-    autoplay = 'id=123'
-    description = 'An new perspective in cool video technology'
-    tags = %w{tag1 tag2 tag3}
-    category = 'cat1'
-    uploader = 'sokrates'
-    uploader_info = 'http://sokrates.example.com'
-    expiration_date = publication_date = Time.at(0)
-
-    video_xml_fragment = SitemapGenerator::Builder::SitemapUrl.new('cool_video.html', {
-      :host => 'http://www.example.com',
-      :video => {
-        :thumbnail_loc => thumbnail_loc,
-        :title => title,
-        :content_loc => content_loc,
-        :gallery_loc => gallery_loc,
-        :player_loc => player_loc,
-        :description => description,
-        :allow_embed => nil,
-        :autoplay => autoplay,
-        :tags => tags,
-        :category => category,
-        :uploader => uploader,
-        :uploader_info => uploader_info,
-        :expiration_date => expiration_date,
-        :publication_date => publication_date
-      }
-    }).to_xml
-
-    # Check that the options were parsed correctly
-    doc = Nokogiri::XML.parse("<root xmlns:video='http://www.google.com/schemas/sitemap-video/1.1'>#{video_xml_fragment}</root>")
-    url = doc.at_xpath("//url")
-    url.should_not be_nil
-    url.at_xpath("loc").text.should == loc
-
-    video = url.at_xpath("video:video")
-    video.should_not be_nil
-    video.at_xpath("video:thumbnail_loc").text.should == thumbnail_loc
-    video.at_xpath("video:gallery_loc").text.should == gallery_loc
-    video.at_xpath("video:title").text.should == title
-    video.at_xpath("video:content_loc").text.should == content_loc
-    video.xpath("video:tag").size.should == 3
-    video.xpath("video:category").size.should == 1
-    video.xpath("video:expiration_date").text.should == expiration_date.iso8601
-    video.xpath("video:publication_date").text.should == publication_date.iso8601
-
-    # Google's documentation and published schema don't match some valid elements may
-    # not validate.
-    xml_fragment_should_validate_against_schema(video, 'http://www.google.com/schemas/sitemap-video/1.1', 'sitemap-video')
-
-    player_loc_node = video.at_xpath("video:player_loc")
-    player_loc_node.should_not be_nil
-    player_loc_node.text.should == player_loc
-    player_loc_node.attribute('allow_embed').text.should == 'yes' # should default to true
-    player_loc_node.attribute('autoplay').text.should == autoplay
-
-    video.xpath("video:uploader").text.should == uploader
-    video.xpath("video:uploader").attribute("info").text.should == uploader_info
+  let(:url_options) do
+    {
+      :host => 'http://example.com',
+      :path => 'cool_video.html'
+    }
   end
 
-  it "should support multiple videos" do
-    loc = 'http://www.example.com/cool_video.html'
-    thumbnail_loc = 'http://www.example.com/video1_thumbnail.png'
-    title = 'Cool Video'
-    content_loc = 'http://www.example.com/cool_video.mpg'
-    player_loc = 'http://www.example.com/cool_video_player.swf'
-    gallery_loc = 'http://www.example.com/cool_video_gallery'
-    allow_embed = true
-    autoplay = 'id=123'
-    description = 'An new perspective in cool video technology'
-    tags = %w{tag1 tag2 tag3}
-    category = 'cat1'
-    uploader = 'sokrates'
-    uploader_info = 'http://sokrates.example.com'
+  let(:video_options) do
+    {
+      :thumbnail_loc => 'http://example.com/video1_thumbnail.png',
+      :title => 'Cool Video',
+      :content_loc => 'http://example.com/cool_video.mpg',
+      :player_loc => 'http://example.com/cool_video_player.swf',
+      :gallery_loc => 'http://example.com/cool_video_gallery',
+      :gallery_title => 'Gallery Title',
+      :allow_embed => true,
+      :autoplay => 'id=123',
+      :description => 'An new perspective in cool video technology',
+      :tags => %w(tag1 tag2 tag3),
+      :category => 'cat1',
+      :uploader => 'sokrates',
+      :uploader_info => 'http://sokrates.example.com',
+      :expiration_date => Time.at(0),
+      :publication_date => Time.at(0),
+      :family_friendly => true,
+      :view_count => 123,
+      :duration => 456,
+      :rating => 0.499999999
+    }
+  end
 
-    video_xml_fragment = SitemapGenerator::Builder::SitemapUrl.new('cool_video.html', {
-      :host => 'http://www.example.com',
-      :videos => [{
-        :thumbnail_loc => thumbnail_loc,
-        :title => title,
-        :content_loc => content_loc,
-        :gallery_loc => gallery_loc,
-        :player_loc => player_loc,
-        :description => description,
-        :allow_embed => allow_embed,
-        :autoplay => autoplay,
-        :tags => tags,
-        :category => category,
-        :uploader => uploader,
-        :uploader_info => uploader_info
-      },
-      {
-        :thumbnail_loc => thumbnail_loc,
-        :title => title,
-        :content_loc => content_loc,
-        :gallery_loc => gallery_loc,
-        :player_loc => player_loc,
-        :description => description,
-        :allow_embed => allow_embed,
-        :autoplay => autoplay,
-        :tags => tags,
-        :category => category,
-        :uploader => uploader,
-        :uploader_info => uploader_info
-      }]
+  # Return XML for the <URL> element.
+  def video_xml(video_options)
+    SitemapGenerator::Builder::SitemapUrl.new(url_options[:path], {
+      :host => url_options[:host],
+      :video => video_options
     }).to_xml
+  end
 
-    # Check that the options were parsed correctly
-    doc = Nokogiri::XML.parse("<root xmlns:video='http://www.google.com/schemas/sitemap-video/1.1'>#{video_xml_fragment}</root>")
-    url = doc.at_xpath("//url")
-    url.should_not be_nil
-    url.at_xpath("loc").text.should == loc
+  # Return a Nokogiri document from the XML.  The root of the document is the <URL> element.
+  def video_doc(xml)
+    Nokogiri::XML.parse("<root xmlns:video='http://www.google.com/schemas/sitemap-video/1.1'>#{xml}</root>")
+  end
 
-    doc.xpath('//video:video').count.should == 2
-    doc.xpath('//video:video').each do |video|
-      xml_fragment_should_validate_against_schema(video, 'http://www.google.com/schemas/sitemap-video/1.1', 'sitemap-video')
+  # Validate the contents of the video element
+  def validate_video_element(video_doc, video_options)
+    video_doc.at_xpath('video:thumbnail_loc').text.should == video_options[:thumbnail_loc]
+    video_doc.at_xpath("video:thumbnail_loc").text.should == video_options[:thumbnail_loc]
+    video_doc.at_xpath("video:gallery_loc").text.should   == video_options[:gallery_loc]
+    video_doc.at_xpath("video:gallery_loc").attribute('title').text.should == video_options[:gallery_title]
+    video_doc.at_xpath("video:title").text.should         == video_options[:title]
+    video_doc.at_xpath("video:view_count").text.should    == video_options[:view_count].to_s
+    video_doc.at_xpath("video:duration").text.should      == video_options[:duration].to_s
+    video_doc.at_xpath("video:rating").text.should        == ('%0.1f' % video_options[:rating])
+    video_doc.at_xpath("video:content_loc").text.should   == video_options[:content_loc]
+    video_doc.at_xpath("video:category").text.should      == video_options[:category]
+    video_doc.xpath("video:tag").collect(&:text).should   == video_options[:tags]
+    video_doc.at_xpath("video:expiration_date").text.should  == video_options[:expiration_date].iso8601
+    video_doc.at_xpath("video:publication_date").text.should == video_options[:publication_date].iso8601
+    video_doc.at_xpath("video:player_loc").text.should    == video_options[:player_loc]
+    video_doc.at_xpath("video:player_loc").attribute('allow_embed').text.should == (video_options[:allow_embed] ? 'yes' : 'no')
+    video_doc.at_xpath("video:player_loc").attribute('autoplay').text.should    == video_options[:autoplay]
+    video_doc.at_xpath("video:uploader").text.should      == video_options[:uploader]
+    video_doc.at_xpath("video:uploader").attribute("info").text.should == video_options[:uploader_info]
+    xml_fragment_should_validate_against_schema(video_doc, 'http://www.google.com/schemas/sitemap-video/1.1', 'sitemap-video')
+  end
+
+  it "should add a valid video sitemap element" do
+    xml = video_xml(video_options)
+    doc = video_doc(xml)
+    doc.at_xpath("//url/loc").text.should == File.join(url_options[:host], url_options[:path])
+    validate_video_element(doc.at_xpath('//url/video:video'), video_options)
+  end
+
+  it "should support multiple video elements" do
+    xml = video_xml([video_options, video_options])
+    doc = video_doc(xml)
+    doc.at_xpath("//url/loc").text.should == File.join(url_options[:host], url_options[:path])
+    doc.xpath('//url/video:video').count.should == 2
+    doc.xpath('//url/video:video').each do |video|
+      validate_video_element(video, video_options)
+    end
+  end
+
+  it "should default allow_embed to 'yes'" do
+    xml = video_xml(video_options.merge(:allow_embed => nil))
+    doc = video_doc(xml)
+    doc.at_xpath("//url/video:video/video:player_loc").attribute('allow_embed').text.should == 'yes'
+  end
+
+  it "should not include optional elements if they are not passed" do
+    optional = [:player_loc, :content_loc, :category, :tags, :tag, :uploader, :gallery_loc, :family_friendly, :publication_date, :expiration_date, :view_count, :rating, :duration]
+    required_options = video_options.delete_if { |k,v| optional.include?(k) }
+    xml = video_xml(required_options)
+    doc = video_doc(xml)
+    optional.each do |element|
+      doc.at_xpath("//url/video:video/video:#{element}").should be_nil
     end
   end
 end

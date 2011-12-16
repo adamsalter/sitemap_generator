@@ -77,8 +77,8 @@ describe SitemapGenerator::Builder::SitemapUrl do
     it "should convert dates and times to W3C format" do
       url = new_url
       url.send(:w3c_date, Date.new(0)).should == '0000-01-01'
-      url.send(:w3c_date, Time.at(0).utc).should == '1970-01-01T00:00:00Z'
-      url.send(:w3c_date, DateTime.new(0)).should == '0000-01-01T00:00:00Z'
+      url.send(:w3c_date, Time.at(0).utc).should == '1970-01-01T00:00:00+00:00'
+      url.send(:w3c_date, DateTime.new(0)).should == '0000-01-01T00:00:00+00:00'
     end
 
     it "should return strings unmodified" do
@@ -88,7 +88,7 @@ describe SitemapGenerator::Builder::SitemapUrl do
     it "should try to convert to utc" do
       time = Time.at(0)
       time.expects(:respond_to?).times(2).returns(false, true) # iso8601, utc
-      new_url.send(:w3c_date, time).should == '1970-01-01T00:00:00Z'
+      new_url.send(:w3c_date, time).should == '1970-01-01T00:00:00+00:00'
     end
 
     it "should include timezone for objects which do not respond to iso8601 or utc" do
@@ -135,6 +135,18 @@ describe SitemapGenerator::Builder::SitemapUrl do
       url = new_url
       url.expects(:yes_or_no).with('surely').returns('absolutely')
       url.send(:yes_or_no_with_default, 'surely', true).should == 'absolutely'
+    end
+  end
+
+  describe "format_float" do
+    it "should not modify if a string" do
+      new_url.send(:format_float, '0.4').should == '0.4'
+    end
+
+    it "should round to one decimal place" do
+      url = new_url
+      url.send(:format_float, 0.499999).should == '0.5'
+      url.send(:format_float, 3.444444).should == '3.4'
     end
   end
 end
