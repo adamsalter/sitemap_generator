@@ -26,6 +26,7 @@ Does your website use SitemapGenerator to generate Sitemaps?  Where would you be
 Changelog
 -------
 
+- v2.1.8: Extend and improve Video Sitemap support.  Include sitemap docs in the README, support all element attributes, properly format values.
 - v2.1.7: Improve format of float priorities; Remove Yahoo from ping - the Yahoo
           service has been shut down.
 - v2.1.6: Fix the lastmod value on sitemap file links
