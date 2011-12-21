@@ -82,13 +82,16 @@ module SitemapGenerator
     #
     # * <tt>:sitemaps_namer</tt> - A +SitemapNamer+ instance for generating the sitemap names.
     #
-    # * <tt>include_index</tt> - Boolean.  Whether to <b>add a link to the sitemap index<b>
+    # * <tt>:include_index</tt> - Boolean.  Whether to <b>add a link to the sitemap index<b>
     #   to the current sitemap.  This points search engines to your Sitemap Index to
     #   include it in the indexing of your site.  Default is `true`.  Turned off when
     #  `sitemaps_host` is set or within a `group()` block.
     #
-    # * <tt>include_root</tt> - Boolean.  Whether to **add the root** url i.e. '/' to the
+    # * <tt>:include_root</tt> - Boolean.  Whether to **add the root** url i.e. '/' to the
     #   current sitemap.  Default is `true`.  Turned off within a `group()` block.
+    #
+    # * <tt>:search_engines</tt> - Hash.  A hash of search engine names mapped to
+    #   ping URLs.  See ping_search_engines.
     #
     # * <tt>:verbose</tt> - If +true+, output a summary line for each sitemap and sitemap
     #   index that is created.  Default is +false+.
@@ -97,7 +100,13 @@ module SitemapGenerator
         :include_root => true,
         :include_index => true,
         :filename => :sitemap,
-        :verbose => false
+        :verbose => false,
+        :search_engines => {
+          :google         => "http://www.google.com/webmasters/sitemaps/ping?sitemap=%s",
+          :ask            => "http://submissions.ask.com/ping?sitemap=%s",
+          :bing           => "http://www.bing.com/webmaster/ping.aspx?siteMap=%s",
+          :sitemap_writer => "http://www.sitemapwriter.com/notify.php?crawler=all&url=%s"
+        }
       })
       options.each_pair { |k, v| instance_variable_set("@#{k}".to_sym, v) }
 
@@ -182,23 +191,51 @@ module SitemapGenerator
       @group
     end
 
-    # Ping search engines.
+    # Ping search engines to notify them of updated sitemaps.
     #
-    # @see http://en.wikipedia.org/wiki/Sitemap_index
-    def ping_search_engines
+    # Search engines are already notified for you if you run `rake sitemap:refresh`.
+    # If you want to ping search engines separately to your sitemap generation, run
+    # `rake sitemap:refresh:no_ping` and then run a rake task or script
+    # which calls this method as in the example below.
+    #
+    # == Arguments
+    # * sitemap_index_url - The full URL to your sitemap index file.
+    #   If not provided the location is based on the `host` you have
+    #   set and any other options like your `sitemaps_path`.  The URL
+    #   will be CGI escaped for you when included as part of the
+    #   search engine ping URL.
+    #
+    # == Options
+    # A hash of one or more search engines to ping in addition to the
+    # default search engines.  The key is the name of the search engine
+    # as a string or symbol and the value is the full URL to ping with
+    # a string interpolation that will be replaced by the CGI escaped sitemap
+    # index URL.  If you have any literal percent characters in your URL you
+    # need to escape them with `%%`.  For example if your sitemap index URL
+    # is `http://example.com/sitemap_index.xml.gz` and your
+    # ping url is `http://example.com/100%%/ping?url=%s`
+    # then the final URL that is pinged will be `http://example.com/100%/ping?url=http%3A%2F%2Fexample.com%2Fsitemap_index.xml.gz`
+    #
+    # == Examples
+    #
+    # Both of these examples will ping the default search engines in addition to `http://superengine.com/ping?url=http%3A%2F%2Fexample.com%2Fsitemap_index.xml.gz`
+    #
+    #   SitemapGenerator::Sitemap.host('http://example.com/')
+    #   SitemapGenerator::Sitemap.ping_search_engines(:super_engine => 'http://superengine.com/ping?url=%s')
+    #
+    # Is equivalent to:
+    #
+    #   SitemapGenerator::Sitemap.ping_search_engines('http://example.com/sitemap_index.xml.gz', :super_engine => 'http://superengine.com/ping?url=%s')
+    def ping_search_engines(*args)
+      engines = args.last.is_a?(Hash) ? args.pop : {}
+      index_url = CGI.escape(args.shift || sitemap_index_url)
+
       require 'open-uri'
       require 'timeout'
 
-      sitemap_index_url = CGI.escape(sitemap_index.location.url)
-      search_engines = {
-        :google         => "http://www.google.com/webmasters/sitemaps/ping?sitemap=#{sitemap_index_url}",
-        :ask            => "http://submissions.ask.com/ping?sitemap=#{sitemap_index_url}",
-        :bing           => "http://www.bing.com/webmaster/ping.aspx?siteMap=#{sitemap_index_url}",
-        :sitemap_writer => "http://www.sitemapwriter.com/notify.php?crawler=all&url=#{sitemap_index_url}"
-      }
-
       puts "\n" if verbose
-      search_engines.each do |engine, link|
+      search_engines.merge(engines).each do |engine, link|
+        link = link % index_url
         begin
           Timeout::timeout(10) {
             open(link)
@@ -221,14 +258,19 @@ module SitemapGenerator
       @sitemaps_host || @default_host
     end
 
-    # Lazy-initialize a sitemap instance when it's accessed
+    # Lazy-initialize a sitemap instance and return it.
     def sitemap
       @sitemap ||= SitemapGenerator::Builder::SitemapFile.new(sitemap_location)
     end
 
-    # Lazy-initialize a sitemap index instance when it's accessed
+    # Lazy-initialize a sitemap index instance and return it.
     def sitemap_index
       @sitemap_index ||= SitemapGenerator::Builder::SitemapIndexFile.new(sitemap_index_location)
+    end
+
+    # Return the full url to the sitemap index file.
+    def sitemap_index_url
+      sitemap_index.location.url
     end
 
     def finalize!
@@ -412,6 +454,20 @@ module SitemapGenerator
         @filename = value
         self.sitemaps_namer = SitemapGenerator::SitemapNamer.new(@filename)
         self.sitemap_index_namer = SitemapGenerator::SitemapIndexNamer.new("#{@filename}_index")
+      end
+
+      # Set the search engines hash to a new hash of search engine names mapped to
+      # ping URLs (see ping_search_engines).  If the value is nil it is converted
+      # to an empty hash.
+      # === Example
+      # <tt>search_engines = { :google => "http://www.google.com/webmasters/sitemaps/ping?sitemap=%s" }</tt>
+      def search_engines=(value)
+        @search_engines = value || {}
+      end
+
+      # Return the hash of search engines.
+      def search_engines
+        @search_engines || {}
       end
 
       # Set the namer to use when generating SitemapFiles (does not apply to the

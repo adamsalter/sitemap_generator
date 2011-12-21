@@ -7,8 +7,8 @@ describe SitemapGenerator::LinkSet do
   end
 
   describe "initializer options" do
-    options = [:public_path, :sitemaps_path, :default_host, :filename]
-    values = [File.expand_path(SitemapGenerator.app.root + 'tmp/'), 'mobile/', 'http://myhost.com', :xxx]
+    options = [:public_path, :sitemaps_path, :default_host, :filename, :search_engines]
+    values = [File.expand_path(SitemapGenerator.app.root + 'tmp/'), 'mobile/', 'http://myhost.com', :xxx, { :abc => '123' }]
 
     options.zip(values).each do |option, value|
       it "should set #{option} to #{value}" do
@@ -91,6 +91,35 @@ describe SitemapGenerator::LinkSet do
     end
   end
 
+  describe "sitemap_index_url" do
+    it "should return the url to the index file" do
+      @ls.default_host = @default_host
+      @ls.sitemap_index.location.url.should == "#{@default_host}/sitemap_index.xml.gz"
+      @ls.sitemap_index_url.should == @ls.sitemap_index.location.url
+    end
+  end
+
+  describe "search_engines" do
+    it "should have search engines by default" do
+      @ls.search_engines.should be_a(Hash)
+      @ls.search_engines.size.should == 4
+    end
+
+    it "should support being modified" do
+      @ls.search_engines[:newengine] = 'abc'
+      @ls.search_engines.size.should == 5
+    end
+
+    it "should support being set to nil" do
+      ls = SitemapGenerator::LinkSet.new(:default_host => 'http://one.com', :search_engines => nil)
+      ls.search_engines.should be_a(Hash)
+      ls.search_engines.should be_empty
+      ls.search_engines = nil
+      ls.search_engines.should be_a(Hash)
+      ls.search_engines.should be_empty
+    end
+  end
+
   describe "ping search engines" do
     before do
       @ls = SitemapGenerator::LinkSet.new :default_host => 'http://one.com'
@@ -99,6 +128,35 @@ describe SitemapGenerator::LinkSet do
     it "should not fail" do
       @ls.expects(:open).at_least_once
       lambda { @ls.ping_search_engines }.should_not raise_error
+    end
+
+    it "should raise if no host is set" do
+      lambda { SitemapGenerator::LinkSet.new.ping_search_engines }.should raise_error(SitemapGenerator::SitemapError, 'No value set for host')
+    end
+
+    it "should use the sitemap index url provided" do
+      index_url = 'http://example.com/index.xml'
+      ls = SitemapGenerator::LinkSet.new(:search_engines => { :google => 'http://google.com/?url=%s' })
+      ls.expects(:open).with("http://google.com/?url=#{CGI.escape(index_url)}")
+      ls.ping_search_engines(index_url)
+    end
+
+    it "should use the sitemap index url from the link set" do
+      ls = SitemapGenerator::LinkSet.new(
+        :default_host => 'http://one.com',
+        :search_engines => { :google => 'http://google.com/?url=%s' })
+      index_url = ls.sitemap_index_url
+      ls.expects(:open).with("http://google.com/?url=#{CGI.escape(index_url)}")
+      ls.ping_search_engines(index_url)
+    end
+
+    it "should include the given search engines" do
+      @ls.search_engines = nil
+      @ls.expects(:open).with(regexp_matches(/^http:\/\/newnegine\.com\?/))
+      @ls.ping_search_engines(:newengine => 'http://newnegine.com?%s')
+
+      @ls.expects(:open).with(regexp_matches(/^http:\/\/newnegine\.com\?/)).twice
+      @ls.ping_search_engines(:newengine => 'http://newnegine.com?%s', :anotherengine => 'http://newnegine.com?%s')
     end
   end
 
