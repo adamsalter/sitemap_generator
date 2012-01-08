@@ -57,41 +57,29 @@ Those who knew him know what an amazing guy he was, and what an excellent Rails 
 
 The canonical repository is now: [http://github.com/kjvarga/sitemap_generator][canonical_repo]
 
-Install for Rails
+Install
 =======
 
-Rails 3
--------
+Rails
+-----
 
-Add the gem to your `Gemspec`:
+Add the gem to your `Gemfile`:
 
     gem 'sitemap_generator'
 
-Then run `bundle`.
+Alternatively, if you are not using a `Gemfile` add the gem to your `config/environment.rb` file config block:
 
-Rails 2 Gem
---------
+    config.gem 'sitemap_generator'
 
-1.  Follow the Rails 3 install if you are using a `Gemfile`.
+**Rails 1 or 2 only**, add the following code to your `Rakefile` to include the gem's Rake tasks in your project (Rails 3 does this for you automatically, so this step is not necessary):
 
-    If you are not using a `Gemfile` add the gem to your `config/environment.rb` configuration block with:
+    begin
+      require 'sitemap_generator/tasks'
+    rescue Exception => e
+      puts "Warning, couldn't load gem tasks: #{e.message}! Skipping..."
+    end
 
-        config.gem 'sitemap_generator'
-
-    Then run `rake gems:install`.
-
-2. Include the gem's Rake tasks in your `Rakefile`:
-
-        begin
-          require 'sitemap_generator/tasks'
-        rescue Exception => e
-          puts "Warning, couldn't load gem tasks: #{e.message}! Skipping..."
-        end
-
-Rails 2 Plugin
-----------
-
-Run `script/plugin install git://github.com/kjvarga/sitemap_generator.git` from your application's root directory.
+<i>If you would prefer to install as a plugin (deprecated) don't do any of the above.  Simply run `script/plugin install git://github.com/kjvarga/sitemap_generator.git` from your application root directory.</i>
 
 Getting Started
 ======
@@ -107,10 +95,31 @@ Run `rake sitemap:refresh` as needed to create or rebuild your sitemap files.  S
 
 **To disable all non-essential output from `rake` run the tasks passing a `-s` option.**  For example: `rake -s sitemap:refresh`.
 
-Search Engine Notification
+Pinging Search Engines
 -----
 
 Using `rake sitemap:refresh` will notify major search engines to let them know that a new sitemap is available (Google, Bing, Ask, SitemapWriter).  To generate new sitemaps without notifying search engines (for example when running in a local environment) use `rake sitemap:refresh:no_ping`.
+
+If you want to customize the hash of search engines you can access it at:
+
+    SitemapGenerator::Sitemap.search_engines
+
+Usually you would be adding a new search engine to ping.  In this case you can modify the `search_engines` hash directly.  This ensures that when `SitemapGenerator::Sitemap.ping_search_engines` is called your new search engine will be included.
+
+If you are calling `ping_search_engines` manually (for example if you have to wait some time or perform a custom action after your sitemaps have been regenerated) then you can pass you new search engine directly in the call as in the following example:
+
+    SitemapGenerator::Sitemap.ping_search_engines(:newengine => 'http://newengine.com/ping?url=%s')
+
+The key gives the name of the search engine as a string or symbol and the value is the full URL to ping with a string interpolation that will be replaced by the CGI escaped sitemap index URL.  If you have any literal percent characters in your URL you need to escape them with `%%`.
+
+If you are calling `SitemapGenerator::Sitemap.ping_search_engines` from outside of your sitemap config file then you will need to set `SitemapGenerator::Sitemap.default_host` and any other options that you set in your sitemap config which affect the location of the sitemap index file.  For example:
+
+    SitemapGenerator::Sitemap.default_host = 'http://example.com'
+    SitemapGenerator::Sitemap.ping_search_engines
+
+Alternatively you can pass in the full URL to your sitemap index in which case we would have just the following:
+
+    SitemapGenerator::Sitemap.ping_search_engines('http://example.com/sitemap_index.xml.gz')
 
 Crontab
 -----
