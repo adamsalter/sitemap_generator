@@ -26,6 +26,8 @@ Does your website use SitemapGenerator to generate Sitemaps?  Where would you be
 Changelog
 -------
 
+- v2.2.0: Support adding new search engines to ping and modifying the default search engines.
+          Allow the URL of the sitemap index to be passed as an argument to `ping_search_engines`.  See **Pinging Search Engines**.
 - v2.1.8: Extend and improve Video Sitemap support.  Include sitemap docs in the README, support all element attributes, properly format values.
 - v2.1.7: Improve format of float priorities; Remove Yahoo from ping - the Yahoo
           service has been shut down.
