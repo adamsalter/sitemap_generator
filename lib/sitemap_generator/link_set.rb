@@ -107,7 +107,7 @@ module SitemapGenerator
           :bing           => "http://www.bing.com/webmaster/ping.aspx?siteMap=%s",
           :sitemap_writer => "http://www.sitemapwriter.com/notify.php?crawler=all&url=%s"
         }
-      })
+      )
       options.each_pair { |k, v| instance_variable_set("@#{k}".to_sym, v) }
 
       # If an index is passed in, protect it from modification.
