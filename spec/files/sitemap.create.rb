@@ -4,8 +4,8 @@ SitemapGenerator::Sitemap.create do
   add '/contents', :priority => 0.7, :changefreq => 'daily'
 
   # add all individual articles
-  Content.find(:all).each do |c|
-    add "/content/#{c.to_param}", :lastmod => c.updated_at
+  (1..10).each do |i|
+    add "/content/#{i}"
   end
 
   add "/merchant_path", :host => "https://www.example.com"
