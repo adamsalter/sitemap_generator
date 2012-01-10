@@ -227,11 +227,12 @@ module SitemapGenerator
     #
     #   SitemapGenerator::Sitemap.ping_search_engines('http://example.com/sitemap_index.xml.gz', :super_engine => 'http://superengine.com/ping?url=%s')
     def ping_search_engines(*args)
-      engines = args.last.is_a?(Hash) ? args.pop : {}
-      index_url = CGI.escape(args.shift || sitemap_index_url)
-
+      require 'cgi/session'
       require 'open-uri'
       require 'timeout'
+
+      engines = args.last.is_a?(Hash) ? args.pop : {}
+      index_url = CGI.escape(args.shift || sitemap_index_url)
 
       puts "\n" if verbose
       search_engines.merge(engines).each do |engine, link|
