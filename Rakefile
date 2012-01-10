@@ -1,131 +1,43 @@
-require "rubygems"
-require "bundler/setup"
-require 'rake'
-require 'spec/rake/spectask'
-require 'sitemap_generator/tasks'
+require 'bundler/setup'
+Bundler.require
 
-begin
-  require 'jeweler'
-  Jeweler::Tasks.new do |gem|
-    gem.name = "sitemap_generator"
-    gem.summary = %Q{Easily generate enterprise class Sitemaps for your Rails site using a familiar Rails Routes-like DSL}
-    gem.description = %Q{SitemapGenerator is a Rails gem that makes it easy to generate enterprise-class Sitemaps readable by all search engines.  Generated Sitemaps adhere to the Sitemap protocol specification.  When you generate new Sitemaps, SitemapGenerator can automatically ping the major search engines (including Google, Yahoo and Bing) to notify them.  SitemapGenerator includes rake tasks to easily manage your sitemaps.}
-    gem.email = "kjvarga@gmail.com"
-    gem.homepage = "http://github.com/kjvarga/sitemap_generator"
-    gem.authors = ["Karl Varga", "Adam Salter"]
-    gem.files =  FileList["[A-Z]*", "{bin,lib,rails,templates,tasks}/**/*"]
-    gem.test_files = []
-    gem.add_development_dependency "rspec"
-    gem.add_development_dependency "nokogiri"
-    gem.add_development_dependency "sqlite3-ruby"
-    gem.add_development_dependency "jeweler"
-    gem.add_development_dependency "github"
-    gem.add_development_dependency "git"
-  end
-  Jeweler::GemcutterTasks.new
-rescue LoadError
-  puts "Jeweler (or a dependency) not available. Install it with: gem install jeweler"
+desc 'Default: run spec tests.'
+task :default => :spec
+
+require "rspec/core/rake_task"
+RSpec::Core::RakeTask.new(:spec) do |spec|
+  spec.pattern = Dir.glob(['spec/sitemap_generator/**/*'])
+  spec.rspec_opts = ['--backtrace']
 end
 
 #
-# Helper methods
+# Helpers
 #
-module Helpers
-  extend self
 
-  # Return a full local path to path fragment <tt>path</tt>
-  def local_path(path)
-    File.join(File.dirname(__FILE__), path)
-  end
-
-  # Copy all of the local files into <tt>path</tt> after completely cleaning it
-  def prepare_path(path)
-    rm_rf path
-    mkdir_p path
-    cp_r(FileList["[A-Z]*", "{bin,lib,rails,templates,tasks}"], path)
-  end
-end
+def name;         @name ||= Dir['*.gemspec'].first.split('.').first end
+def version;      File.read('VERSION').chomp end
+def gemspec_file; "#{name}.gemspec" end
+def gem_file;     "#{name}-#{version}.gem" end
 
 #
-# Tasks
+# Release Tasks
+# @see https://github.com/mojombo/rakegem
 #
-task :default => :test
 
-desc "Run specs"
-namespace :test do
-  #desc "Test as a gem, plugin and Rails 3 gem"
-  #task :all => ['test:gem', 'test:plugin']
-
-  desc "Run specs on a gem install"
-  task :gem => ['test:prepare:gem', 'multi_spec']
-  desc "Run specs on a plugin install"
-  task :plugin => ['test:prepare:plugin', 'multi_spec']
-  desc "Run specs on a rails3 install"
-  task :rails3 => ['test:prepare:rails3', 'multi_spec']
-
-  task :multi_spec do
-    Rake::Task['spec'].invoke
-    Rake::Task['spec'].reenable
+desc "Create tag v#{version}, build the gem and push to Git"
+task :release => :build do
+  unless `git branch` =~ /^\* master$/
+    puts "You must be on the master branch to release!"
+    exit!
   end
-
-  namespace :prepare do
-    desc "Prepare the gem install for testing"
-    task :gem do
-      ENV["SITEMAP_RAILS"] = 'gem'
-      rm_rf(Helpers.local_path('spec/mock_app_gem/public/sitemap*'))
-    end
-
-    desc "Prepare the plugin install for testing"
-    task :plugin do
-      ENV["SITEMAP_RAILS"] = 'plugin'
-      Helpers.prepare_path(Helpers.local_path('spec/mock_app_plugin/vendor/plugins/sitemap_generator-1.2.3'))
-      rm_rf(Helpers.local_path('spec/mock_app_plugin/public/sitemap*'))
-    end
-
-    desc "Prepare the rails3 install for testing"
-    task :rails3 do
-      ENV["SITEMAP_RAILS"] = 'rails3'
-      rm_rf(Helpers.local_path('spec/mock_rails3_gem/public/sitemap*'))
-    end
-  end
+  sh "git tag v#{version}"
+  sh "git push origin master --tags"
 end
 
-desc "Run tests as a gem install"
-task :test => ['test:gem']
-
-Spec::Rake::SpecTask.new(:spec) do |spec|
-  spec.libs << 'lib' << 'spec'
-  spec.spec_files = FileList['spec/sitemap_generator/**/*_spec.rb']
-end
-
-Spec::Rake::SpecTask.new(:rcov) do |spec|
-  spec.libs << 'lib' << 'spec'
-  spec.pattern = 'spec/**/*_spec.rb'
-  spec.rcov = true
-end
-
-# require 'rdoc'
-# desc 'Generate documentation'
-# RDoc::Task.new(:rdoc) do |rdoc|
-#   rdoc.rdoc_dir = 'rdoc'
-#   rdoc.title    = 'SitemapGenerator'
-#   rdoc.options << '--line-numbers' << '--inline-source'
-#   rdoc.rdoc_files.include('README.md')
-#   rdoc.rdoc_files.include('lib/**/*.rb')
-# end
-
-namespace :release do
-
-  desc "Release a new patch version"
-  task :patch do
-    Rake::Task['version:bump:patch'].invoke
-    Rake::Task['release:current'].invoke
-  end
-
-  desc "Release the current version (e.g. after a version bump).  This rebuilds the gemspec, pushes the updated code, tags it and releases to RubyGems"
-  task :current do
-    Rake::Task['github:release'].invoke
-    Rake::Task['git:release'].invoke
-    Rake::Task['gemcutter:release'].invoke
-  end
+desc "Build #{gem_file} into the pkg/ directory"
+task :build do
+  sh "mkdir -p pkg"
+  sh "gem build #{gemspec_file}"
+  sh "mv #{gem_file} pkg"
+  sh "bundle --local"
 end
