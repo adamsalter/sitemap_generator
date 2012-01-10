@@ -9,7 +9,9 @@ describe SitemapGenerator::Interpreter do
   end
 
   it "should find the config file if Rails.root doesn't end in a slash" do
-    Rails = stub(:root => SitemapGenerator.app.root.to_s.sub(/\/$/, ''))
+    SitemapGenerator::Utilities.with_warnings(nil) do
+      Rails = stub(:root => SitemapGenerator.app.root.to_s.sub(/\/$/, ''))
+    end
     # Rails.expects(:root).returns(rails_root).at_least_once
     lambda { SitemapGenerator::Interpreter.run }.should_not raise_exception(Errno::ENOENT)
   end
