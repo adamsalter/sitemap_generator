@@ -12,6 +12,8 @@ describe SitemapGenerator::Utilities do
       utils.round(1.4, 3)  .should == 1.4
       utils.round(1.45, 1) .should == 1.5
       utils.round(1.445, 2).should == 1.45
+      # Demonstrates a bug in the round method
+      # utils.round(9.995, 2).should == 10 
     end
 
     it "should round for negative number" do
