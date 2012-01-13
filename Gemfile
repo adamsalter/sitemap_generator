@@ -1,27 +1,14 @@
 source 'http://rubygems.org'
 
-gem 'sitemap_generator', :path => './'
-
-# Rails
-# gem 'rails', '2.3.8'
-# gem 'rspec-rails', '~>1.3.2', :require => 'spec/rails'
-
 gem 'builder'
-gem 'rake' #, '>= 0.8.7'
-
-# Simplify these dependencies
-# gem 'git', '1.2.5'
-# gem 'jeweler', '=1.4.0'
-# gem 'github', '0.4.5' # comment out to test on 1.9; removed in framework_agnostic
-# gem 'gemcutter', '0.6.1'
-
-# These seem to be dependencies of jeweler or one of the other gems
-gem 'nokogiri' #, '1.4.4'
+gem 'nokogiri'
+gem 'rake'
+gem 'sitemap_generator', :path => './'
 gem 'sqlite3-ruby', :require => 'sqlite3'
 
 group :development, :test do
-  gem 'mocha' #, '0.9.10'
+  gem 'mocha'
   gem 'rcov'
-  gem 'rspec' #, '1.3.1', :require => 'spec'
+  gem 'rspec'
   gem 'ruby-debug19', :require => 'ruby-debug'
 end
