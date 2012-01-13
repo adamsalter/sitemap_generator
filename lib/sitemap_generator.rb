@@ -49,7 +49,7 @@ module SitemapGenerator
     !!@yeild_sitemap
   end
 
-  self.root      = File.expand_path(File.join(File.dirname(__FILE__), '../'))
+  self.root      = File.expand_path(File.join(File.dirname(__FILE__), '../'))  # Root of the install dir, not the Rails app
   self.templates = SitemapGenerator::Templates.new(self.root)
   self.app       = SitemapGenerator::Application.new
 end
