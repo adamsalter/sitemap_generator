@@ -36,7 +36,7 @@ module SitemapGenerator
       interpreter.eval(:yield_sitemap => @yield_sitemap || SitemapGenerator.yield_sitemap?, &block)
       finalize!
       end_time = Time.now if @verbose
-      output(sitemap_index.stats_summary(:time_taken => end_time - start_time))
+      output(sitemap_index.stats_summary(:time_taken => end_time - start_time)) if @verbose
       self
     end
 
