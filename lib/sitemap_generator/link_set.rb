@@ -36,7 +36,7 @@ module SitemapGenerator
       interpreter.eval(:yield_sitemap => @yield_sitemap || SitemapGenerator.yield_sitemap?, &block)
       finalize!
       end_time = Time.now if @verbose
-      puts sitemap_index.stats_summary(:time_taken => end_time - start_time) if @verbose
+      output(sitemap_index.stats_summary(:time_taken => end_time - start_time))
       self
     end
 
@@ -234,16 +234,16 @@ module SitemapGenerator
       engines = args.last.is_a?(Hash) ? args.pop : {}
       index_url = CGI.escape(args.shift || sitemap_index_url)
 
-      puts "\n" if verbose
+      output("\n")
       search_engines.merge(engines).each do |engine, link|
         link = link % index_url
         begin
           Timeout::timeout(10) {
             open(link)
           }
-          puts "Successful ping of #{engine.to_s.titleize}" if verbose
+          output("Successful ping of #{engine.to_s.titleize}")
         rescue Timeout::Error, StandardError => e
-          puts "Ping failed for #{engine.to_s.titleize}: #{e.inspect} (URL #{link})" if verbose
+          output("Ping failed for #{engine.to_s.titleize}: #{e.inspect} (URL #{link})")
         end
       end
     end
@@ -372,7 +372,7 @@ module SitemapGenerator
       add_default_links if !@added_default_links && !@created_group
       return if sitemap.finalized? || sitemap.empty? && @created_group
       sitemap_index.add(sitemap)
-      puts sitemap.summary if verbose
+      output(sitemap.summary)
     end
 
     # Finalize a sitemap index and output a summary line.  Do nothing if it has already
@@ -380,7 +380,7 @@ module SitemapGenerator
     def finalize_sitemap_index!
       return if @protect_index || sitemap_index.finalized?
       sitemap_index.finalize!
-      puts sitemap_index.summary if verbose
+      output(sitemap_index.summary)
     end
 
     # Return the interpreter linked to this instance.
@@ -396,6 +396,20 @@ module SitemapGenerator
       @sitemap = nil if @sitemap && @sitemap.finalized?
       self.sitemaps_namer.reset # start from 1
       @added_default_links = false
+    end
+
+    # Write the given string out to STDOUT.  Used so that the sitemap config can be
+    # evaluated and some info output to STDOUT in a lazy fasion.
+    def output(string)
+      if !verbose
+        return
+      elsif @have_output
+        puts string
+      else
+        @have_output = true
+        puts "In #{sitemap_index.location.public_path}:"
+        puts string
+      end
     end
 
     module LocationHelpers
