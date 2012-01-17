@@ -3,7 +3,6 @@ PATH
   specs:
     sitemap_generator (2.2.1)
       builder
-      rake
 
 GEM
   remote: http://rubygems.org/
@@ -18,7 +17,6 @@ GEM
     mocha (0.10.0)
       metaclass (~> 0.0.1)
     nokogiri (1.5.0)
-    rake (0.9.2.2)
     rcov (0.9.11)
     rspec (2.8.0)
       rspec-core (~> 2.8.0)
