@@ -581,4 +581,27 @@ describe SitemapGenerator::LinkSet do
       ls.include_index?.should be_true
     end
   end
+
+  describe "output" do
+    it "should not output" do
+      @ls.verbose = false
+      @ls.expects(:puts).never
+      @ls.send(:output, '')
+    end
+
+    it "should print the header on first output" do
+      @ls.verbose = true
+      @ls.expects(:puts).twice
+      @ls.send(:output, '')
+      @ls.expects(:puts).with('').once
+      @ls.send(:output, '')
+    end
+
+    it "should print the given string" do
+      @ls.verbose = true
+      @ls.send(:output, '') # prints header & abc
+      @ls.expects(:puts).with('')
+      @ls.send(:output, '') # just prints abc
+    end
+  end
 end

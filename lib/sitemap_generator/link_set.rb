@@ -237,13 +237,14 @@ module SitemapGenerator
       output("\n")
       search_engines.merge(engines).each do |engine, link|
         link = link % index_url
+        name = Utilities.titleize(engine.to_s)
         begin
           Timeout::timeout(10) {
             open(link)
           }
-          output("Successful ping of #{engine.to_s.titleize}")
+          output("Successful ping of #{name}")
         rescue Timeout::Error, StandardError => e
-          output("Ping failed for #{engine.to_s.titleize}: #{e.inspect} (URL #{link})")
+          output("Ping failed for #{name}: #{e.inspect} (URL #{link})")
         end
       end
     end
@@ -407,7 +408,7 @@ module SitemapGenerator
         puts string
       else
         @have_output = true
-        puts "In #{sitemap_index.location.public_path}:"
+        puts "In #{sitemap_index.location.public_path}"
         puts string
       end
     end

@@ -22,4 +22,11 @@ describe SitemapGenerator::Utilities do
       }.should_not raise_exception
     end
   end
+
+  describe "titleize" do
+    it "should titleize words and replace underscores" do
+      SitemapGenerator::Utilities.titleize('google').should == 'Google'
+      SitemapGenerator::Utilities.titleize('amy_and_jon').should == 'Amy And Jon'
+    end
+  end
 end

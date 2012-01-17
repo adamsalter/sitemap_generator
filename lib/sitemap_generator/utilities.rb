@@ -126,5 +126,10 @@ module SitemapGenerator
     ensure
       $VERBOSE = old_verbose
     end
+
+    def titleize(string)
+      string.gsub!(/_/, ' ')
+      string.split(/(\W)/).map(&:capitalize).join
+    end
   end
 end
