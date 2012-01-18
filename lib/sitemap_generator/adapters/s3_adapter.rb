@@ -15,7 +15,11 @@ module SitemapGenerator
       
       storage   = Fog::Storage.new(credentials)
       directory = storage.directories.get(ENV['FOG_DIRECTORY'])
-      directory.files.create(:key => location.path_in_public, :body => File.open(location.path))
+      directory.files.create(
+        :key    => location.path_in_public, 
+        :body   => File.open(location.path),
+        :public => true,
+      )
     end
   end
 end
