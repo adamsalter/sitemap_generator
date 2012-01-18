@@ -14,5 +14,5 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'rspec'
   s.add_dependency 'builder'
   s.test_files  = Dir.glob(['spec/**/*']) - Dir.glob(['spec/mock_*', 'spec/mock_*/**/*'])
-  s.files       = Dir.glob(["[A-Z]*", "{lib,rails,tasks,templates}/**/*"]) - Dir.glob('*.orig')
+  s.files       = Dir.glob(["[A-Z]*", "{lib,rails,templates}/**/*"]) - Dir.glob('*.orig')
 end
