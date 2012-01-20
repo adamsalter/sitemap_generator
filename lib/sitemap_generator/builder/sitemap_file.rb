@@ -125,11 +125,22 @@ module SitemapGenerator
       # Return a summary string
       def summary(opts={})
         uncompressed_size = number_to_human_size(@filesize)
-        compressed_size =   number_to_human_size(@location.filesize)
-        "+ #{'%-21s' % @location.path_in_public} #{'%13s' % @link_count} links / #{'%10s' % uncompressed_size} / #{'%10s' % compressed_size} gzipped"
+        compressed_size   = number_to_human_size(@location.filesize)
+        path = ellipsis(@location.path_in_public, 47)
+        "+ #{'%-47s' % path} #{'%10s' % @link_count} links / #{'%10s' % compressed_size}"
       end
 
       protected
+
+      # Replace the last 3 characters of string with ... if the string is as big
+      # or bigger than max.
+      def ellipsis(string, max)
+        if string.size >= max
+          string[0, max - 3] + '...'
+        else
+          string
+        end
+      end
 
       # Return the bytesize length of the string.  Ruby 1.8.6 compatible.
       def bytesize(string)
