@@ -1,11 +1,14 @@
 SitemapGenerator
 ================
 
-SitemapGenerator generates Sitemaps for your Rails application.  The Sitemaps adhere to the [Sitemap 0.9 protocol][sitemap_protocol] specification.  You specify the contents of your Sitemap using a configuration file, à la Rails Routes.  A set of rake tasks is included to help you manage your Sitemaps.
+SitemapGenerator is the easiest way to generate Sitemaps in Ruby.  Rails integration provides access to the Rails route helpers within your sitemap config file and automatically makes the rake tasks available to you.  Or if you prefer to use another framework, you can!  You can use the rake tasks provided or run your sitemap configs as plain ruby scripts.
+
+Sitemaps adhere to the [Sitemap 0.9 protocol][sitemap_protocol] specification.
 
 Features
 -------
 
+- Framework agnostic
 - Supports [News sitemaps][sitemap_news], [Video sitemaps][sitemap_video], [Image sitemaps][sitemap_images], and [Geo sitemaps][sitemap_geo]
 - Supports read-only filesystems like Heroku via uploading to a remote host like Amazon S3
 - Compatible with Rails 2 & 3
@@ -15,6 +18,35 @@ Features
 - Notifies search engines (Google, Bing, Ask, SitemapWriter) of new sitemaps
 - Ensures your old sitemaps stay in place if the new sitemap fails to generate
 - Gives you complete control over your sitemaps and their content
+
+Show Me
+-------
+
+Install:
+
+    gem install sitemap_generator
+
+Create `sitemap.rb`:
+
+    require 'rubygems'
+    require 'sitemap_generator'
+
+    SitemapGenerator::Sitemap.default_host = 'http://example.com'
+    SitemapGenerator::Sitemap.create do
+      add '/home', :changefreq => 'daily', :priority => 0.9
+      add '/contact_us', :changefreq => 'weekly'
+    end
+
+Run it:
+
+    ruby sitemap.rb
+
+Output:
+
+    In /Users/karl/projects/sitemap_generator-test/public/
+    + sitemap1.xml.gz                                          4 links /  357 Bytes
+    + sitemap_index.xml.gz                                  1 sitemaps /  228 Bytes
+    Sitemap stats: 4 links / 1 sitemaps / 0m00s
 
 Contribute
 -------
@@ -26,6 +58,7 @@ Does your website use SitemapGenerator to generate Sitemaps?  Where would you be
 Changelog
 -------
 
+- **v3.0.0: Framework agnostic**; fix alignment in output, show directory sitemaps are being generated into, only show sitemap compressed file size; toggle output using VERBOSE environment variable; remove tasks/ directory because it's deprecated in Rails 2;  Simplify dependencies.
 - v2.2.1: Support adding new search engines to ping and modifying the default search engines.
           Allow the URL of the sitemap index to be passed as an argument to `ping_search_engines`.  See **Pinging Search Engines**.
 - v2.1.8: Extend and improve Video Sitemap support.  Include sitemap docs in the README, support all element attributes, properly format values.
@@ -62,6 +95,17 @@ The canonical repository is now: [http://github.com/kjvarga/sitemap_generator][c
 Install
 =======
 
+Ruby
+-----
+
+    gem install 'sitemap_generator'
+
+To use the rake tasks add the following to your `Rakefile`:
+
+    require 'sitemap_generator/tasks'
+
+The Rake tasks expect your sitemap to be at `config/sitemap.rb` but if you need to change that call like so: `rake sitemap:refresh CONFIG_FILE="path/to/sitemap.rb"`
+
 Rails
 -----
 
@@ -86,6 +130,17 @@ Alternatively, if you are not using a `Gemfile` add the gem to your `config/envi
 Getting Started
 ======
 
+Preventing Output
+-----
+
+To disable all non-essential output set the environment variable `VERBOSE=false` when calling Rake or running your Ruby script.
+
+Alternatively you can pass the `-s` option to Rake, for example `rake -s sitemap:refresh`.
+
+To disable output in-code use the following:
+
+    SitemapGenerator.verbose = false
+
 Rake Tasks
 -----
 
@@ -95,7 +150,6 @@ Run `rake sitemap:refresh` as needed to create or rebuild your sitemap files.  S
 
 `rake sitemap:refresh` will output information about each sitemap that is written including its location, how many links it contains and the size of the file.
 
-**To disable all non-essential output from `rake` run the tasks passing a `-s` option.**  For example: `rake -s sitemap:refresh`.
 
 Pinging Search Engines
 -----
