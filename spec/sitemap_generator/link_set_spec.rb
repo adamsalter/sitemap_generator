@@ -165,18 +165,24 @@ describe SitemapGenerator::LinkSet do
       @ls = SitemapGenerator::LinkSet.new(:default_host => 'http://one.com')
     end
 
-    it "should default to false" do
-      @ls.verbose.should be_false
-    end
-
     it "should be set as an initialize option" do
+      SitemapGenerator::LinkSet.new(:default_host => 'http://one.com', :verbose => false).verbose.should be_false
       SitemapGenerator::LinkSet.new(:default_host => 'http://one.com', :verbose => true).verbose.should be_true
     end
 
     it "should be set as an accessor" do
       @ls.verbose = true
       @ls.verbose.should be_true
+      @ls.verbose = false
+      @ls.verbose.should be_false
     end
+
+    it "should use SitemapGenerator.verbose as a default" do
+      SitemapGenerator.expects(:verbose).returns(true).at_least_once
+      SitemapGenerator::LinkSet.new.verbose.should be_true
+      SitemapGenerator.expects(:verbose).returns(false).at_least_once
+      SitemapGenerator::LinkSet.new.verbose.should be_false
+    end   
   end
 
   describe "when finalizing" do
@@ -583,16 +589,18 @@ describe SitemapGenerator::LinkSet do
   end
 
   describe "output" do
+    let(:ls) { SitemapGenerator::LinkSet.new }
+
     it "should not output" do
-      @ls.verbose = false
-      @ls.expects(:puts).never
-      @ls.send(:output, '')
+      ls.verbose = false
+      ls.expects(:puts).never
+      ls.send(:output, '')
     end
 
     it "should print the given string" do
-      @ls.verbose = true
-      @ls.expects(:puts).with('')
-      @ls.send(:output, '')
+      ls.verbose = true
+      ls.expects(:puts).with('')
+      ls.send(:output, '')
     end
   end
 end

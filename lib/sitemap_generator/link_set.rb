@@ -103,7 +103,6 @@ module SitemapGenerator
         :include_root => true,
         :include_index => true,
         :filename => :sitemap,
-        :verbose => false,
         :search_engines => {
           :google         => "http://www.google.com/webmasters/sitemaps/ping?sitemap=%s",
           :ask            => "http://submissions.ask.com/ping?sitemap=%s",
@@ -299,6 +298,16 @@ module SitemapGenerator
     # current sitemap.  Default is `true`.  Turned off within a `group()` block.
     def include_root?
       !!@include_root
+    end
+
+    # Set verbose on the instance or by setting ENV['VERBOSE'] to true or false.
+    # By default verbose is true.  When running rake tasks, pass the <tt>-s</tt>
+    # option to rake to turn verbose off.
+    def verbose
+      if @verbose.nil?
+        @verbose = SitemapGenerator.verbose.nil? ? true : SitemapGenerator.verbose
+      end
+      @verbose
     end
 
     protected

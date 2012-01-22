@@ -29,4 +29,22 @@ describe SitemapGenerator::Utilities do
       SitemapGenerator::Utilities.titleize('amy_and_jon').should == 'Amy And Jon'
     end
   end
+
+  describe "truthy?" do
+    it "should be truthy" do
+      ['1', 1, 't', 'true', true].each do |value|
+        SitemapGenerator::Utilities.truthy?(value).should be_true
+      end
+      SitemapGenerator::Utilities.truthy?(nil).should be_false
+    end
+  end
+
+  describe "falsy?" do
+    it "should be falsy" do
+      ['0', 0, 'f', 'false', false].each do |value|
+        SitemapGenerator::Utilities.falsy?(value).should be_true
+      end
+      SitemapGenerator::Utilities.falsy?(nil).should be_false
+    end
+  end
 end

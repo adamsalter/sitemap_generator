@@ -186,6 +186,19 @@ describe "SitemapGenerator" do
     end
   end
 
+  describe "verbose" do
+    it "should be set via ENV['VERBOSE']" do
+      original = SitemapGenerator.verbose
+      SitemapGenerator.verbose = nil
+      ENV['VERBOSE'] = 'true'
+      SitemapGenerator.verbose.should be_true
+      SitemapGenerator.verbose = nil
+      ENV['VERBOSE'] = 'false'
+      SitemapGenerator.verbose.should be_false
+      SitemapGenerator.verbose = original
+    end
+  end
+
   protected
 
   #

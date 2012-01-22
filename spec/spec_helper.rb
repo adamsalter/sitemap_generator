@@ -6,6 +6,8 @@ require 'rspec/autorun'
 # in ./support/ and its subdirectories.
 Dir[File.expand_path(File.join(File.dirname(__FILE__),'support','**','*.rb'))].each {|f| require f}
 
+SitemapGenerator.verbose = false
+
 RSpec.configure do |config|
   config.mock_with :mocha
   config.include(FileMacros)

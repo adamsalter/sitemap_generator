@@ -41,7 +41,22 @@ module SitemapGenerator
 
   class << self
     attr_accessor :root, :app, :templates
-    attr_writer :yield_sitemap
+    attr_writer :yield_sitemap, :verbose
+  end
+
+  # Global default for the verbose setting.
+  def self.verbose
+    if @verbose.nil?
+      @verbose = if SitemapGenerator::Utilities.truthy?(ENV['VERBOSE'])
+        true
+      elsif SitemapGenerator::Utilities.falsy?(ENV['VERBOSE'])
+        false
+      else
+        nil
+      end
+    else
+      @verbose
+    end
   end
 
   # Returns true if we should yield the sitemap instance to the block, false otherwise.

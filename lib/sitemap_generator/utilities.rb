@@ -131,5 +131,13 @@ module SitemapGenerator
       string.gsub!(/_/, ' ')
       string.split(/(\W)/).map(&:capitalize).join
     end
+
+    def truthy?(value)
+      ['1', 1, 't', 'true', true].include?(value)
+    end
+
+    def falsy?(value)
+      ['0', 0, 'f', 'false', false].include?(value)
+    end
   end
 end
