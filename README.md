@@ -36,6 +36,7 @@ Create `sitemap.rb`:
       add '/home', :changefreq => 'daily', :priority => 0.9
       add '/contact_us', :changefreq => 'weekly'
     end
+    SitemapGenerator::Sitemap.ping_search_engines # called for you when you use the rake task
 
 Run it:
 
@@ -47,6 +48,11 @@ Output:
     + sitemap1.xml.gz                                          4 links /  357 Bytes
     + sitemap_index.xml.gz                                  1 sitemaps /  228 Bytes
     Sitemap stats: 4 links / 1 sitemaps / 0m00s
+
+    Successful ping of Google
+    Successful ping of Ask
+    Successful ping of Bing
+    Successful ping of Sitemap Writer
 
 Contribute
 -------
