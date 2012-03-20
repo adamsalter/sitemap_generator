@@ -8,9 +8,13 @@ end
 
 def with_max_links(num)
   original = SitemapGenerator::MAX_SITEMAP_LINKS
-  SitemapGenerator.const_set(:MAX_SITEMAP_LINKS, num)
+  SitemapGenerator::Utilities.with_warnings(nil) do
+    SitemapGenerator.const_set(:MAX_SITEMAP_LINKS, num)
+  end
   yield
-  SitemapGenerator.const_set(:MAX_SITEMAP_LINKS, original)
+  SitemapGenerator::Utilities.with_warnings(nil) do
+    SitemapGenerator.const_set(:MAX_SITEMAP_LINKS, original)
+  end
 end
 
 describe "SitemapGenerator" do
@@ -169,20 +173,9 @@ describe "SitemapGenerator" do
   end
 
   describe "external dependencies" do
-    describe "rails" do
-      before :each do
-        @rails = Rails
-        Object.send(:remove_const, :Rails)
-      end
-
-      after :each do
-        Object::Rails = @rails
-      end
-
-      it "should work outside of Rails" do
-        defined?(Rails).should be_nil
-        lambda { ::SitemapGenerator::LinkSet.new }.should_not raise_exception
-      end
+    it "should work outside of Rails" do
+      Object.stubs(:Rails => nil)
+      lambda { ::SitemapGenerator::LinkSet.new }.should_not raise_exception
     end
   end
 
@@ -196,6 +189,16 @@ describe "SitemapGenerator" do
       ENV['VERBOSE'] = 'false'
       SitemapGenerator.verbose.should be_false
       SitemapGenerator.verbose = original
+    end
+  end
+
+  describe "yield_sitemap" do
+    it "should set the yield_sitemap flag" do
+      SitemapGenerator.yield_sitemap = false
+      SitemapGenerator.yield_sitemap?.should be_false
+      SitemapGenerator.yield_sitemap = true
+      SitemapGenerator.yield_sitemap?.should be_true
+      SitemapGenerator.yield_sitemap = false
     end
   end
 

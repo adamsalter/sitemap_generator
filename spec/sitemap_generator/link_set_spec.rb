@@ -182,7 +182,7 @@ describe SitemapGenerator::LinkSet do
       SitemapGenerator::LinkSet.new.verbose.should be_true
       SitemapGenerator.expects(:verbose).returns(false).at_least_once
       SitemapGenerator::LinkSet.new.verbose.should be_false
-    end   
+    end
   end
 
   describe "when finalizing" do
@@ -601,6 +601,61 @@ describe SitemapGenerator::LinkSet do
       ls.verbose = true
       ls.expects(:puts).with('')
       ls.send(:output, '')
+    end
+  end
+
+  describe "yield_sitemap" do
+    let(:ls) { SitemapGenerator::LinkSet.new(:default_host => @default_host) }
+
+    it "should default to the value of SitemapGenerator.yield_sitemap?" do
+      SitemapGenerator.expects(:yield_sitemap?).returns(true)
+      ls.yield_sitemap?.should be_true
+      SitemapGenerator.expects(:yield_sitemap?).returns(false)
+      ls.yield_sitemap?.should be_false
+    end
+
+    it "should be settable as an option" do
+      SitemapGenerator.expects(:yield_sitemap?).never
+      SitemapGenerator::LinkSet.new(:yield_sitemap => true).yield_sitemap?.should be_true
+      SitemapGenerator::LinkSet.new(:yield_sitemap => false).yield_sitemap?.should be_false
+    end
+
+    it "should be settable as an attribute" do
+      ls.yield_sitemap = true
+      ls.yield_sitemap?.should be_true
+      ls.yield_sitemap = false
+      ls.yield_sitemap?.should be_false
+    end
+
+    it "should yield the sitemap in the call to create" do
+      ls.send(:interpreter).expects(:eval).with(:yield_sitemap => true)
+      ls.yield_sitemap = true
+      ls.create
+      ls.send(:interpreter).expects(:eval).with(:yield_sitemap => false)
+      ls.yield_sitemap = false
+      ls.create
+    end
+  end
+
+  describe "add_links" do
+    let(:ls) { SitemapGenerator::LinkSet.new(:default_host => @default_host) }
+
+    it "should not change the value of yield_sitemap" do
+      ls.stubs(:create)
+      ls.yield_sitemap = false
+      ls.add_links
+      ls.yield_sitemap.should be_false
+      ls.yield_sitemap = true
+      ls.add_links
+      ls.yield_sitemap.should be_true
+    end
+
+    it "should always yield the sitemap instance" do
+      ls.send(:interpreter).expects(:eval).with(:yield_sitemap => true).twice
+      ls.yield_sitemap = false
+      ls.add_links
+      ls.yield_sitemap = true
+      ls.add_links
     end
   end
 end
