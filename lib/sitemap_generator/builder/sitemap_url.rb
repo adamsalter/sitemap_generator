@@ -27,6 +27,7 @@ module SitemapGenerator
       # * +geo+
       # * +news+
       def initialize(path, options={})
+        options = options.dup
         if sitemap = path.is_a?(SitemapGenerator::Builder::SitemapFile) && path
           SitemapGenerator::Utilities.reverse_merge!(options, :host => sitemap.location.host, :lastmod => sitemap.lastmod)
           path = sitemap.location.path_in_public

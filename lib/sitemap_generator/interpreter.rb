@@ -21,7 +21,7 @@ module SitemapGenerator
     #
     # All other options are passed to the LinkSet by setting them using accessor methods.
     def initialize(opts={}, &block)
-      SitemapGenerator::Utilities.reverse_merge!(opts, :link_set => SitemapGenerator::Sitemap)
+      opts = SitemapGenerator::Utilities.reverse_merge(opts, :link_set => SitemapGenerator::Sitemap)
       @linkset = opts.delete :link_set
       @linkset.send(:set_options, opts)
       eval(&block) if block_given?
@@ -65,6 +65,7 @@ module SitemapGenerator
     #   Default is config/sitemap.rb in your application's root directory.
     # All other options are passed to +new+.
     def self.run(opts={}, &block)
+      opts = opts.dup
       config_file = opts.delete(:config_file)
       config_file ||= SitemapGenerator.app.root + 'config/sitemap.rb'
       interpreter = self.new(opts)

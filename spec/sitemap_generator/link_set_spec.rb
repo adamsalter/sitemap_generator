@@ -502,6 +502,12 @@ describe SitemapGenerator::LinkSet do
       ls.sitemap.location.filename.should =~ /sitemap1_1/
       ls.sitemap_index.location.filename.should =~ /sitemap1_index/
     end
+
+    it "should not modify the options hash" do
+      options = { :filename => 'sitemaptest', :verbose => false }
+      ls.create(options)
+      options.should == { :filename => 'sitemaptest', :verbose => false }
+    end
   end
 
   describe "reset!" do
@@ -624,6 +630,31 @@ describe SitemapGenerator::LinkSet do
       ls.add_links
       ls.yield_sitemap = true
       ls.add_links
+    end
+  end
+
+  describe "add" do
+    it "should not modify the options hash" do
+      options = { :host => 'http://newhost.com' }
+      ls.add('/home', options)
+      options.should == { :host => 'http://newhost.com' }
+    end
+
+    it "should add the link to the sitemap and include the default host" do
+      ls.stubs(:add_default_links)
+      ls.sitemap.expects(:add).with('/home', :host => ls.default_host)
+      ls.add('/home')
+    end
+
+    it "should allow setting of a custom host" do
+      ls.stubs(:add_default_links)
+      ls.sitemap.expects(:add).with('/home', :host => 'http://newhost.com')
+      ls.add('/home', :host => 'http://newhost.com')
+    end
+
+    it "should add the default links if they have not been added" do
+      ls.expects(:add_default_links)
+      ls.add('/home')
     end
   end
 end
