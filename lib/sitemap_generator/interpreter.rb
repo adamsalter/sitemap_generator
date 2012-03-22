@@ -31,6 +31,10 @@ module SitemapGenerator
       @linkset.add(*args)
     end
 
+    def add_to_index(*args)
+      @linkset.add_to_index(*args)
+    end
+    
     # Start a new group of sitemaps.  Any of the options to SitemapGenerator.new may
     # be passed.  Pass a block with calls to +add+ to add links to the sitemaps.
     #

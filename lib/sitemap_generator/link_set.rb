@@ -137,6 +137,16 @@ module SitemapGenerator
       retry
     end
 
+    # Add a link to the Sitemap Index.
+    # * link - A string link e.g. '/sitemaps/sitemap1.xml.gz' or a SitemapFile instance.
+    # * options - A hash of options including `:lastmod`, ':priority`, ':changefreq` and `:host`
+    #
+    # The `:host` option defaults to the value of `sitemaps_host` which is the host where your
+    # sitemaps reside.  If no `sitemaps_host` is set, the `default_host` is used.
+    def add_to_index(link, options={})
+      sitemap_index.add(link, SitemapGenerator::Utilities.reverse_merge(options, :host => sitemaps_host))
+    end
+
     # Create a new group of sitemap files.
     #
     # Returns a new LinkSet instance with the options passed in set on it.  All groups
@@ -391,7 +401,7 @@ module SitemapGenerator
     def finalize_sitemap!
       add_default_links if !@added_default_links && !@created_group
       return if sitemap.finalized? || sitemap.empty? && @created_group
-      sitemap_index.add(sitemap)
+      add_to_index(sitemap)
       output(sitemap.summary)
     end
 

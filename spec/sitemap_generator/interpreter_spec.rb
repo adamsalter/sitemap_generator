@@ -55,6 +55,13 @@ describe SitemapGenerator::Interpreter do
         interpreter.sitemap.should be(link_set)
       end
     end
+    
+    describe "add_to_index" do
+      it "should add a link to the sitemap index" do
+        link_set.expects(:add_to_index).with('test', :option => 'value')
+        interpreter.add_to_index('test', :option => 'value')
+      end
+    end
   end
 
   describe "eval" do

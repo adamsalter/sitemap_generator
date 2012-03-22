@@ -657,4 +657,35 @@ describe SitemapGenerator::LinkSet do
       ls.add('/home')
     end
   end
+
+  describe "add_to_index", :focus do
+    it "should add the link to the sitemap index and pass options" do
+      ls.sitemap_index.expects(:add).with('/test', has_entry(:option => 'value'))
+      ls.add_to_index('/test', :option => 'value')
+    end
+
+    it "should not modify the options hash" do
+      options = { :host => 'http://newhost.com' }
+      ls.add_to_index('/home', options)
+      options.should == { :host => 'http://newhost.com' }
+    end
+
+    describe "host" do
+      it "should be the sitemaps_host" do
+        ls.sitemaps_host = 'http://sitemapshost.com'
+        ls.sitemap_index.expects(:add).with('/home', :host => 'http://sitemapshost.com')
+        ls.add_to_index('/home')
+      end
+
+      it "should be the default_host if no sitemaps_host set" do
+        ls.sitemap_index.expects(:add).with('/home', :host => ls.default_host)
+        ls.add_to_index('/home')
+      end
+
+      it "should allow setting a custom host" do
+        ls.sitemap_index.expects(:add).with('/home', :host => 'http://newhost.com')
+        ls.add_to_index('/home', :host => 'http://newhost.com')
+      end
+    end
+  end
 end

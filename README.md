@@ -456,7 +456,7 @@ You can read more about `add` in the [XML Specification](http://sitemaps.org/pro
 
   Host to use when building the URL.  Example:
 
-        add '/login', :host => 'https://securehost.com/login'
+        add '/login', :host => 'https://securehost.com'
 
 * `priority` - Default: `0.5` (Float).
 
@@ -464,6 +464,31 @@ You can read more about `add` in the [XML Specification](http://sitemaps.org/pro
 
         add '/about', :priority => 0.75
 
+Adding Links to the Sitemap Index
+----------
+
+Sometimes you may need to manually add some links to the sitemap index file.  For example if you are generating your sitemaps incrementally you may want to create a sitemap index which includes the files which have already been generated.  To achieve this you can use the `add_to_index` method which works exactly the same as the `add` method described above.
+
+It supports the same options as `add`, namely:
+
+* `changefreq`
+* `lastmod`
+* `host`
+
+  The value for `host` defaults to whatever you have set as your `sitemaps_host`.  Remember that the `sitemaps_host` is the host where your sitemaps reside.  If your sitemaps are on the same host as your `default_host`, then the value for `default_host` is used.  Example:
+
+        add_to_index '/mysitemap1.xml.gz', :host => 'http://sitemaphostingserver.com'
+
+* `priority`
+
+An example:
+
+    SitemapGenerator::Sitemap.default_host = "http://www.example.com"
+    SitemapGenerator::Sitemap.create do
+      add_to_index '/mysitemap1.xml.gz'
+      add_to_index '/mysitemap2.xml.gz'
+      ...
+    end
 
 Speeding Things Up
 ----------
