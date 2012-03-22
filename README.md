@@ -64,6 +64,7 @@ Does your website use SitemapGenerator to generate Sitemaps?  Where would you be
 Changelog
 -------
 
+- v3.1.0: Add `add_to_index` method to add links to the sitemap index.  Add `sitemap` method for accessing the LinkSet instance from within `create()`.  Don't modify options hashes passed to methods.  Fix and improve `yield_sitemap` option handling.
 - **v3.0.0: Framework agnostic**; fix alignment in output, show directory sitemaps are being generated into, only show sitemap compressed file size; toggle output using VERBOSE environment variable; remove tasks/ directory because it's deprecated in Rails 2;  Simplify dependencies.
 - v2.2.1: Support adding new search engines to ping and modifying the default search engines.
           Allow the URL of the sitemap index to be passed as an argument to `ping_search_engines`.  See **Pinging Search Engines**.
@@ -489,6 +490,30 @@ An example:
       add_to_index '/mysitemap2.xml.gz'
       ...
     end
+
+Accessing the LinkSet instance
+----------
+
+Sometimes you need to mess with the internals to do custom stuff.  If you need access to the LinkSet instance from within `create()` you can use the `sitemap` method to do so.
+
+In this example, say we have already pre-generated three sitemap files: `sitemap1.xml.gz`, `sitemap2.xml.gz`, `sitemap3.xml.gz`.  Now we want to start the sitemap generation at `sitemap4.xml.gz` and create a bunch of new sitemaps.  There are a few ways we can do this, but this is an easy way:
+
+    SitemapGenerator::Sitemap.default_host = "http://www.example.com"
+    SitemapGenerator::Sitemap.create do
+      3.times do |i|
+        add_to_index sitemap.sitemaps_namer.to_s
+        sitemap.sitemaps_namer.next
+      end
+      add '/home'
+      add '/another'
+    end
+
+The output looks something like this:
+
+    In /Users/karl/projects/sitemap_generator-test/public/
+    + sitemap4.xml.gz                                          4 links /  347 Bytes
+    + sitemap_index.xml.gz                                  4 sitemaps /  242 Bytes
+    Sitemap stats: 4 links / 4 sitemaps / 0m00s
 
 Speeding Things Up
 ----------
