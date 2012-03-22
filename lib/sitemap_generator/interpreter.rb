@@ -39,12 +39,18 @@ module SitemapGenerator
       @linkset.group(*args, &block)
     end
 
+    # Return the LinkSet instance so that you can access it from within the `create` block
+    # without having to use the yield_sitemap option.
+    def sitemap
+      @linkset
+    end
+
     # Evaluate the block in the interpreter.  Pass :yield_sitemap => true to
     # yield the Interpreter instance to the block...for old-style calling.
     def eval(opts={}, &block)
       if block_given?
         if opts[:yield_sitemap]
-          yield self
+          yield @linkset
         else
           instance_eval(&block)
         end
