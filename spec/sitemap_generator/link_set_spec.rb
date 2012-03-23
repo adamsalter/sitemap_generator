@@ -409,6 +409,21 @@ describe SitemapGenerator::LinkSet do
         end
       end
     end
+
+    describe "adapter" do
+      it "should inherit the current adapter" do
+        ls.adapter = mock('adapter')
+        group = ls.group
+        group.should_not be(ls)
+        group.adapter.should be(ls.adapter)
+      end
+
+      it "should set the value" do
+        adapter = mock('adapter')
+        group = ls.group(:adapter => adapter)
+        group.adapter.should be(adapter)
+      end
+    end
   end
 
   describe "after create" do
@@ -658,7 +673,7 @@ describe SitemapGenerator::LinkSet do
     end
   end
 
-  describe "add_to_index", :focus do
+  describe "add_to_index" do
     it "should add the link to the sitemap index and pass options" do
       ls.sitemap_index.expects(:add).with('/test', has_entry(:option => 'value'))
       ls.add_to_index('/test', :option => 'value')
