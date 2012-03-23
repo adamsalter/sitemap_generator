@@ -64,6 +64,7 @@ Does your website use SitemapGenerator to generate Sitemaps?  Where would you be
 Changelog
 -------
 
+- v3.1.1: Bugfix: Groups inherit current adapter
 - v3.1.0: Add `add_to_index` method to add links to the sitemap index.  Add `sitemap` method for accessing the LinkSet instance from within `create()`.  Don't modify options hashes passed to methods.  Fix and improve `yield_sitemap` option handling.
 - **v3.0.0: Framework agnostic**; fix alignment in output, show directory sitemaps are being generated into, only show sitemap compressed file size; toggle output using VERBOSE environment variable; remove tasks/ directory because it's deprecated in Rails 2;  Simplify dependencies.
 - v2.2.1: Support adding new search engines to ping and modifying the default search engines.
