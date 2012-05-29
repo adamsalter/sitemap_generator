@@ -1,3 +1,8 @@
+# Optional: Set Amazon S3 credentials. If omitted, sitemaps will go in /public.
+SitemapGenerator::Sitemap.s3_access_key_id = ""
+SitemapGenerator::Sitemap.s3_secret_access_key = ""
+SitemapGenerator::Sitemap.s3_bucket_name = ""
+
 # Set the host name for URL creation
 SitemapGenerator::Sitemap.default_host = "http://www.example.com"
 
