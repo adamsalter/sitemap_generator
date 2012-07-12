@@ -24,7 +24,7 @@ describe SitemapGenerator::LinkSet do
       :sitemaps_path => nil,
       :public_path => SitemapGenerator.app.root + 'public/',
       :default_host => nil,
-      :include_index => true,
+      :include_index => false,
       :include_root => true
     }
 
@@ -36,12 +36,20 @@ describe SitemapGenerator::LinkSet do
   end
 
   describe "include_root include_index option" do
+    it "should include the root url and the sitemap index url" do
+      ls = SitemapGenerator::LinkSet.new(:default_host => default_host, :include_root => true, :include_index => true)
+      ls.include_root.should be_true
+      ls.include_index.should be_true
+      ls.add_links { |sitemap| }
+      ls.sitemap.link_count.should == 2
+    end
+
     it "should not include the root url" do
       ls = SitemapGenerator::LinkSet.new(:default_host => default_host, :include_root => false)
       ls.include_root.should be_false
-      ls.include_index.should be_true
+      ls.include_index.should be_false
       ls.add_links { |sitemap| }
-      ls.sitemap.link_count.should == 1
+      ls.sitemap.link_count.should == 0
     end
 
     it "should not include the sitemap index url" do
@@ -102,12 +110,12 @@ describe SitemapGenerator::LinkSet do
   describe "search_engines" do
     it "should have search engines by default" do
       ls.search_engines.should be_a(Hash)
-      ls.search_engines.size.should == 4
+      ls.search_engines.size.should == 3
     end
 
     it "should support being modified" do
       ls.search_engines[:newengine] = 'abc'
-      ls.search_engines.size.should == 5
+      ls.search_engines.size.should == 4
     end
 
     it "should support being set to nil" do
@@ -575,11 +583,6 @@ describe SitemapGenerator::LinkSet do
     it "should return false" do
       ls = SitemapGenerator::LinkSet.new(:default_host => default_host, :sitemaps_host => sitemaps_host)
       ls.include_index?.should be_false
-    end
-
-    it "should return true" do
-      ls = SitemapGenerator::LinkSet.new(:default_host => default_host, :sitemaps_host => default_host)
-      ls.include_index?.should be_true
     end
   end
 

@@ -633,7 +633,7 @@ The following options are supported:
 
 * `filename` - Symbol.  The **base name for the files** that will be generated.  The default value is `:sitemap`.  This yields sitemaps with names like `sitemap1.xml.gz`, `sitemap2.xml.gz`, `sitemap3.xml.gz` etc, and a sitemap index named `sitemap_index.xml.gz`.  If we now set the value to `:geo` the sitemaps would be named `geo1.xml.gz`, `geo2.xml.gz`, `geo3.xml.gz` etc, and the sitemap index would be named `geo_index.xml.gz`.
 
-* `include_index` - Boolean.  Whether to **add a link to the sitemap index** to the current sitemap.  This points search engines to your Sitemap Index to include it in the indexing of your site.  Default is `true`.  Turned off when `sitemaps_host` is set or within a `group()` block.
+* `include_index` - Boolean.  Whether to **add a link to the sitemap index** to the current sitemap.  This points search engines to your Sitemap Index to include it in the indexing of your site.  2012-07: This is now turned off by default because Google may complain about there being 'Nested Sitemap indexes'.  Default is `false`.  Turned off when `sitemaps_host` is set or within a `group()` block.
 
 * `include_root` - Boolean.  Whether to **add the root** url i.e. '/' to the current sitemap.  Default is `true`.  Turned off within a `group()` block.
 

@@ -30,7 +30,7 @@ describe "Sitemap Groups" do
   it "should add default links if no groups are created" do
     @sm.create do
     end
-    @sm.link_count.should == 2
+    @sm.link_count.should == 1
     file_should_exist(SitemapGenerator.app.root + 'public/sitemap_index.xml.gz')
     file_should_exist(SitemapGenerator.app.root + 'public/sitemap1.xml.gz')
   end
@@ -41,7 +41,7 @@ describe "Sitemap Groups" do
       group(:filename => :sitemap_en) { }
       add '/after'
     end
-    @sm.link_count.should == 4
+    @sm.link_count.should == 3
     file_should_exist(SitemapGenerator.app.root + 'public/sitemap_index.xml.gz')
     file_should_exist(SitemapGenerator.app.root + 'public/sitemap1.xml.gz')
     file_should_exist(SitemapGenerator.app.root + 'public/sitemap_en1.xml.gz')
@@ -93,7 +93,7 @@ describe "Sitemap Groups" do
       group(:filename => :second) { add '/four' }
       add 'five'
     end
-    @sm.link_count.should == 7
+    @sm.link_count.should == 6
     file_should_exist(SitemapGenerator.app.root + 'public/sitemap_index.xml.gz')
     file_should_exist(SitemapGenerator.app.root + 'public/sitemap1.xml.gz')
     file_should_exist(SitemapGenerator.app.root + 'public/first1.xml.gz')
@@ -108,7 +108,7 @@ describe "Sitemap Groups" do
       group(:default_host => 'http://betterhost.com') { add '/four' }
       add 'five'
     end
-    @sm.link_count.should == 7
+    @sm.link_count.should == 6
     file_should_exist(SitemapGenerator.app.root + 'public/sitemap_index.xml.gz')
     file_should_exist(SitemapGenerator.app.root + 'public/sitemap1.xml.gz')
     file_should_not_exist(SitemapGenerator.app.root + 'public/sitemap2.xml.gz')
@@ -122,7 +122,7 @@ describe "Sitemap Groups" do
       group(:sitemaps_host => 'http://newhost.com') { add '/four' }
       add 'five'
     end
-    @sm.link_count.should == 7
+    @sm.link_count.should == 6
     file_should_exist(SitemapGenerator.app.root + 'public/sitemap_index.xml.gz')
     file_should_exist(SitemapGenerator.app.root + 'public/sitemap1.xml.gz')
     file_should_exist(SitemapGenerator.app.root + 'public/sitemap2.xml.gz')

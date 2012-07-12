@@ -88,7 +88,7 @@ module SitemapGenerator
     #
     # * <tt>:include_index</tt> - Boolean.  Whether to <b>add a link to the sitemap index<b>
     #   to the current sitemap.  This points search engines to your Sitemap Index to
-    #   include it in the indexing of your site.  Default is `true`.  Turned off when
+    #   include it in the indexing of your site.  Default is `false`.  Turned off when
     #  `sitemaps_host` is set or within a `group()` block.
     #
     # * <tt>:include_root</tt> - Boolean.  Whether to **add the root** url i.e. '/' to the
@@ -102,7 +102,7 @@ module SitemapGenerator
     def initialize(options={})
       options = SitemapGenerator::Utilities.reverse_merge(options,
         :include_root => true,
-        :include_index => true,
+        :include_index => false,
         :filename => :sitemap,
         :search_engines => {
           :google         => "http://www.google.com/webmasters/sitemaps/ping?sitemap=%s",
