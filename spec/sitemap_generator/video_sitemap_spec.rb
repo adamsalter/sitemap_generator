@@ -106,5 +106,4 @@ describe "SitemapGenerator" do
     doc = video_doc(xml)
     doc.at_xpath("//url/video:video/video:player_loc").attribute('autoplay').should be_nil
   end
-
 end
