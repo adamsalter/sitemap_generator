@@ -7,13 +7,13 @@ Sitemaps adhere to the [Sitemap 0.9 protocol][sitemap_protocol] specification.
 ## Features
 
 * Framework agnostic
-* Supports [News sitemaps][sitemap_news], [Video sitemaps][sitemap_video], [Image sitemaps][sitemap_images], and [Geo sitemaps][sitemap_geo]
+* Supports [News sitemaps][sitemap_news], [Video sitemaps][sitemap_video], [Image sitemaps][sitemap_images], [Geo sitemaps][sitemap_geo] and [Mobile sitemaps][sitemap_mobile]
 * Supports read-only filesystems like Heroku via uploading to a remote host like Amazon S3
 * Compatible with Rails 2 & 3
 * Adheres to the [Sitemap 0.9 protocol][sitemap_protocol]
 * Handles millions of links
 * Automatically compresses your sitemaps
-* Notifies search engines (Google, Bing, Ask, SitemapWriter) of new sitemaps
+* Notifies search engines (Google, Bing, SitemapWriter) of new sitemaps
 * Ensures your old sitemaps stay in place if the new sitemap fails to generate
 * Gives you complete control over your sitemaps and their content
 
@@ -50,12 +50,11 @@ Output:
 
 ```
 In /Users/karl/projects/sitemap_generator-test/public/
-+ sitemap1.xml.gz                                          4 links /  357 Bytes
++ sitemap1.xml.gz                                          3 links /  357 Bytes
 + sitemap_index.xml.gz                                  1 sitemaps /  228 Bytes
-Sitemap stats: 4 links / 1 sitemaps / 0m00s
+Sitemap stats: 3 links / 1 sitemaps / 0m00s
 
 Successful ping of Google
-Successful ping of Ask
 Successful ping of Bing
 Successful ping of Sitemap Writer
 ```
@@ -70,6 +69,7 @@ Does your website use SitemapGenerator to generate Sitemaps?  Where would you be
 
 ## Changelog
 
+* v3.2: **Support mobile tags**, **SitemapGenerator::S3Adapter** a simple S3 adapter which uses Fog and doesn't require CarrierWave; Remove Ask from the sitemap ping because the service has been shutdown; [Turn off `include_index`][include_index_change] by default; Fix the news XML namespace;  Only include autoplay attribute if present
 * v3.1.1: Bugfix: Groups inherit current adapter
 * v3.1.0: Add `add_to_index` method to add links to the sitemap index.  Add `sitemap` method for accessing the LinkSet instance from within `create()`.  Don't modify options hashes passed to methods.  Fix and improve `yield_sitemap` option handling.
 * **v3.0.0: Framework agnostic**; fix alignment in output, show directory sitemaps are being generated into, only show sitemap compressed file size; toggle output using VERBOSE environment variable; remove tasks/ directory because it's deprecated in Rails 2;  Simplify dependencies.
@@ -173,7 +173,7 @@ SitemapGenerator.verbose = false
 
 ### Pinging Search Engines
 
-Using `rake sitemap:refresh` will notify major search engines to let them know that a new sitemap is available (Google, Bing, Ask, SitemapWriter).  To generate new sitemaps without notifying search engines (for example when running in a local environment) use `rake sitemap:refresh:no_ping`.
+Using `rake sitemap:refresh` will notify major search engines to let them know that a new sitemap is available (Google, Bing, SitemapWriter).  To generate new sitemaps without notifying search engines (for example when running in a local environment) use `rake sitemap:refresh:no_ping`.
 
 If you want to customize the hash of search engines you can access it at:
 
@@ -262,6 +262,10 @@ end
 
 ### Upload Sitemaps to a Remote Host
 
+> SitemapGenerator::S3Adapter is a simple S3 adapter which was added in v3.2 which
+> uses Fog and doesn't require CarrierWave.  You can find a bit more information
+> about it [on the wiki page][remote_hosts].
+
 Sometimes it is desirable to host your sitemap files on a remote server and point robots
 and search engines to the remote files.  For example if you are using a host like Heroku
 which doesn't allow writing to the local filesystem.  You still require *some* write access
@@ -302,7 +306,8 @@ You generate your sitemaps as usual using `rake sitemap:refresh`.
 Note that SitemapGenerator will automatically turn off `include_index` in this case because
 the `sitemaps_host` does not match the `default_host`.  The link to the sitemap index file
 that would otherwise be included would point to a different host than the rest of the links
-in the sitemap, something that the sitemap rules forbid.
+in the sitemap, something that the sitemap rules forbid.  (Since version 3.2 this is no
+longer an issue because [`include_index` is off by default][include_index_change].)
 
 ### Generating Multiple Sitemaps
 
@@ -403,12 +408,12 @@ A few things to note:
 Now let's see what is output when we run this configuration with `rake sitemap:refresh:no_ping`:
 
 ```
-+ sitemap1.xml.gz                   3 links /  923 Bytes /  329 Bytes gzipped
++ sitemap1.xml.gz                   2 links /  923 Bytes /  329 Bytes gzipped
 + sitemap_index.xml.gz           1 sitemaps /  364 Bytes /  199 Bytes gzipped
-Sitemap stats: 3 links / 1 sitemaps / 0m00s
+Sitemap stats: 2 links / 1 sitemaps / 0m00s
 ```
 
-Weird!  The sitemap has three links, even though only added one!  This is because SitemapGenerator adds the root URL `/` and the URL of the sitemap index file to your sitemap by default.  (You can change the default behaviour by setting the `include_root` or `include_index` option.)
+Weird!  The sitemap has two links, even though only added one!  This is because SitemapGenerator adds the root URL `/` by default.  (Note that prior to version 3.2 the  URL of the sitemap index file was also added to the sitemap by default but [this behaviour has been changed][include_index_change] because of Google complaining about nested indexing.)  You can change the default behaviour by setting the `include_root` or `include_index` option.
 
 Now let's take a look at the files that were created.  After uncompressing and XML-tidying the contents we have:
 
@@ -435,12 +440,6 @@ Now let's take a look at the files that were created.  After uncompressing and X
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>http://www.example.com/sitemap_index.xml.gz</loc>
-    <lastmod>2011-05-21T00:03:38+00:00</lastmod>
-    <changefreq>always</changefreq>
-    <priority>1.0</priority>
-  </url>
-  <url>
     <loc>http://www.example.com/welcome</loc>
     <lastmod>2011-05-21T00:03:38+00:00</lastmod>
     <changefreq>weekly</changefreq>
@@ -449,7 +448,7 @@ Now let's take a look at the files that were created.  After uncompressing and X
 </urlset>
 ```
 
-The sitemaps conform to the [Sitemap 0.9 protocol][sitemap_protocol].  Notice the values for `priority` and `changefreq` on the root and sitemap index links, the ones that were added for us?  The values tell us that these links are the highest priority and should be checked regularly because they are constantly changing.  You can specify your own values for these options in your call to `add`.
+The sitemaps conform to the [Sitemap 0.9 protocol][sitemap_protocol].  Notice the value for `priority` and `changefreq` on the root link, the one that was added for us?  The values tell us that this link is the highest priority and should be checked regularly because it are constantly changing.  You can specify your own values for these options in your call to `add`.
 
 ### Adding Links
 
@@ -882,9 +881,11 @@ Copyright (c) 2009 Karl Varga released under the MIT license
 [sitemap_video]:http://www.google.com/support/webmasters/bin/topic.py?topic=10079
 [sitemap_news]:http://www.google.com/support/webmasters/bin/topic.py?hl=en&topic=10078
 [sitemap_geo]:http://www.google.com/support/webmasters/bin/topic.py?hl=en&topic=14688
+[sitemap_mobile]:http://support.google.com/webmasters/bin/answer.py?hl=en&answer=34648
 [sitemap_protocol]:http://sitemaps.org/protocol.php
 [video_tags]:http://www.google.com/support/webmasters/bin/answer.py?hl=en&answer=80472#4
 [image_tags]:http://www.google.com/support/webmasters/bin/answer.py?hl=en&answer=178636
 [geo_tags]:http://www.google.com/support/webmasters/bin/answer.py?hl=en&answer=94555
 [news_tags]:http://www.google.com/support/news_pub/bin/answer.py?answer=74288
 [remote_hosts]:https://github.com/kjvarga/sitemap_generator/wiki/Generate-Sitemaps-on-read-only-filesystems-like-Heroku
+[include_index_change]:https://github.com/kjvarga/sitemap_generator/issues/70
