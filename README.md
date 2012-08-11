@@ -69,6 +69,7 @@ Does your website use SitemapGenerator to generate Sitemaps?  Where would you be
 
 ## Changelog
 
+* v3.2.1: Fix syntax error in SitemapGenerator::S3Adapter
 * v3.2: **Support mobile tags**, **SitemapGenerator::S3Adapter** a simple S3 adapter which uses Fog and doesn't require CarrierWave; Remove Ask from the sitemap ping because the service has been shutdown; [Turn off `include_index`][include_index_change] by default; Fix the news XML namespace;  Only include autoplay attribute if present
 * v3.1.1: Bugfix: Groups inherit current adapter
 * v3.1.0: Add `add_to_index` method to add links to the sitemap index.  Add `sitemap` method for accessing the LinkSet instance from within `create()`.  Don't modify options hashes passed to methods.  Fix and improve `yield_sitemap` option handling.
