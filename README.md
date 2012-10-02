@@ -69,6 +69,7 @@ Does your website use SitemapGenerator to generate Sitemaps?  Where would you be
 
 ## Changelog
 
+* v3.3: **Support creating sitemaps with no index file**.  A big thank-you to [Eric Hochberger][ehoch] for generously paying for this feature.
 * v3.2.1: Fix syntax error in SitemapGenerator::S3Adapter
 * v3.2: **Support mobile tags**, **SitemapGenerator::S3Adapter** a simple S3 adapter which uses Fog and doesn't require CarrierWave; Remove Ask from the sitemap ping because the service has been shutdown; [Turn off `include_index`][include_index_change] by default; Fix the news XML namespace;  Only include autoplay attribute if present
 * v3.1.1: Bugfix: Groups inherit current adapter
@@ -260,6 +261,12 @@ task :refresh_sitemaps do
   run "cd #{latest_release} && RAILS_ENV=#{rails_env} rake sitemap:refresh"
 end
 ```
+
+### Sitemaps with no Index File
+
+Sometimes you may not want the sitemap index file to be automatically created, for example when you have a small site with only one sitemap file.  Or you may only want an index file created if you have more than one sitemap file.  Or you may never want the index file to be created.
+
+To handle these cases, take a look at the `create_index` option in the Sitemap Options section below.
 
 ### Upload Sitemaps to a Remote Host
 
@@ -629,6 +636,8 @@ The options passed to `group` only apply to the links and sitemaps generated in 
 
 The following options are supported:
 
+* `create_index` - Supported values: `true`, `false`, `:auto`.  Default: `true`. Whether to create a sitemap index file.  If `true` an index file is always created regardless of how many sitemap files are generated.  If `false` an index file is never created.  If `:auto` an index file is created only when you have more than one sitemap file (i.e. you have added more than 50,000 - `SitemapGenerator::MAX_SITEMAP_LINKS` - links).
+
 * `default_host` - String.  Required.  **Host including protocol** to use when building a link to add to your sitemap.  For example `http://example.com`.  Calling `add '/home'` would then generate the URL `http://example.com/home` and add that to the sitemap.  You can pass a `:host` option in your call to `add` to override this value on a per-link basis.  For example calling `add '/home', :host => 'https://example.com'` would generate the URL `https://example.com/home`, for that link only.
 
 * `filename` - Symbol.  The **base name for the files** that will be generated.  The default value is `:sitemap`.  This yields sitemaps with names like `sitemap1.xml.gz`, `sitemap2.xml.gz`, `sitemap3.xml.gz` etc, and a sitemap index named `sitemap_index.xml.gz`.  If we now set the value to `:geo` the sitemaps would be named `geo1.xml.gz`, `geo2.xml.gz`, `geo3.xml.gz` etc, and the sitemap index would be named `geo_index.xml.gz`.
@@ -860,6 +869,7 @@ Tested and working on:
 
 ## Thanks (in no particular order)
 
+* [Eric Hochberger][ehoch]
 * [Rodrigo Flores](https://github.com/rodrigoflores) for News sitemaps
 * [Alex Soto](http://github.com/apsoto) for Video sitemaps
 * [Alexadre Bini](http://github.com/alexandrebini) for Image sitemaps
@@ -890,3 +900,4 @@ Copyright (c) 2009 Karl Varga released under the MIT license
 [news_tags]:http://www.google.com/support/news_pub/bin/answer.py?answer=74288
 [remote_hosts]:https://github.com/kjvarga/sitemap_generator/wiki/Generate-Sitemaps-on-read-only-filesystems-like-Heroku
 [include_index_change]:https://github.com/kjvarga/sitemap_generator/issues/70
+[ehoch]:https://github.com/ehoch
