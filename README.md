@@ -7,7 +7,7 @@ Sitemaps adhere to the [Sitemap 0.9 protocol][sitemap_protocol] specification.
 ## Features
 
 * Framework agnostic
-* Supports [News sitemaps][sitemap_news], [Video sitemaps][sitemap_video], [Image sitemaps][sitemap_images], [Geo sitemaps][sitemap_geo] and [Mobile sitemaps][sitemap_mobile]
+* Supports [News sitemaps][sitemap_news], [Video sitemaps][sitemap_video], [Image sitemaps][sitemap_images], [Geo sitemaps][sitemap_geo], [Mobile sitemaps][sitemap_mobile] and [Alternate Links][alternate_links]
 * Supports read-only filesystems like Heroku via uploading to a remote host like Amazon S3
 * Compatible with Rails 2 & 3
 * Adheres to the [Sitemap 0.9 protocol][sitemap_protocol]
@@ -16,7 +16,6 @@ Sitemaps adhere to the [Sitemap 0.9 protocol][sitemap_protocol] specification.
 * Notifies search engines (Google, Bing, SitemapWriter) of new sitemaps
 * Ensures your old sitemaps stay in place if the new sitemap fails to generate
 * Gives you complete control over your sitemaps and their content
-
 
 ### Show Me
 
@@ -498,6 +497,8 @@ You can read more about `add` in the [XML Specification](http://sitemaps.org/pro
 
 ### Supported Options to `add`
 
+For other options be sure to check out the **Sitemap Extensions** section below.
+
 * `changefreq` - Default: `'weekly'` (String).
 
   Indicates how often the content of the page changes.  One of `'always'`, `'hourly'`, `'daily'`, `'weekly'`, `'monthly'`, `'yearly'` or `'never'`.  Example:
@@ -744,14 +745,14 @@ end
 
 #### Supported options
 
-* `publication_name`
-* `publication_language`
-* `publication_date`
-* `genres`
-* `access`
-* `title`
-* `keywords`
-* `stock_tickers`
+* `:publication_name`
+* `:publication_language`
+* `:publication_date`
+* `:genres`
+* `:access`
+* `:title`
+* `:keywords`
+* `:stock_tickers`
 
 
 ### Image Sitemaps
@@ -770,11 +771,11 @@ end
 
 #### Supported options
 
-* `loc` Required, location of the image
-* `caption`
-* `geo_location`
-* `title`
-* `license`
+* `:loc` Required, location of the image
+* `:caption`
+* `:geo_location`
+* `:title`
+* `:license`
 
 
 ### Video Sitemaps
@@ -816,26 +817,32 @@ end
 
 #### Supported options
 
-* `format` Required, either 'kml' or 'georss'
+* `:format` Required, either 'kml' or 'georss'
 
 
-### Alternate links (useful for i18n)
+### Alternate Links
 
-Alternate links can be added by passing a `:alternate` Hash do `add`. You may add more alternate links to url, by passing an array of hashes using the `:alternates` option.
+A useful feature for internationalization is to specify alternate links for a url.
+
+Alternate links can be added by passing an `:alternate` Hash to `add`. You can pass more than one alternate link by passing an array of hashes using the `:alternates` option.
+
+Check out the Google specification [here][alternate_links].
 
 #### Example
 
 ```ruby
-add('/index.html', :alternate => {
-  :href => 'http://www.example.de/index.html',
-  :lang => 'de'
-})
+SitemapGenerator::Sitemap.create do
+  add('/index.html', :alternate => {
+    :href => 'http://www.example.de/index.html',
+    :lang => 'de'
+  })
+end
 ```
 
 #### Supported options
 
 * `:href` - Required, string.
-* `lang`  - Required, string.
+* `:lang`  - Required, string.
 
 
 ## Raison d'être
@@ -920,3 +927,4 @@ Copyright (c) 2009 Karl Varga released under the MIT license
 [remote_hosts]:https://github.com/kjvarga/sitemap_generator/wiki/Generate-Sitemaps-on-read-only-filesystems-like-Heroku
 [include_index_change]:https://github.com/kjvarga/sitemap_generator/issues/70
 [ehoch]:https://github.com/ehoch
+[alternate_links]:http://support.google.com/webmasters/bin/answer.py?hl=en&answer=2620865
