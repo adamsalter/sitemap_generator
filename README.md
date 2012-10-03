@@ -68,6 +68,7 @@ Does your website use SitemapGenerator to generate Sitemaps?  Where would you be
 
 ## Changelog
 
+* v3.4: Support [alternate links][alternate_links] for urls; Support configurable options in the `SitemapGenerator::S3Adapter`
 * v3.3: **Support creating sitemaps with no index file**.  A big thank-you to [Eric Hochberger][ehoch] for generously paying for this feature.
 * v3.2.1: Fix syntax error in SitemapGenerator::S3Adapter
 * v3.2: **Support mobile tags**, **SitemapGenerator::S3Adapter** a simple S3 adapter which uses Fog and doesn't require CarrierWave; Remove Ask from the sitemap ping because the service has been shutdown; [Turn off `include_index`][include_index_change] by default; Fix the news XML namespace;  Only include autoplay attribute if present
