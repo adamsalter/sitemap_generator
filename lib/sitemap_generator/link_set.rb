@@ -297,6 +297,7 @@ module SitemapGenerator
       sitemap_index.location.url
     end
 
+    # All done.  Write out remaining files.
     def finalize!
       finalize_sitemap!
       finalize_sitemap_index!
@@ -417,19 +418,17 @@ module SitemapGenerator
       add_default_links if !@added_default_links && !@created_group
       # This will finalize it.  We add to the index even if not creating an index because
       # the index keeps track of how many links are in our sitemaps and we need this info
-      # for the summary line.  If not for that problem, I would add the sitemap to
-      # the index only if create_index is truthy.
+      # for the summary line.  Also the index determines which file gets the first name
+      # so everything has to go via the index.
       add_to_index(sitemap)
-      output(sitemap.summary)
     end
 
     # Finalize a sitemap index and output a summary line.  Do nothing if it has already
     # been finalized.
     def finalize_sitemap_index!
-      return if @protect_index || !@create_index || sitemap_index.finalized?
-      return if @create_index == :auto && sitemap_index.link_count <= 1
+      return if @protect_index || sitemap_index.finalized?
       sitemap_index.finalize!
-      output(sitemap_index.summary)
+      sitemap_index.write
     end
 
     # Return the interpreter linked to this instance.
@@ -559,7 +558,8 @@ module SitemapGenerator
           :namer => sitemaps_namer,
           :public_path => public_path,
           :sitemaps_path => @sitemaps_path,
-          :adapter => @adapter
+          :adapter => @adapter,
+          :verbose => verbose
         )
       end
 
@@ -570,7 +570,9 @@ module SitemapGenerator
           :namer => sitemap_index_namer,
           :public_path => public_path,
           :sitemaps_path => @sitemaps_path,
-          :adapter => @adapter
+          :adapter => @adapter,
+          :verbose => verbose,
+          :create_index => @create_index
         )
       end
 

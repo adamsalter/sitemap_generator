@@ -32,11 +32,6 @@ describe 'SitemapGenerator::Builder::SitemapFile' do
     @s.finalized?.should be_false
   end
 
-  it "should increment the namer after finalizing" do
-    @s.finalize!
-    @s.location.filename.should_not == @s.location.namer.to_s
-  end
-
   it "should raise if no default host is set" do
     lambda { SitemapGenerator::Builder::SitemapFile.new.location.url }.should raise_error(SitemapGenerator::SitemapError)
   end
@@ -44,11 +39,18 @@ describe 'SitemapGenerator::Builder::SitemapFile' do
   describe "lastmod" do
     it "should be the file last modified time" do
       lastmod = (Time.now - 1209600)
+      @s.location.reserve_name
       File.expects(:mtime).with(@s.location.path).returns(lastmod)
       @s.lastmod.should == lastmod
     end
 
-    it "should be nil if the file DNE" do
+    it "should be nil if the location has not reserved a name" do
+      File.expects(:mtime).never
+      @s.lastmod.should be_nil
+    end
+    
+    it "should be nil if location has reserved a name and the file DNE" do
+      @s.location.reserve_name
       File.expects(:mtime).raises(Errno::ENOENT)
       @s.lastmod.should be_nil
     end

@@ -42,10 +42,19 @@ module SitemapGenerator
         @xml_wrapper_start.gsub!(/\s+/, ' ').gsub!(/ *> */, '>').strip!
         @xml_wrapper_end   = %q[</urlset>]
         @filesize = bytesize(@xml_wrapper_start) + bytesize(@xml_wrapper_end)
+        @written = false
+        @reserved_name = nil # holds the name reserved from the namer
+        @frozen = false      # rather than actually freeze, use this boolean
       end
 
+      # If a name has been reserved, use the last modified time from the file.
+      # Otherwise return nil.  We don't want to prematurely assign a name
+      # for this sitemap if one has not yet been reserved, because we may
+      # mess up the name-assignment sequence.
       def lastmod
-        File.mtime(location.path) rescue nil
+        File.mtime(location.path) if location.reserved_name?
+      rescue
+        nil
       end
 
       def empty?
@@ -102,31 +111,54 @@ module SitemapGenerator
         @link_count += 1
       end
 
-      # Write out the Sitemap file and freeze this object.
+      # "Freeze" this object.  Actually just flags it as frozen.
+      #
+      # A SitemapGenerator::SitemapFinalizedError exception is raised if the Sitemap
+      # has already been finalized.
+      def finalize!
+        raise SitemapGenerator::SitemapFinalizedError if finalized?
+        @frozen = true
+      end
+
+      def finalized?
+        @frozen
+      end
+
+      # Write out the sitemap and free up memory.
       #
       # All the xml content in the instance is cleared, but attributes like
       # <tt>filesize</tt> are still available.
       #
-      # A SitemapGenerator::SitemapFinalizedError exception is raised if the Sitemap
-      # has already been finalized
-      def finalize!
-        raise SitemapGenerator::SitemapFinalizedError if finalized?
-
+      # A SitemapGenerator::SitemapError exception is raised if the file has
+      # already been written.
+      def write
+        raise SitemapGenerator::SitemapError.new("Sitemap already written!") if written?
+        finalize! unless finalized?
+        reserve_name
         @location.write(@xml_wrapper_start + @xml_content + @xml_wrapper_end)
-
-        # Increment the namer (SitemapFile only)
-        @location.namer.next if @location.namer
-
-        # Cleanup and freeze the object
         @xml_content = @xml_wrapper_start = @xml_wrapper_end = ''
-        freeze
+        puts summary if @location.verbose?
+        @written = true
       end
 
-      def finalized?
-        frozen?
+      # Return true if this file has been written out to disk
+      def written?
+        @written
       end
 
-      # Return a new instance of the sitemap file with the same options, and the next name in the sequence.
+      # Reserve a name from the namer unless one has already been reserved.
+      # Safe to call more than once.
+      def reserve_name
+        @reserved_name ||= @location.reserve_name
+      end
+
+      # Return a boolean indicating whether a name has been reserved
+      def reserved_name?
+        !!@reserved_name
+      end
+
+      # Return a new instance of the sitemap file with the same options,
+      # and the next name in the sequence.
       def new
         location = @location.dup
         location.delete(:filename) if location.namer

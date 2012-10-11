@@ -190,9 +190,7 @@ describe SitemapGenerator::LinkSet do
     let(:ls) { SitemapGenerator::LinkSet.new(:default_host => default_host, :verbose => true) }
 
     it "should output summary lines" do
-      ls.sitemap.expects(:finalize!)
       ls.sitemap.expects(:summary)
-      ls.sitemap_index.expects(:finalize!)
       ls.sitemap_index.expects(:summary)
       ls.finalize!
     end
@@ -725,9 +723,9 @@ describe SitemapGenerator::LinkSet do
     describe "when false" do
       let(:ls)  { SitemapGenerator::LinkSet.new(:default_host => default_host, :create_index => false) }
 
-      it "should not finalize the index" do
+      it "should not write the index" do
         ls.send(:finalize_sitemap_index!)
-        ls.sitemap_index.finalized?.should be_false
+        ls.sitemap_index.written?.should be_false
       end
 
       it "should still add finalized sitemaps to the index (but the index is never finalized)" do
@@ -753,10 +751,10 @@ describe SitemapGenerator::LinkSet do
     describe "when :auto" do
       let(:ls)  { SitemapGenerator::LinkSet.new(:default_host => default_host, :create_index => :auto) }
 
-      it "should not finalize the index when it is empty" do
+      it "should not write the index when it is empty" do
         ls.sitemap_index.empty?.should be_true
         ls.send(:finalize_sitemap_index!)
-        ls.sitemap_index.finalized?.should be_false
+        ls.sitemap_index.written?.should be_false
       end
 
       it "should add finalized sitemaps to the index" do
@@ -764,18 +762,18 @@ describe SitemapGenerator::LinkSet do
         ls.send(:finalize_sitemap!)
       end
 
-      it "should not finalize the index when it has only one link" do
+      it "should not write the index when it has only one link" do
         ls.sitemap_index.add '/test', :host => default_host
         ls.sitemap_index.empty?.should be_false
         ls.send(:finalize_sitemap_index!)
-        ls.sitemap_index.finalized?.should be_false
+        ls.sitemap_index.written?.should be_false
       end
 
-      it "should finalize the index when it has more than one link" do
+      it "should write the index when it has more than one link" do
         ls.sitemap_index.add '/test1', :host => default_host
         ls.sitemap_index.add '/test2', :host => default_host
         ls.send(:finalize_sitemap_index!)
-        ls.sitemap_index.finalized?.should be_true
+        ls.sitemap_index.written?.should be_true
       end
     end
   end

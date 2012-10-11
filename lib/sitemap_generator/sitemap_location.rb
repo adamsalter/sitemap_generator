@@ -29,11 +29,15 @@ module SitemapGenerator
     #   directory if running under Rails.
     # * <tt>sitemaps_path</tt> - gives the path relative to the <tt>public_path</tt> in which to
     #   write sitemaps e.g. <tt>sitemaps/</tt>.
+    # * <tt>verbose</tt> - whether to output summary into to STDOUT.  Default +false+.
+    # * <tt>create_index</tt> - whether to create a sitemap index.  Default +true+.  See LinkSet.
+    #                           Only applies to the SitemapIndexLocation object.
     def initialize(opts={})
-      SitemapGenerator::Utilities.assert_valid_keys(opts, [:adapter, :public_path, :sitemaps_path, :host, :filename, :namer])
+      SitemapGenerator::Utilities.assert_valid_keys(opts, [:adapter, :public_path, :sitemaps_path, :host, :filename, :namer, :verbose, :create_index])
       opts[:adapter] ||= SitemapGenerator::FileAdapter.new
       opts[:public_path] ||= SitemapGenerator.app.root + 'public/'
       opts[:namer] = SitemapGenerator::SitemapNamer.new(:sitemap) if !opts[:filename] && !opts[:namer]
+      opts[:verbose] = !!opts[:verbose]
       self.merge!(opts)
     end
 
@@ -78,8 +82,28 @@ module SitemapGenerator
       self[:filename]
     end
 
+    # If a namer is set, reserve the filename and increment the namer.
+    # Returns the reserved name.
+    def reserve_name
+      if self[:namer]
+        filename
+        self[:namer].next
+      end
+      self[:filename]
+    end
+
+    # Return true if this location has a fixed filename.  If no name has been
+    # reserved from the namer, for instance, returns false.
+    def reserved_name?
+      !!self[:filename]
+    end
+
     def namer
       self[:namer]
+    end
+
+    def verbose?
+      self[:verbose]
     end
 
     # If you set the filename, clear the namer and vice versa.
@@ -106,6 +130,12 @@ module SitemapGenerator
         opts[:namer] = SitemapGenerator::SitemapIndexNamer.new(:sitemap_index)
       end
       super(opts)
+    end
+
+    # Really just a placeholder for an option which should really go into some
+    # kind of options class.
+    def create_index
+      self[:create_index]
     end
   end
 end
