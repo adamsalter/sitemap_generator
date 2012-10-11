@@ -13,7 +13,7 @@ module SitemapGenerator
     #
     # Options include:
     #   :extension - Default: '.xml.gz'. File extension to append.
-    #   :start     - Default: 1. Index at which to start counting.
+    #   :start     - Default: 1. Numerical index at which to start counting.
     def initialize(base, options={});
       @options = SitemapGenerator::Utilities.reverse_merge(options,
         :extension => '.xml.gz',
@@ -54,6 +54,69 @@ module SitemapGenerator
   class SitemapIndexNamer < SitemapNamer
     def to_s
       "#{@base}#{@options[:extension]}"
+    end
+  end
+
+  # The SimpleNamer uses the same namer instance for the sitemap index and the sitemaps.
+  # If no index is needed, the first sitemap gets the first name.  However, if
+  # an index is needed, the index gets the first name.
+  #
+  # A typical sequence would looks like this:
+  #   * sitemap.xml.gz
+  #   * sitemap1.xml.gz
+  #   * sitemap2.xml.gz
+  #   * sitemap3.xml.gz
+  #   * ...
+  #
+  # Options:
+  #   :extension - Default: '.xml.gz'. File extension to append.
+  #   :start     - Default: 1. Numerical index at which to start counting.
+  #   :zero      - Default: nil.  Could be a string or number that gives part
+  #                of the first name in the sequence.  So in the old naming scheme
+  #                setting this to '_index' would produce 'sitemap_index.xml.gz' as
+  #                the first name.  Thereafter, the numerical index defined by +start+
+  #                is used.
+  class SimpleNamer < SitemapNamer
+    def initialize(base, options={})
+      super_options = SitemapGenerator::Utilities.reverse_merge(options,
+        :zero => nil # identifies the marker for the start of the series
+      )
+      super(base, super_options)
+    end
+
+    def to_s
+      "#{@base}#{@count}#{@options[:extension]}"
+    end
+
+    # Reset to the first name
+    def reset
+      @count = @options[:zero]
+    end
+
+    # True if on the first name
+    def start?
+      @count == @options[:zero]
+    end
+
+    # Return this instance set to the next name
+    def next
+      if start?
+        @count = @options[:start]
+      else
+        @count += 1
+      end
+      self
+    end
+
+    # Return this instance set to the previous name
+    def previous
+      raise NameError, "Already at the start of the series" if start?
+      if @count <= @options[:start]
+        @count = @options[:zero]
+      else
+        @count -= 1
+      end
+      self
     end
   end
 end
