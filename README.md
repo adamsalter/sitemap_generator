@@ -835,7 +835,8 @@ Check out the Google specification [here][alternate_links].
 SitemapGenerator::Sitemap.create do
   add('/index.html', :alternate => {
     :href => 'http://www.example.de/index.html',
-    :lang => 'de'
+    :lang => 'de',
+    :nofollow => true
   })
 end
 ```
@@ -844,6 +845,7 @@ end
 
 * `:href` - Required, string.
 * `:lang`  - Required, string.
+* `:nofollow` - Optionall, boolean. Used to mark link as "nofollow"
 
 
 ### Alternate links (useful for i18n)
