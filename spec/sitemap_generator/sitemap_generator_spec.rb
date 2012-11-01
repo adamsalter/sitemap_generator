@@ -202,6 +202,100 @@ describe "SitemapGenerator" do
     end
   end
 
+  describe "create_index" do
+
+    before :each do
+      clean_sitemap_files_from_rails_app
+    end
+
+    describe "when true" do
+      let(:ls) { SitemapGenerator::LinkSet.new(:include_root => false, :default_host => 'http://example.com', :create_index => true) }
+
+      it "should always create index" do
+        ls.create { }
+        file_should_exist(rails_path('public/sitemap_index.xml.gz'))
+        file_should_exist(rails_path('public/sitemap1.xml.gz'))
+        file_should_not_exist(rails_path('public/sitemap2.xml.gz'))
+      end
+
+      it "should always create index" do
+        with_max_links(1) do
+          ls.create { add('/one') }
+        end
+        file_should_exist(rails_path('public/sitemap_index.xml.gz'))
+        file_should_exist(rails_path('public/sitemap1.xml.gz'))
+        file_should_not_exist(rails_path('public/sitemap2.xml.gz'))
+      end
+
+      it "should always create index" do
+        with_max_links(1) do
+          ls.create { add('/one'); add('/two') }
+        end
+        file_should_exist(rails_path('public/sitemap_index.xml.gz'))
+        file_should_exist(rails_path('public/sitemap1.xml.gz'))
+        file_should_exist(rails_path('public/sitemap2.xml.gz'))
+      end
+    end
+
+    describe "when false" do
+      let(:ls) { SitemapGenerator::LinkSet.new(:include_root => false, :default_host => 'http://example.com', :create_index => false) }
+
+      it "should never create index" do
+        ls.create { }
+        file_should_not_exist(rails_path('public/sitemap_index.xml.gz'))
+        file_should_exist(rails_path('public/sitemap1.xml.gz'))
+        file_should_not_exist(rails_path('public/sitemap2.xml.gz'))
+      end
+
+      it "should never create index" do
+        with_max_links(1) do
+          ls.create { add('/one') }
+        end
+        file_should_not_exist(rails_path('public/sitemap_index.xml.gz'))
+        file_should_exist(rails_path('public/sitemap1.xml.gz'))
+        file_should_not_exist(rails_path('public/sitemap2.xml.gz'))
+      end
+
+      it "should never create index" do
+        with_max_links(1) do
+          ls.create { add('/one'); add('/two') }
+        end
+        file_should_not_exist(rails_path('public/sitemap_index.xml.gz'))
+        file_should_exist(rails_path('public/sitemap1.xml.gz'))
+        file_should_exist(rails_path('public/sitemap2.xml.gz'))
+      end
+    end
+
+    describe "when :auto" do
+      let(:ls) { SitemapGenerator::LinkSet.new(:include_root => false, :default_host => 'http://example.com', :create_index => :auto) }
+
+      it "should not create index if one sitemap file" do
+        ls.create { }
+        file_should_not_exist(rails_path('public/sitemap_index.xml.gz'))
+        file_should_exist(rails_path('public/sitemap1.xml.gz'))
+        file_should_not_exist(rails_path('public/sitemap2.xml.gz'))
+      end
+
+      it "should not create index if one sitemap file" do
+        with_max_links(1) do
+          ls.create { add('/one') }
+        end
+        file_should_not_exist(rails_path('public/sitemap_index.xml.gz'))
+        file_should_exist(rails_path('public/sitemap1.xml.gz'))
+        file_should_not_exist(rails_path('public/sitemap2.xml.gz'))
+      end
+
+      it "should create index if more than one sitemap file" do
+        with_max_links(1) do
+          ls.create { add('/one'); add('/two') }
+        end
+        file_should_exist(rails_path('public/sitemap_index.xml.gz'))
+        file_should_exist(rails_path('public/sitemap1.xml.gz'))
+        file_should_exist(rails_path('public/sitemap2.xml.gz'))
+      end
+    end
+  end
+
   protected
 
   #
@@ -229,7 +323,7 @@ describe "SitemapGenerator" do
 
   # Better would be to just invoke the environment task and use
   # the interpreter.
-  def execute_sitemap_config
-   SitemapGenerator::Interpreter.run
+  def execute_sitemap_config(opts={})
+   SitemapGenerator::Interpreter.run(opts)
   end
 end

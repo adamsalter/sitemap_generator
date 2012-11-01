@@ -25,11 +25,11 @@ module SitemapGenerator
         @filesize = bytesize(@xml_wrapper_start) + bytesize(@xml_wrapper_end)
       end
 
-      # Finalize sitemaps as they are added to the index
+      # Finalize sitemaps as they are added to the index.
       def add(link, options={})
         if file = link.is_a?(SitemapFile) && link
           @sitemaps_link_count += file.link_count
-          file.finalize!
+          file.finalize! unless file.finalized?
         end
         super(SitemapGenerator::Builder::SitemapIndexUrl.new(link, options))
       end

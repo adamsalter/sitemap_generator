@@ -20,12 +20,13 @@ describe SitemapGenerator::LinkSet do
     let(:ls) { SitemapGenerator::LinkSet.new }
 
     default_options = {
-      :filename => :sitemap,
+      :filename      => :sitemap,
       :sitemaps_path => nil,
-      :public_path => SitemapGenerator.app.root + 'public/',
-      :default_host => nil,
+      :public_path   => SitemapGenerator.app.root + 'public/',
+      :default_host  => nil,
       :include_index => false,
-      :include_root => true
+      :include_root  => true,
+      :create_index  => true
     }
 
     default_options.each do |option, value|
@@ -369,6 +370,19 @@ describe SitemapGenerator::LinkSet do
       end
     end
 
+    describe "create_index" do
+      it "should inherit the value" do
+        ls.group.create_index.should == ls.create_index
+        ls.create_index = :some_value
+        ls.group.create_index.should == :some_value
+      end
+
+      it "should set the value" do
+        group = ls.group(:create_index => :some_value)
+        group.create_index.should == :some_value
+      end
+    end
+
     describe "should share the current sitemap" do
       it "if only default_host is passed" do
         group = ls.group(:default_host => 'http://newhost.com')
@@ -391,11 +405,6 @@ describe SitemapGenerator::LinkSet do
     end
 
     describe "finalizing" do
-      it "should finalize the sitemaps if a block is passed" do
-        @group = ls.group
-        @group.sitemap.finalized?.should be_false
-      end
-
       it "should only finalize the sitemaps if a block is passed" do
         @group = ls.group
         @group.sitemap.finalized?.should be_false
@@ -530,6 +539,11 @@ describe SitemapGenerator::LinkSet do
       options = { :filename => 'sitemaptest', :verbose => false }
       ls.create(options)
       options.should == { :filename => 'sitemaptest', :verbose => false }
+    end
+
+    it "should set create_index" do
+      ls.create(:create_index => :auto)
+      ls.create_index.should == :auto
     end
   end
 
@@ -703,6 +717,65 @@ describe SitemapGenerator::LinkSet do
       it "should allow setting a custom host" do
         ls.sitemap_index.expects(:add).with('/home', :host => 'http://newhost.com')
         ls.add_to_index('/home', :host => 'http://newhost.com')
+      end
+    end
+  end
+
+  describe "create_index" do
+    describe "when false" do
+      let(:ls)  { SitemapGenerator::LinkSet.new(:default_host => default_host, :create_index => false) }
+
+      it "should not finalize the index" do
+        ls.send(:finalize_sitemap_index!)
+        ls.sitemap_index.finalized?.should be_false
+      end
+
+      it "should still add finalized sitemaps to the index (but the index is never finalized)" do
+        ls.expects(:add_to_index).with(ls.sitemap).once
+        ls.send(:finalize_sitemap!)
+      end
+    end
+
+    describe "when true" do
+      let(:ls)  { SitemapGenerator::LinkSet.new(:default_host => default_host, :create_index => true) }
+
+      it "should always finalize the index" do
+        ls.send(:finalize_sitemap_index!)
+        ls.sitemap_index.finalized?.should be_true
+      end
+
+      it "should add finalized sitemaps to the index" do
+        ls.expects(:add_to_index).with(ls.sitemap).once
+        ls.send(:finalize_sitemap!)
+      end
+    end
+
+    describe "when :auto" do
+      let(:ls)  { SitemapGenerator::LinkSet.new(:default_host => default_host, :create_index => :auto) }
+
+      it "should not finalize the index when it is empty" do
+        ls.sitemap_index.empty?.should be_true
+        ls.send(:finalize_sitemap_index!)
+        ls.sitemap_index.finalized?.should be_false
+      end
+
+      it "should add finalized sitemaps to the index" do
+        ls.expects(:add_to_index).with(ls.sitemap).once
+        ls.send(:finalize_sitemap!)
+      end
+
+      it "should not finalize the index when it has only one link" do
+        ls.sitemap_index.add '/test', :host => default_host
+        ls.sitemap_index.empty?.should be_false
+        ls.send(:finalize_sitemap_index!)
+        ls.sitemap_index.finalized?.should be_false
+      end
+
+      it "should finalize the index when it has more than one link" do
+        ls.sitemap_index.add '/test1', :host => default_host
+        ls.sitemap_index.add '/test2', :host => default_host
+        ls.send(:finalize_sitemap_index!)
+        ls.sitemap_index.finalized?.should be_true
       end
     end
   end
