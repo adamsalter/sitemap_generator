@@ -65,9 +65,45 @@ Does your website use SitemapGenerator to generate Sitemaps?  Where would you be
 
 <a href='http://www.pledgie.com/campaigns/15267'><img alt='Click here to lend your support to: SitemapGenerator and make a donation at www.pledgie.com !' src='http://pledgie.com/campaigns/15267.png?skin_name=chrome' border='0' /></a>
 
+## Important changes in version 4!
+
+Version 4.0 introduces a new **non-backwards compatible** naming scheme.  **If you are running version 3 or earlier and you upgrade to version 4, you need to make a couple small changes to ensure that search engines can still find your sitemaps!**  Your sitemaps will still work fine, but the name of the index file has changed.
+
+### So what has changed?
+
+* **The index is generated intelligently**.  SitemapGenerator now detects whether you need an index or not, and only generates one if you need it or have requested it.  So small sites (less than 50,000 links) won't have one, large sites will.  You don't have to worry about anything.  And with the `create_index` option, it's easier than ever to control index creation to suit your needs.
+
+* **The default index file name has changed** from `sitemap_index.xml.gz` to just `sitemap.xml.gz`.  So the `_index` part has been removed.  Your sitemaps will still be named `sitemap1.xml.gz`, `sitemap2.xml.gz`, `sitemap3.xml.gz` etc.
+
+* **Everyone now points search engines to the `sitemap.xml.gz` file**.  It doesn't matter whether your site has 10 links or a million links, just point to `sitemap.xml.gz`.  If your site needs an index, that is the index.  If it doesn't, then that's your sitemap.  Simple.
+
+* **It's easier to write custom namers** because the index and the sitemaps share the same namer instance (which is now a `SitemapGenerator::SimpleNamer` instance).
+
+* **Groups share the new naming convention**.  So the files in your `geo` group will be named `geo.xml.gz`, `geo1.xml.gz`, `geo2.xml.gz` etc.  Pre-version 4 these files would have been named `geo1.xml.gz`, `geo2.xml.gz`, `geo3.xml.gz` etc.
+
+### I don't want any of this crap!
+
+You don't care, you just want to get on with your day.  To resort to pre-version 4 behaviour add the following to your sitemap config:
+
+```ruby
+SitemapGenerator::Sitemap.create_index = true
+SitemapGenerator::Sitemap.sitemaps_namer = SitemapGenerator::SimpleNamer.new(:sitemap, :zero => '_index')
+```
+
+This tells SitemapGenerator to always create an index file and to name it `sitemap_index.xml.gz`.  If you are already using custom namers, you don't need to set `sitemaps_namer`; your old namers will still work as before.
+
+### I want it!  What do I need to do?
+
+1. Update your `robots.txt` file and make sure it points to `sitemap.xml.gz`.
+2. Generate your sitemaps to create the new `sitemap.xml.gz` file.
+3. Optionally remove the old `sitemap_index.xml.gz` file (or link it to the new file if you want to make sure that search engines can find it while you update them.)
+4. Go to your Google Webmaster tools and other places where you've pointed search engines to your sitemaps and point them to your new `sitemap.xml.gz` file.
+
+That's it!  Welcome to the future!
 
 ## Changelog
 
+* **v4.0: NEW, NON-BACKWARDS COMPATIBLE CHANGES.**  See above for more info. `create_index` defaults to `:auto`.  Define `SitemapGenerator::SimpleNamer` class for simpler custom namers compatible with the new naming conventions.
 * v3.4: Support [alternate links][alternate_links] for urls; Support configurable options in the `SitemapGenerator::S3Adapter`
 * v3.3: **Support creating sitemaps with no index file**.  A big thank-you to [Eric Hochberger][ehoch] for generously paying for this feature.
 * v3.2.1: Fix syntax error in SitemapGenerator::S3Adapter
@@ -250,7 +286,7 @@ To ensure that your application's sitemaps are available after a deployment you 
     end
     ```
 3.  **Regenerate your sitemaps after each deployment:**
-    
+
     ```ruby
     after "deploy", "refresh_sitemaps"
     task :refresh_sitemaps do
