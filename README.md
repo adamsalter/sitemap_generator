@@ -9,13 +9,14 @@ Sitemaps adhere to the [Sitemap 0.9 protocol][sitemap_protocol] specification.
 * Framework agnostic
 * Supports [News sitemaps][sitemap_news], [Video sitemaps][sitemap_video], [Image sitemaps][sitemap_images], [Geo sitemaps][sitemap_geo], [Mobile sitemaps][sitemap_mobile] and [Alternate Links][alternate_links]
 * Supports read-only filesystems like Heroku via uploading to a remote host like Amazon S3
-* Compatible with Rails 2 & 3
+* Compatible with Rails 2 & 3 and tested with Ruby REE, 1.9.2 & 1.9.3
 * Adheres to the [Sitemap 0.9 protocol][sitemap_protocol]
 * Handles millions of links
 * Automatically compresses your sitemaps
 * Notifies search engines (Google, Bing, SitemapWriter) of new sitemaps
 * Ensures your old sitemaps stay in place if the new sitemap fails to generate
-* Gives you complete control over your sitemaps and their content
+* Gives you complete control over your sitemap contents and naming scheme
+* Intelligent sitemap indexing
 
 ### Show Me
 
@@ -49,8 +50,7 @@ Output:
 
 ```
 In /Users/karl/projects/sitemap_generator-test/public/
-+ sitemap1.xml.gz                                          3 links /  357 Bytes
-+ sitemap_index.xml.gz                                  1 sitemaps /  228 Bytes
++ sitemap.xml.gz                                          3 links /  357 Bytes
 Sitemap stats: 3 links / 1 sitemaps / 0m00s
 
 Successful ping of Google
@@ -81,7 +81,7 @@ Version 4.0 introduces a new **non-backwards compatible** naming scheme.  **If y
 
 * **Groups share the new naming convention**.  So the files in your `geo` group will be named `geo.xml.gz`, `geo1.xml.gz`, `geo2.xml.gz` etc.  Pre-version 4 these files would have been named `geo1.xml.gz`, `geo2.xml.gz`, `geo3.xml.gz` etc.
 
-### I don't want any of this crap!
+### I don't want it!  How can I keep everything as it was?
 
 You don't care, you just want to get on with your day.  To resort to pre-version 4 behaviour add the following to your sitemap config:
 
