@@ -7,8 +7,8 @@ module SitemapGenerator
     @@requires_finalization_opts = [:filename, :sitemaps_path, :sitemaps_namer, :sitemaps_host]
     @@new_location_opts = [:filename, :sitemaps_path, :sitemaps_namer]
 
-    attr_reader :default_host, :sitemaps_path, :filename
-    attr_accessor :verbose, :yahoo_app_id, :include_root, :include_index, :sitemaps_host, :adapter, :yield_sitemap, :create_index
+    attr_reader :default_host, :sitemaps_path, :filename, :create_index
+    attr_accessor :verbose, :yahoo_app_id, :include_root, :include_index, :sitemaps_host, :adapter, :yield_sitemap
 
     # Create a new sitemap index and sitemap files.  Pass a block calls to the following
     # methods:
@@ -100,11 +100,11 @@ module SitemapGenerator
     # * <tt>:verbose</tt> - If +true+, output a summary line for each sitemap and sitemap
     #   index that is created.  Default is +false+.
     #
-    # * <tt>:create_index</tt> - Supported values: `true`, `false`, `:auto`.  Default: `true`.
+    # * <tt>:create_index</tt> - Supported values: `true`, `false`, `:auto`.  Default: `:auto`.
     #   Whether to create a sitemap index file.  If `true` an index file is always created,
     #   regardless of how many links are in your sitemap.  If `false` an index file is never
     #   created.  If `:auto` an index file is created only if your sitemap has more than
-    #   50,000 (or SitemapGenerator::MAX_SITEMAP_LINKS) links.
+    #   one sitemap file.
     #
     # KJV: When adding a new option be sure to include it in `options_for_group()` if
     # the option should be inherited by groups.
@@ -118,7 +118,7 @@ module SitemapGenerator
           :bing           => "http://www.bing.com/webmaster/ping.aspx?siteMap=%s",
           :sitemap_writer => "http://www.sitemapwriter.com/notify.php?crawler=all&url=%s"
         },
-        :create_index => true
+        :create_index => :auto
       )
       options.each_pair { |k, v| instance_variable_set("@#{k}".to_sym, v) }
 
@@ -173,9 +173,12 @@ module SitemapGenerator
     #
     # If you are not changing any of the location settings like <tt>filename<tt>,
     # <tt>sitemaps_path</tt>, <tt>sitemaps_host</tt> or <tt>sitemaps_namer</tt>
-    # links you add within the group will be added to the current sitemap file (e.g. sitemap1.xml).
-    # If one of these options is specified, the current sitemap file is finalized
-    # and a new sitemap file started.
+    # links you add within the group will be added to the current sitemap.
+    # Otherwise the current sitemap file is finalized and a new sitemap file started,
+    # using the options you specified.
+    #
+    # Most commonly, you'll want to give the group's files a distinct name using
+    # the <tt>filename</tt> option.
     #
     # Options like <tt>:default_host</tt> can be used and it will only affect the links
     # within the group.  Links added outside of the group will revert to the previous
@@ -187,15 +190,15 @@ module SitemapGenerator
       if (@@requires_finalization_opts & original_opts.keys).empty?
         # If no new filename or path is specified reuse the default sitemap file.
         # A new location object will be set on it for the duration of the group.
-        opts[:sitemap] = sitemap
+        original_opts[:sitemap] = sitemap
       elsif original_opts.key?(:sitemaps_host) && (@@new_location_opts & original_opts.keys).empty?
         # If no location options are provided we are creating the next sitemap in the
         # current series, so finalize and inherit the namer.
         finalize_sitemap!
-        opts[:sitemaps_namer] = sitemaps_namer
+        original_opts[:sitemaps_namer] = sitemaps_namer
       end
 
-      opts = options_for_group(opts)
+      opts = options_for_group(original_opts)
       @group = SitemapGenerator::LinkSet.new(opts)
       if opts.key?(:sitemap)
         # If the group is sharing the current sitemap, set the
@@ -206,9 +209,24 @@ module SitemapGenerator
           @group.interpreter.eval(:yield_sitemap => @yield_sitemap || SitemapGenerator.yield_sitemap?, &block)
           @sitemap.location.merge!(@original_location)
         end
-      elsif block_given?
-        @group.interpreter.eval(:yield_sitemap => @yield_sitemap || SitemapGenerator.yield_sitemap?, &block)
-        @group.finalize_sitemap!
+      else
+        # Handle the case where a user only has one group, and it's being written
+        # to a new sitemap file.  They would expect there to be an index.  So force
+        # index creation.  If there is more than one group, we would have an index anyways,
+        # so it's safe to force index creation in these other cases.  In the case that
+        # the groups reuse the current sitemap, don't force index creation because
+        # we want the default behaviour i.e. only an index if more than one sitemap file.
+        # Don't force index creation if the user specifically requested no index.  This
+        # unfortunately means that if they set it to :auto they may be getting an index
+        # when they didn't want one, but you shouldn't be using groups if you only have
+        # one sitemap and don't want an index.  Rather, just add the links directly in the create()
+        # block.
+        @group.create_index = true if @group.create_index != false
+
+        if block_given?
+          @group.interpreter.eval(:yield_sitemap => @yield_sitemap || SitemapGenerator.yield_sitemap?, &block)
+          @group.finalize_sitemap!
+        end
       end
       @group
     end
@@ -355,7 +373,7 @@ module SitemapGenerator
       end
     end
 
-    # Given +opts+, return a hash of options prepped for creating a new group from this LinkSet.
+    # Given +opts+, modify it and return it prepped for creating a new group from this LinkSet.
     # If <tt>:public_path</tt> is present in +opts+ it is removed because groups cannot
     # change the public path.
     def options_for_group(opts)
@@ -574,6 +592,13 @@ module SitemapGenerator
           :verbose => verbose,
           :create_index => @create_index
         )
+      end
+
+      # Set the value of +create_index+ on the SitemapIndexLocation object of the
+      # SitemapIndexFile.
+      def create_index=(value)
+        @create_index = value
+        @sitemap_index.location[:create_index] = value if @sitemap_index && !@sitemap_index.finalized? && !@protect_index
       end
 
       protected

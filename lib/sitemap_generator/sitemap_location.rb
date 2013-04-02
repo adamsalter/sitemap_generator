@@ -14,8 +14,8 @@ module SitemapGenerator
       end
     end
 
-    # If no +filename+ or +namer+ is provided, the default namer is used.  For sitemap
-    # files this generates names like <tt>sitemap1.xml.gz</tt>, <tt>sitemap2.xml.gz</tt> and so on,
+    # If no +filename+ or +namer+ is provided, the default namer is used, which
+    # generates names like <tt>sitemap.xml.gz</tt>, <tt>sitemap1.xml.gz</tt>, <tt>sitemap2.xml.gz</tt> and so on.
     #
     # === Options
     # * <tt>adapter</tt> - SitemapGenerator::Adapter subclass
@@ -30,7 +30,7 @@ module SitemapGenerator
     # * <tt>sitemaps_path</tt> - gives the path relative to the <tt>public_path</tt> in which to
     #   write sitemaps e.g. <tt>sitemaps/</tt>.
     # * <tt>verbose</tt> - whether to output summary into to STDOUT.  Default +false+.
-    # * <tt>create_index</tt> - whether to create a sitemap index.  Default +true+.  See LinkSet.
+    # * <tt>create_index</tt> - whether to create a sitemap index.  Default `:auto`.  See LinkSet.
     #                           Only applies to the SitemapIndexLocation object.
     def initialize(opts={})
       SitemapGenerator::Utilities.assert_valid_keys(opts, [:adapter, :public_path, :sitemaps_path, :host, :filename, :namer, :verbose, :create_index])
