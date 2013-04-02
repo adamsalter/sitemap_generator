@@ -22,7 +22,7 @@ describe "Sitemap Groups" do
       end
     end
 
-    file_should_exist(SitemapGenerator.app.root + 'public/sitemap_index.xml.gz')
+    file_should_exist(SitemapGenerator.app.root + 'public/sitemap.xml.gz')
     file_should_exist(SitemapGenerator.app.root + 'public/sitemap_en1.xml.gz')
     file_should_not_exist(SitemapGenerator.app.root + 'public/sitemap1.xml.gz')
   end
@@ -31,8 +31,8 @@ describe "Sitemap Groups" do
     @sm.create do
     end
     @sm.link_count.should == 1
-    file_should_exist(SitemapGenerator.app.root + 'public/sitemap_index.xml.gz')
-    file_should_exist(SitemapGenerator.app.root + 'public/sitemap1.xml.gz')
+    file_should_exist(SitemapGenerator.app.root + 'public/sitemap.xml.gz')
+    file_should_not_exist(SitemapGenerator.app.root + 'public/sitemap1.xml.gz')
   end
 
   it "should add links to the default sitemap" do
@@ -42,7 +42,7 @@ describe "Sitemap Groups" do
       add '/after'
     end
     @sm.link_count.should == 3
-    file_should_exist(SitemapGenerator.app.root + 'public/sitemap_index.xml.gz')
+    file_should_exist(SitemapGenerator.app.root + 'public/sitemap.xml.gz')
     file_should_exist(SitemapGenerator.app.root + 'public/sitemap1.xml.gz')
     file_should_exist(SitemapGenerator.app.root + 'public/sitemap_en1.xml.gz')
   end
@@ -61,13 +61,13 @@ describe "Sitemap Groups" do
       end
     }
     @sm.link_count.should == 4
-    file_should_exist(SitemapGenerator.app.root + 'public/sitemap_index.xml.gz')
+    file_should_exist(SitemapGenerator.app.root + 'public/sitemap.xml.gz')
     file_should_exist(SitemapGenerator.app.root + 'public/sitemap1.xml.gz')
     file_should_exist(SitemapGenerator.app.root + 'public/sitemap2.xml.gz')
     file_should_not_exist(SitemapGenerator.app.root + 'public/sitemap3.xml.gz')
+    file_should_exist(SitemapGenerator.app.root + 'public/en/sitemap_en.xml.gz')
     file_should_exist(SitemapGenerator.app.root + 'public/en/sitemap_en1.xml.gz')
-    file_should_exist(SitemapGenerator.app.root + 'public/en/sitemap_en2.xml.gz')
-    file_should_not_exist(SitemapGenerator.app.root + 'public/en/sitemap_en3.xml.gz')
+    file_should_not_exist(SitemapGenerator.app.root + 'public/en/sitemap_en2.xml.gz')
   end
 
   it "should support multiple groups" do
@@ -80,9 +80,9 @@ describe "Sitemap Groups" do
       end
     end
     @sm.link_count.should == 2
-    file_should_exist(SitemapGenerator.app.root + 'public/sitemap_index.xml.gz')
-    file_should_exist(SitemapGenerator.app.root + 'public/en/sitemap_en1.xml.gz')
-    file_should_exist(SitemapGenerator.app.root + 'public/fr/sitemap_fr1.xml.gz')
+    file_should_exist(SitemapGenerator.app.root + 'public/sitemap.xml.gz')
+    file_should_exist(SitemapGenerator.app.root + 'public/en/sitemap_en.xml.gz')
+    file_should_exist(SitemapGenerator.app.root + 'public/fr/sitemap_fr.xml.gz')
   end
 
   it "the sitemap shouldn't be finalized if the groups don't conflict" do
@@ -94,10 +94,10 @@ describe "Sitemap Groups" do
       add 'five'
     end
     @sm.link_count.should == 6
-    file_should_exist(SitemapGenerator.app.root + 'public/sitemap_index.xml.gz')
+    file_should_exist(SitemapGenerator.app.root + 'public/sitemap.xml.gz')
     file_should_exist(SitemapGenerator.app.root + 'public/sitemap1.xml.gz')
-    file_should_exist(SitemapGenerator.app.root + 'public/first1.xml.gz')
-    file_should_exist(SitemapGenerator.app.root + 'public/second1.xml.gz')
+    file_should_exist(SitemapGenerator.app.root + 'public/first.xml.gz')
+    file_should_exist(SitemapGenerator.app.root + 'public/second.xml.gz')
   end
 
   it "groups should share the sitemap if the sitemap location is unchanged" do
@@ -109,7 +109,7 @@ describe "Sitemap Groups" do
       add 'five'
     end
     @sm.link_count.should == 6
-    file_should_exist(SitemapGenerator.app.root + 'public/sitemap_index.xml.gz')
+    file_should_exist(SitemapGenerator.app.root + 'public/sitemap.xml.gz')
     file_should_exist(SitemapGenerator.app.root + 'public/sitemap1.xml.gz')
     file_should_not_exist(SitemapGenerator.app.root + 'public/sitemap2.xml.gz')
   end
@@ -123,7 +123,7 @@ describe "Sitemap Groups" do
       add 'five'
     end
     @sm.link_count.should == 6
-    file_should_exist(SitemapGenerator.app.root + 'public/sitemap_index.xml.gz')
+    file_should_exist(SitemapGenerator.app.root + 'public/sitemap.xml.gz')
     file_should_exist(SitemapGenerator.app.root + 'public/sitemap1.xml.gz')
     file_should_exist(SitemapGenerator.app.root + 'public/sitemap2.xml.gz')
     file_should_exist(SitemapGenerator.app.root + 'public/sitemap3.xml.gz')

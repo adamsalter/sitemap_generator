@@ -131,6 +131,7 @@ describe "SitemapGenerator" do
       ::SitemapGenerator::Sitemap.reset!
       ::SitemapGenerator::Sitemap.default_host = 'http://test.local'
       ::SitemapGenerator::Sitemap.filename = 'sitemap'
+      ::SitemapGenerator::Sitemap.create_index = true
     end
 
     it "should allow changing of the filename" do
@@ -138,7 +139,7 @@ describe "SitemapGenerator" do
         add '/goerss', :geo => { :format => 'georss' }
         add '/kml', :geo => { :format => 'kml' }
       end
-      file_should_exist(rails_path('public/geo_sitemap_index.xml.gz'))
+      file_should_exist(rails_path('public/geo_sitemap.xml.gz'))
       file_should_exist(rails_path('public/geo_sitemap1.xml.gz'))
     end
 
@@ -292,6 +293,18 @@ describe "SitemapGenerator" do
         file_should_exist(rails_path('public/sitemap_index.xml.gz'))
         file_should_exist(rails_path('public/sitemap1.xml.gz'))
         file_should_exist(rails_path('public/sitemap2.xml.gz'))
+      end
+
+      it "should create index if more than one group" do
+        with_max_links(1) do
+          ls.create do
+            group(:filename => :group1) { add('/one') };
+            group(:filename => :group2) { add('/two') };
+          end
+        end
+        file_should_exist(rails_path('public/sitemap.xml.gz'))
+        file_should_exist(rails_path('public/group1.xml.gz'))
+        file_should_exist(rails_path('public/group2.xml.gz'))
       end
     end
   end

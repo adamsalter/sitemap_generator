@@ -26,7 +26,7 @@ describe SitemapGenerator::LinkSet do
       :default_host  => nil,
       :include_index => false,
       :include_root  => true,
-      :create_index  => true
+      :create_index  => :auto
     }
 
     default_options.each do |option, value|
@@ -187,7 +187,7 @@ describe SitemapGenerator::LinkSet do
   end
 
   describe "when finalizing" do
-    let(:ls) { SitemapGenerator::LinkSet.new(:default_host => default_host, :verbose => true) }
+    let(:ls) { SitemapGenerator::LinkSet.new(:default_host => default_host, :verbose => true, :create_index => true) }
 
     it "should output summary lines" do
       ls.sitemap.expects(:summary)
