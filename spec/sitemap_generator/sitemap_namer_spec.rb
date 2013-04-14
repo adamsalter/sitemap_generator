@@ -148,5 +148,18 @@ describe SitemapGenerator::SimpleNamer do
       namer.to_s.should == "sitemap_index.xml.gz"
       namer.next.to_s.should == "sitemap1.xml.gz"
     end
+
+    it "as a symbol" do
+      namer = SitemapGenerator::SimpleNamer.new(:sitemap, :zero => :index)
+      namer.to_s.should == "sitemapindex.xml.gz"
+      namer.next.to_s.should == "sitemap1.xml.gz"
+    end
+
+    it "with a starting index" do
+      namer = SitemapGenerator::SimpleNamer.new(:sitemap, :zero => 'abc', :start => 10)
+      namer.to_s.should == "sitemapabc.xml.gz"
+      namer.next.to_s.should == "sitemap10.xml.gz"
+      namer.next.to_s.should == "sitemap11.xml.gz"
+    end
   end
 end

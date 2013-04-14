@@ -4,8 +4,8 @@ require 'builder'
 # which lists all the sitemap files written.
 module SitemapGenerator
   class LinkSet
-    @@requires_finalization_opts = [:filename, :sitemaps_path, :sitemaps_namer, :sitemaps_host]
-    @@new_location_opts = [:filename, :sitemaps_path, :sitemaps_namer]
+    @@requires_finalization_opts = [:filename, :sitemaps_path, :sitemaps_namer, :sitemaps_host, :namer]
+    @@new_location_opts = [:filename, :sitemaps_path, :sitemaps_namer, :namer]
 
     attr_reader :default_host, :sitemaps_path, :filename, :create_index
     attr_accessor :verbose, :yahoo_app_id, :include_root, :include_index, :sitemaps_host, :adapter, :yield_sitemap
@@ -81,10 +81,8 @@ module SitemapGenerator
     #   to e.g. 'en/'.  Sitemaps are written to <tt>public_path</tt> + <tt>sitemaps_path</tt>
     #
     # * <tt>:filename</tt> - symbol giving the base name for files (default <tt>:sitemap</tt>).
-    #   The sitemap names are generated like "#{filename}1.xml.gz", "#{filename}2.xml.gz"
-    #   and the index name is like "#{filename}_index.xml.gz".
-    #
-    # * <tt>:sitemaps_namer</tt> - A +SitemapNamer+ instance for generating the sitemap names.
+    #   The names are generated like "#{filename}.xml.gz", "#{filename}1.xml.gz", "#{filename}2.xml.gz"
+    #   with the first file being the index if you have more than one sitemap file.
     #
     # * <tt>:include_index</tt> - Boolean.  Whether to <b>add a link to the sitemap index<b>
     #   to the current sitemap.  This points search engines to your Sitemap Index to
@@ -105,6 +103,15 @@ module SitemapGenerator
     #   regardless of how many links are in your sitemap.  If `false` an index file is never
     #   created.  If `:auto` an index file is created only if your sitemap has more than
     #   one sitemap file.
+    #
+    # * <tt>:namer</tt> - A <tt>SitemapGenerator::SimpleNamer</tt> instance for generating the sitemap
+    #   and index file names.  See <tt>:filename</tt> if you don't need to do anything fancy, and can
+    #   accept the default naming conventions.
+    #
+    # === Deprecated
+    #
+    # * <tt>:sitemaps_namer</tt> - Deprecated, use <tt>:namer</tt>.  A <tt>SitemapGenerator::SitemapNamer</tt> instance for generating the sitemap names.
+    # * <tt>:sitemap_index_namer</tt> - Deprecated, use <tt>:namer</tt>.  A <tt>SitemapGenerator::SitemapIndexNamer</tt> instance for generating the sitemap index name.
     #
     # KJV: When adding a new option be sure to include it in `options_for_group()` if
     # the option should be inherited by groups.
@@ -172,7 +179,7 @@ module SitemapGenerator
     # be finalized when the block returns.
     #
     # If you are not changing any of the location settings like <tt>filename<tt>,
-    # <tt>sitemaps_path</tt>, <tt>sitemaps_host</tt> or <tt>sitemaps_namer</tt>
+    # <tt>sitemaps_path</tt>, <tt>sitemaps_host</tt> or <tt>namer</tt>,
     # links you add within the group will be added to the current sitemap.
     # Otherwise the current sitemap file is finalized and a new sitemap file started,
     # using the options you specified.
@@ -195,7 +202,7 @@ module SitemapGenerator
         # If no location options are provided we are creating the next sitemap in the
         # current series, so finalize and inherit the namer.
         finalize_sitemap!
-        original_opts[:sitemaps_namer] = sitemaps_namer
+        original_opts[:namer] = namer
       end
 
       opts = options_for_group(original_opts)
@@ -359,11 +366,11 @@ module SitemapGenerator
     # Set each option on this instance using accessor methods.  This will affect
     # both the sitemap and the sitemap index.
     #
-    # If both `filename` and `sitemaps_namer` are passed, set filename first so it
+    # If both `filename` and `namer` are passed, set filename first so it
     # doesn't override the latter.
     def set_options(opts={})
       opts = opts.dup
-      %w(filename sitemaps_namer).each do |key|
+      %w(filename namer sitemaps_namer).each do |key|
         if value = opts.delete(key.to_sym)
           send("#{key}=", value)
         end
@@ -456,11 +463,12 @@ module SitemapGenerator
     end
 
     # Reset this instance.  Keep the same options, but return to the same state
-    # as before an sitemaps were created.
+    # as before any sitemaps were created.
     def reset!
       @sitemap_index = nil if @sitemap_index && @sitemap_index.finalized? && !@protect_index
       @sitemap = nil if @sitemap && @sitemap.finalized?
-      self.sitemaps_namer.reset # start from 1
+      self.namer.reset
+      self.sitemaps_namer.reset if self.sitemaps_namer
       @added_default_links = false
     end
 
@@ -520,14 +528,16 @@ module SitemapGenerator
         update_location_info(:host, value)
       end
 
-      # Set the filename base to use when generating sitemaps and sitemap indexes.
-      # The index name will be +value+ with <tt>_index.xml.gz</tt> appended.
+      # Set the filename base to use when generating sitemaps (and the sitemap index).
+      #
       # === Example
       # <tt>filename = :sitemap</tt>
+      #
+      # === Generates
+      # <tt>sitemap.xml.gz, sitemap1.xml.gz, sitemap2.xml.gz, ...</tt>
       def filename=(value)
         @filename = value
-        self.sitemaps_namer = SitemapGenerator::SitemapNamer.new(@filename)
-        self.sitemap_index_namer = SitemapGenerator::SitemapIndexNamer.new("#{@filename}_index")
+        self.namer = SitemapGenerator::SimpleNamer.new(@filename)
       end
 
       # Set the search engines hash to a new hash of search engine names mapped to
@@ -544,36 +554,11 @@ module SitemapGenerator
         @search_engines || {}
       end
 
-      # Set the namer to use when generating SitemapFiles (does not apply to the
-      # SitemapIndexFile)
-      def sitemaps_namer=(value)
-        @sitemaps_namer = value
-        @sitemap.location[:namer] = value if @sitemap && !@sitemap.finalized?
-      end
-
-      # Return the current sitemaps namer object.  If it not set, looks for it on
-      # the current sitemap and if there is no sitemap, creates a new one using
-      # the current filename.
-      def sitemaps_namer
-        @sitemaps_namer ||= @sitemap && @sitemap.location.namer || SitemapGenerator::SitemapNamer.new(@filename)
-      end
-
-      # Set the namer to use when generating SitemapFiles (does not apply to the
-      # SitemapIndexFile)
-      def sitemap_index_namer=(value)
-        @sitemap_index_namer = value
-        @sitemap_index.location[:namer] = value if @sitemap_index && !@sitemap_index.finalized? && !@protect_index
-      end
-
-      def sitemap_index_namer
-        @sitemap_index_namer ||= @sitemap_index && @sitemap_index.location.namer || SitemapGenerator::SitemapIndexNamer.new("#{@filename}_index")
-      end
-
       # Return a new +SitemapLocation+ instance with the current options included
       def sitemap_location
         SitemapGenerator::SitemapLocation.new(
           :host => sitemaps_host,
-          :namer => sitemaps_namer,
+          :namer => sitemaps_namer || namer,  # sitemaps_namer is deprecated
           :public_path => public_path,
           :sitemaps_path => @sitemaps_path,
           :adapter => @adapter,
@@ -585,7 +570,7 @@ module SitemapGenerator
       def sitemap_index_location
         SitemapGenerator::SitemapLocation.new(
           :host => sitemaps_host,
-          :namer => sitemap_index_namer,
+          :namer => sitemap_index_namer || namer,  # sitemap_index_namer is deprecated
           :public_path => public_path,
           :sitemaps_path => @sitemaps_path,
           :adapter => @adapter,
@@ -601,6 +586,21 @@ module SitemapGenerator
         @sitemap_index.location[:create_index] = value if @sitemap_index && !@sitemap_index.finalized? && !@protect_index
       end
 
+      # Set the namer to use to generate the sitemap (and index) file names.
+      # This should be an instance of <tt>SitemapGenerator::SimpleNamer</tt>
+      def namer=(value)
+        @namer = value
+        @sitemap.location[:namer] = value if @sitemap && !@sitemap.finalized?
+        @sitemap_index.location[:namer] = value if @sitemap_index && !@sitemap_index.finalized? && !@protect_index
+      end
+
+      # Return the namer object.  If it is not set, looks for it on
+      # the current sitemap and if there is no sitemap, creates a new one using
+      # the current filename.
+      def namer
+        @namer ||= @sitemap && @sitemap.location.namer || SitemapGenerator::SimpleNamer.new(@filename)
+      end
+
       protected
 
       # Update the given attribute on the current sitemap index and sitemap file location objects.
@@ -612,5 +612,48 @@ module SitemapGenerator
       end
     end
     include LocationHelpers
+
+    module Deprecated
+      # *Deprecated*
+      #
+      # Set the namer to use when generating SitemapFiles (does not apply to the
+      # SitemapIndexFile)
+      #
+      # As of version 4, use the <tt>namer<tt> option.
+      def sitemaps_namer=(value)
+        @sitemaps_namer = value
+        @sitemap.location[:namer] = value if @sitemap && !@sitemap.finalized?
+      end
+
+      # *Deprecated*
+      #
+      # Return the current sitemaps namer object.  If it not set, looks for it on
+      # the current sitemap and if there is no sitemap, creates a new one using
+      # the current filename.
+      #
+      # As of version 4, use the <tt>namer<tt> option.
+      def sitemaps_namer
+        @sitemaps_namer ||= @sitemap && @sitemap.location.namer
+      end
+
+      # *Deprecated*
+      #
+      # Set the namer to use when generating the index file.
+      # The namer should be a <tt>SitemapGenerator::SitemapIndexNamer</tt> instance.
+      #
+      # As of version 4, use the <tt>namer<tt> option.
+      def sitemap_index_namer=(value)
+        @sitemap_index_namer = value
+        @sitemap_index.location[:namer] = value if @sitemap_index && !@sitemap_index.finalized? && !@protect_index
+      end
+
+      # *Deprecated*
+      #
+      # As of version 4, use the <tt>namer<tt> option.
+      def sitemap_index_namer
+        @sitemap_index_namer ||= @sitemap_index && @sitemap_index.location.namer
+      end
+    end
+    include Deprecated
   end
 end

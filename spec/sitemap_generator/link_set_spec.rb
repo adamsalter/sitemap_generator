@@ -95,15 +95,15 @@ describe SitemapGenerator::LinkSet do
     it "should change when the sitemaps_path is changed" do
       ls.default_host = 'http://one.com'
       ls.sitemaps_path = 'sitemaps/'
-      ls.sitemap.location.url.should == 'http://one.com/sitemaps/sitemap1.xml.gz'
-      ls.sitemap_index.location.url.should == 'http://one.com/sitemaps/sitemap_index.xml.gz'
+      ls.sitemap.location.url.should == 'http://one.com/sitemaps/sitemap.xml.gz'
+      ls.sitemap_index.location.url.should == 'http://one.com/sitemaps/sitemap.xml.gz'
     end
   end
 
   describe "sitemap_index_url" do
     it "should return the url to the index file" do
       ls.default_host = default_host
-      ls.sitemap_index.location.url.should == "#{default_host}/sitemap_index.xml.gz"
+      ls.sitemap_index.location.url.should == "#{default_host}/sitemap.xml.gz"
       ls.sitemap_index_url.should == ls.sitemap_index.location.url
     end
   end
@@ -520,7 +520,7 @@ describe SitemapGenerator::LinkSet do
       ls.sitemaps_namer.should == namer
       ls.sitemap.location.namer.should == namer
       ls.sitemap.location.filename.should =~ /sitemap1_1/
-      ls.sitemap_index.location.filename.should =~ /sitemap1_index/
+      ls.sitemap_index.location.filename.should =~ /^sitemap1/
     end
 
     it "should support both sitemaps_namer and filename options no matter the order" do
@@ -530,7 +530,7 @@ describe SitemapGenerator::LinkSet do
       options[:filename] = "sitemap1"
       ls.create(options)
       ls.sitemap.location.filename.should =~ /sitemap1_1/
-      ls.sitemap_index.location.filename.should =~ /sitemap1_index/
+      ls.sitemap_index.location.filename.should =~ /^sitemap1/
     end
 
     it "should not modify the options hash" do
@@ -547,7 +547,7 @@ describe SitemapGenerator::LinkSet do
 
   describe "reset!" do
     it "should reset the sitemap namer" do
-      SitemapGenerator::Sitemap.sitemaps_namer.expects(:reset)
+      SitemapGenerator::Sitemap.namer.expects(:reset)
       SitemapGenerator::Sitemap.create(:default_host => 'http://cnn.com')
     end
 
@@ -556,6 +556,13 @@ describe SitemapGenerator::LinkSet do
       SitemapGenerator::Sitemap.create(:default_host => 'http://cnn.com')
       SitemapGenerator::Sitemap.instance_variable_set(:@added_default_links, false)
     end
+
+    it "should reset the deprecated sitemaps_namer, if set" do
+      ls.sitemaps_namer = stub(:reset => nil)
+      ls.sitemaps_namer.expects(:reset)
+      ls.send(:reset!)
+    end
+
   end
 
   describe "include_root?" do

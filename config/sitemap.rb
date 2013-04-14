@@ -1,4 +1,5 @@
 SitemapGenerator::Sitemap.default_host = "http://www.example.com"
+
 SitemapGenerator::Sitemap.create(
     :include_root => true, :include_index => true,
     :filename => :new_sitemaps, :sitemaps_path => 'fr/') do

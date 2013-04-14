@@ -687,7 +687,8 @@ automatically turned off when the `sitemaps_host` does not match `default_host`.
 Because the link to the sitemap index file that would otherwise be added would point to a
 different host than the rest of the links in the sitemap.  Something that the sitemap rules forbid.
 
-* `sitemaps_namer` - A `SitemapGenerator::SitemapNamer` instance **for generating sitemap names**.  You can read about Sitemap Namers by reading the API docs.  Sitemap Namers don't apply to the sitemap index.  You can only modify the name of the index file using the `filename` option.  Sitemap Namers allow you to set the name, extension and number sequence for sitemap files.
+* `namer` - A `SitemapGenerator::SimpleNamer` instance **for generating sitemap names**.  You can read about Sitemap Namers by reading the API docs.  Allows you to set the name, extension and number sequence for sitemap files, as well as modify the name of
+the first file in the sequence, which is typically the index file.
 
 * `sitemaps_path` - String. A **relative path** giving a directory under your `public_path` at which to write sitemaps.  The difference between the two options is that the `sitemaps_path` is used when generating a link to a sitemap file.  For example, if we set `SitemapGenerator::Sitemap.sitemaps_path = 'en/'` and use the default `public_path` sitemaps will be written to `public/en/`.  And when the sitemap index is added to our sitemap it would have a URL like `http://example.com/en/sitemap_index.xml.gz`.
 

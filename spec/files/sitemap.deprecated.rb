@@ -1,5 +1,7 @@
 SitemapGenerator::Sitemap.default_host = "http://www.example.com"
 SitemapGenerator::Sitemap.yahoo_app_id = false
+SitemapGenerator::Sitemap.create_index = true
+SitemapGenerator::Sitemap.namer = SitemapGenerator::SimpleNamer.new(:sitemap, :zero => '_index')
 
 SitemapGenerator::Sitemap.add_links do |sitemap|
   sitemap.add '/contents', :priority => 0.7, :changefreq => 'daily'

@@ -22,7 +22,7 @@ module SitemapGenerator
     # * <tt>filename</tt> - full name of the file e.g. <tt>'sitemap1.xml.gz'<tt>
     # * <tt>host</tt> - host name for URLs.  The full URL to the file is then constructed from
     #   the <tt>host</tt>, <tt>sitemaps_path</tt> and <tt>filename</tt>
-    # * <tt>namer</tt> - a SitemapGenerator::SitemapNamer instance.  Can be passed instead of +filename+.
+    # * <tt>namer</tt> - a SitemapGenerator::SimpleNamer instance.  Can be passed instead of +filename+.
     # * <tt>public_path</tt> - path to the "public" directory, or the directory you want to
     #   write sitemaps in.  Default is a directory <tt>public/</tt>
     #   in the current working directory, or relative to the Rails root
