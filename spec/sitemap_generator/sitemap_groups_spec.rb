@@ -21,9 +21,8 @@ describe "Sitemap Groups" do
         add '/en'
       end
     end
-
     file_should_exist(SitemapGenerator.app.root + 'public/sitemap.xml.gz')
-    file_should_exist(SitemapGenerator.app.root + 'public/sitemap_en1.xml.gz')
+    file_should_exist(SitemapGenerator.app.root + 'public/sitemap_en.xml.gz')
     file_should_not_exist(SitemapGenerator.app.root + 'public/sitemap1.xml.gz')
   end
 
@@ -44,7 +43,7 @@ describe "Sitemap Groups" do
     @sm.link_count.should == 3
     file_should_exist(SitemapGenerator.app.root + 'public/sitemap.xml.gz')
     file_should_exist(SitemapGenerator.app.root + 'public/sitemap1.xml.gz')
-    file_should_exist(SitemapGenerator.app.root + 'public/sitemap_en1.xml.gz')
+    file_should_exist(SitemapGenerator.app.root + 'public/sitemap_en.xml.gz')
   end
 
   it "should rollover when sitemaps are full" do
@@ -85,7 +84,7 @@ describe "Sitemap Groups" do
     file_should_exist(SitemapGenerator.app.root + 'public/fr/sitemap_fr.xml.gz')
   end
 
-  it "the sitemap shouldn't be finalized if the groups don't conflict" do
+  it "the sitemap shouldn't be finalized until the end if the groups don't conflict" do
     @sm.create do
       add 'one'
       group(:filename => :first) { add '/two' }
@@ -98,6 +97,8 @@ describe "Sitemap Groups" do
     file_should_exist(SitemapGenerator.app.root + 'public/sitemap1.xml.gz')
     file_should_exist(SitemapGenerator.app.root + 'public/first.xml.gz')
     file_should_exist(SitemapGenerator.app.root + 'public/second.xml.gz')
+    gzipped_xml_file_should_validate_against_schema(SitemapGenerator.app.root + 'public/sitemap.xml.gz', 'siteindex')
+    gzipped_xml_file_should_validate_against_schema(SitemapGenerator.app.root + 'public/sitemap1.xml.gz', 'sitemap')
   end
 
   it "groups should share the sitemap if the sitemap location is unchanged" do
@@ -110,8 +111,8 @@ describe "Sitemap Groups" do
     end
     @sm.link_count.should == 6
     file_should_exist(SitemapGenerator.app.root + 'public/sitemap.xml.gz')
-    file_should_exist(SitemapGenerator.app.root + 'public/sitemap1.xml.gz')
-    file_should_not_exist(SitemapGenerator.app.root + 'public/sitemap2.xml.gz')
+    file_should_not_exist(SitemapGenerator.app.root + 'public/sitemap1.xml.gz')
+    gzipped_xml_file_should_validate_against_schema(SitemapGenerator.app.root + 'public/sitemap.xml.gz', 'sitemap')
   end
 
   it "sitemaps should be finalized if virtual location settings are changed" do
@@ -128,6 +129,6 @@ describe "Sitemap Groups" do
     file_should_exist(SitemapGenerator.app.root + 'public/sitemap2.xml.gz')
     file_should_exist(SitemapGenerator.app.root + 'public/sitemap3.xml.gz')
     file_should_not_exist(SitemapGenerator.app.root + 'public/sitemap4.xml.gz')
-    file_should_exist(SitemapGenerator.app.root + 'public/en/sitemap1.xml.gz')
+    file_should_exist(SitemapGenerator.app.root + 'public/en/sitemap.xml.gz')
   end
 end
