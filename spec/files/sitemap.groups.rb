@@ -1,4 +1,5 @@
 SitemapGenerator::Sitemap.default_host = "http://www.example.com"
+
 SitemapGenerator::Sitemap.create(
     :include_root => true, :include_index => true,
     :filename => :new_sitemaps, :sitemaps_path => 'fr/') do
@@ -13,8 +14,15 @@ SitemapGenerator::Sitemap.create(
     add '/three'
   end
 
-  # Test a namer
+  # Test a deprecated namer
   group(:sitemaps_namer => SitemapGenerator::SitemapNamer.new(:abc, :start => 3)) do
+    add '/four'
+    add '/five'
+    add '/six'
+  end
+
+  # Test a simple namer
+  group(:sitemaps_namer => SitemapGenerator::SimpleNamer.new(:def)) do
     add '/four'
     add '/five'
     add '/six'
@@ -22,7 +30,9 @@ SitemapGenerator::Sitemap.create(
 
   add '/seven'
 
-  # This should be in a file of its own
+  # This should be in a file of its own.
+  # Not technically valid to have a link with a different host, but people like
+  # to do strange things sometimes.
   group(:sitemaps_host => "http://exceptional.com") do
     add '/eight'
     add '/nine'
@@ -33,5 +43,7 @@ SitemapGenerator::Sitemap.create(
   # This should have no effect.  Already added default links.
   group(:include_root => true, :include_index => true) {}
 
+  # Not technically valid to have a link with a different host, but people like
+  # to do strange things sometimes
   add "/merchant_path", :host => "https://www.merchanthost.com"
 end

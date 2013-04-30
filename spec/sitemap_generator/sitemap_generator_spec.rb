@@ -40,42 +40,77 @@ describe "SitemapGenerator" do
     end
   end
 
-  [:deprecated, :create].each do |extension|
-    describe "generate sitemap" do
-      before :all do
-        SitemapGenerator::Sitemap.reset!
-        clean_sitemap_files_from_rails_app
-        copy_sitemap_file_to_rails_app(extension)
-        with_max_links(10) { execute_sitemap_config }
-      end
+  describe "generate sitemap with deprecated config" do
+    before :all do
+      SitemapGenerator::Sitemap.reset!
+      clean_sitemap_files_from_rails_app
+      copy_sitemap_file_to_rails_app(:deprecated)
+      with_max_links(10) { execute_sitemap_config }
+    end
 
-      it "should create sitemaps" do
-        file_should_exist(rails_path('public/sitemap_index.xml.gz'))
-        file_should_exist(rails_path('public/sitemap1.xml.gz'))
-        file_should_exist(rails_path('public/sitemap2.xml.gz'))
-        file_should_not_exist(rails_path('public/sitemap3.xml.gz'))
-      end
+    it "should create sitemaps" do
+      file_should_exist(rails_path('public/sitemap_index.xml.gz'))
+      file_should_exist(rails_path('public/sitemap1.xml.gz'))
+      file_should_exist(rails_path('public/sitemap2.xml.gz'))
+      file_should_not_exist(rails_path('public/sitemap3.xml.gz'))
+    end
 
-      it "should have 13 links" do
-        SitemapGenerator::Sitemap.link_count.should == 13
-      end
+    it "should have 13 links" do
+      SitemapGenerator::Sitemap.link_count.should == 13
+    end
 
-      it "index XML should validate" do
-        gzipped_xml_file_should_validate_against_schema rails_path('public/sitemap_index.xml.gz'), 'siteindex'
-      end
+    it "index XML should validate" do
+      gzipped_xml_file_should_validate_against_schema rails_path('public/sitemap_index.xml.gz'), 'siteindex'
+    end
 
-      it "sitemap XML should validate" do
-        gzipped_xml_file_should_validate_against_schema rails_path('public/sitemap1.xml.gz'), 'sitemap'
-        gzipped_xml_file_should_validate_against_schema rails_path('public/sitemap2.xml.gz'), 'sitemap'
-      end
+    it "sitemap XML should validate" do
+      gzipped_xml_file_should_validate_against_schema rails_path('public/sitemap1.xml.gz'), 'sitemap'
+      gzipped_xml_file_should_validate_against_schema rails_path('public/sitemap2.xml.gz'), 'sitemap'
+    end
 
-      it "index XML should not have excess whitespace" do
-        gzipped_xml_file_should_have_minimal_whitespace rails_path('public/sitemap_index.xml.gz')
-      end
+    it "index XML should not have excess whitespace" do
+      gzipped_xml_file_should_have_minimal_whitespace rails_path('public/sitemap_index.xml.gz')
+    end
 
-      it "sitemap XML should not have excess whitespace" do
-        gzipped_xml_file_should_have_minimal_whitespace rails_path('public/sitemap1.xml.gz')
-      end
+    it "sitemap XML should not have excess whitespace" do
+      gzipped_xml_file_should_have_minimal_whitespace rails_path('public/sitemap1.xml.gz')
+    end
+  end
+
+  describe "generate sitemap with normal config" do
+    before :all do
+      SitemapGenerator::Sitemap.reset!
+      clean_sitemap_files_from_rails_app
+      copy_sitemap_file_to_rails_app(:create)
+      with_max_links(10) { execute_sitemap_config }
+    end
+
+    it "should create sitemaps" do
+      file_should_exist(rails_path('public/sitemap.xml.gz'))
+      file_should_exist(rails_path('public/sitemap1.xml.gz'))
+      file_should_exist(rails_path('public/sitemap2.xml.gz'))
+      file_should_not_exist(rails_path('public/sitemap3.xml.gz'))
+    end
+
+    it "should have 13 links" do
+      SitemapGenerator::Sitemap.link_count.should == 13
+    end
+
+    it "index XML should validate" do
+      gzipped_xml_file_should_validate_against_schema rails_path('public/sitemap.xml.gz'), 'siteindex'
+    end
+
+    it "sitemap XML should validate" do
+      gzipped_xml_file_should_validate_against_schema rails_path('public/sitemap1.xml.gz'), 'sitemap'
+      gzipped_xml_file_should_validate_against_schema rails_path('public/sitemap2.xml.gz'), 'sitemap'
+    end
+
+    it "index XML should not have excess whitespace" do
+      gzipped_xml_file_should_have_minimal_whitespace rails_path('public/sitemap.xml.gz')
+    end
+
+    it "sitemap XML should not have excess whitespace" do
+      gzipped_xml_file_should_have_minimal_whitespace rails_path('public/sitemap1.xml.gz')
     end
   end
 
@@ -86,34 +121,35 @@ describe "SitemapGenerator" do
       copy_sitemap_file_to_rails_app(:groups)
       with_max_links(2) { execute_sitemap_config }
       @expected = %w[
-        public/en/xxx1.xml.gz
+        public/en/xxx.xml.gz
         public/fr/abc3.xml.gz
         public/fr/abc4.xml.gz
-        public/fr/new_sitemaps_index.xml.gz
+        public/fr/def.xml.gz
+        public/fr/new_sitemaps.xml.gz
         public/fr/new_sitemaps1.xml.gz
         public/fr/new_sitemaps2.xml.gz
         public/fr/new_sitemaps3.xml.gz
         public/fr/new_sitemaps4.xml.gz]
-      @sitemaps = (@expected - %w[public/fr/new_sitemaps_index.xml.gz])
+      @sitemaps = (@expected - %w[public/fr/new_sitemaps.xml.gz])
     end
 
     it "should create sitemaps" do
       @expected.each { |file| file_should_exist(rails_path(file)) }
       file_should_not_exist(rails_path('public/fr/new_sitemaps5.xml.gz'))
-      file_should_not_exist(rails_path('public/en/xxx2.xml.gz'))
+      file_should_not_exist(rails_path('public/en/xxx1.xml.gz'))
       file_should_not_exist(rails_path('public/fr/abc5.xml.gz'))
     end
 
-    it "should have 13 links" do
-      SitemapGenerator::Sitemap.link_count.should == 13
+    it "should have 16 links" do
+      SitemapGenerator::Sitemap.link_count.should == 16
     end
 
     it "index XML should validate" do
-      gzipped_xml_file_should_validate_against_schema rails_path('public/fr/new_sitemaps_index.xml.gz'), 'siteindex'
+      gzipped_xml_file_should_validate_against_schema rails_path('public/fr/new_sitemaps.xml.gz'), 'siteindex'
     end
 
     it "index XML should not have excess whitespace" do
-      gzipped_xml_file_should_have_minimal_whitespace rails_path('public/fr/new_sitemaps_index.xml.gz')
+      gzipped_xml_file_should_have_minimal_whitespace rails_path('public/fr/new_sitemaps.xml.gz')
     end
 
     it "sitemaps XML should validate" do
@@ -153,7 +189,7 @@ describe "SitemapGenerator" do
         add '/another'
       end
 
-      file_should_exist(rails_path('public/sitemaps/sitemap_index.xml.gz'))
+      file_should_exist(rails_path('public/sitemaps/sitemap.xml.gz'))
       file_should_exist(rails_path('public/sitemaps/sitemap1.xml.gz'))
     end
 
@@ -168,7 +204,7 @@ describe "SitemapGenerator" do
         add '/yet-another'
       end
 
-      file_should_exist(rails_path('public/sitemaps/deep/directory/sitemap_index.xml.gz'))
+      file_should_exist(rails_path('public/sitemaps/deep/directory/sitemap.xml.gz'))
       file_should_exist(rails_path('public/sitemaps/deep/directory/sitemap1.xml.gz'))
     end
   end
@@ -204,7 +240,6 @@ describe "SitemapGenerator" do
   end
 
   describe "create_index" do
-
     before :each do
       clean_sitemap_files_from_rails_app
     end
@@ -213,28 +248,26 @@ describe "SitemapGenerator" do
       let(:ls) { SitemapGenerator::LinkSet.new(:include_root => false, :default_host => 'http://example.com', :create_index => true) }
 
       it "should always create index" do
-        ls.create { }
-        file_should_exist(rails_path('public/sitemap_index.xml.gz'))
-        file_should_exist(rails_path('public/sitemap1.xml.gz'))
-        file_should_not_exist(rails_path('public/sitemap2.xml.gz'))
-      end
-
-      it "should always create index" do
         with_max_links(1) do
           ls.create { add('/one') }
         end
-        file_should_exist(rails_path('public/sitemap_index.xml.gz'))
+        file_should_exist(rails_path('public/sitemap.xml.gz'))
         file_should_exist(rails_path('public/sitemap1.xml.gz'))
         file_should_not_exist(rails_path('public/sitemap2.xml.gz'))
+        gzipped_xml_file_should_validate_against_schema rails_path('public/sitemap.xml.gz'), 'siteindex'
+        gzipped_xml_file_should_validate_against_schema rails_path('public/sitemap1.xml.gz'), 'sitemap'
       end
 
       it "should always create index" do
         with_max_links(1) do
           ls.create { add('/one'); add('/two') }
         end
-        file_should_exist(rails_path('public/sitemap_index.xml.gz'))
+        file_should_exist(rails_path('public/sitemap.xml.gz'))
         file_should_exist(rails_path('public/sitemap1.xml.gz'))
         file_should_exist(rails_path('public/sitemap2.xml.gz'))
+        gzipped_xml_file_should_validate_against_schema rails_path('public/sitemap.xml.gz'), 'siteindex'
+        gzipped_xml_file_should_validate_against_schema rails_path('public/sitemap1.xml.gz'), 'sitemap'
+        gzipped_xml_file_should_validate_against_schema rails_path('public/sitemap2.xml.gz'), 'sitemap'
       end
     end
 
@@ -242,57 +275,49 @@ describe "SitemapGenerator" do
       let(:ls) { SitemapGenerator::LinkSet.new(:include_root => false, :default_host => 'http://example.com', :create_index => false) }
 
       it "should never create index" do
-        ls.create { }
-        file_should_not_exist(rails_path('public/sitemap_index.xml.gz'))
-        file_should_exist(rails_path('public/sitemap1.xml.gz'))
-        file_should_not_exist(rails_path('public/sitemap2.xml.gz'))
-      end
-
-      it "should never create index" do
         with_max_links(1) do
           ls.create { add('/one') }
         end
-        file_should_not_exist(rails_path('public/sitemap_index.xml.gz'))
-        file_should_exist(rails_path('public/sitemap1.xml.gz'))
-        file_should_not_exist(rails_path('public/sitemap2.xml.gz'))
+        file_should_exist(rails_path('public/sitemap.xml.gz'))
+        file_should_not_exist(rails_path('public/sitemap1.xml.gz'))
+        gzipped_xml_file_should_validate_against_schema rails_path('public/sitemap.xml.gz'), 'sitemap'
       end
 
       it "should never create index" do
         with_max_links(1) do
           ls.create { add('/one'); add('/two') }
         end
-        file_should_not_exist(rails_path('public/sitemap_index.xml.gz'))
+        file_should_exist(rails_path('public/sitemap.xml.gz'))
         file_should_exist(rails_path('public/sitemap1.xml.gz'))
-        file_should_exist(rails_path('public/sitemap2.xml.gz'))
+        file_should_not_exist(rails_path('public/sitemap2.xml.gz'))
+        gzipped_xml_file_should_validate_against_schema rails_path('public/sitemap.xml.gz'), 'sitemap'
+        gzipped_xml_file_should_validate_against_schema rails_path('public/sitemap1.xml.gz'), 'sitemap'
       end
     end
 
     describe "when :auto" do
       let(:ls) { SitemapGenerator::LinkSet.new(:include_root => false, :default_host => 'http://example.com', :create_index => :auto) }
 
-      it "should not create index if one sitemap file" do
-        ls.create { }
-        file_should_not_exist(rails_path('public/sitemap_index.xml.gz'))
-        file_should_exist(rails_path('public/sitemap1.xml.gz'))
-        file_should_not_exist(rails_path('public/sitemap2.xml.gz'))
-      end
-
-      it "should not create index if one sitemap file" do
+      it "should not create index if only one sitemap file" do
         with_max_links(1) do
           ls.create { add('/one') }
         end
-        file_should_not_exist(rails_path('public/sitemap_index.xml.gz'))
-        file_should_exist(rails_path('public/sitemap1.xml.gz'))
-        file_should_not_exist(rails_path('public/sitemap2.xml.gz'))
+        file_should_exist(rails_path('public/sitemap.xml.gz'))
+        file_should_not_exist(rails_path('public/sitemap1.xml.gz'))
+        gzipped_xml_file_should_validate_against_schema rails_path('public/sitemap.xml.gz'), 'sitemap'
       end
 
       it "should create index if more than one sitemap file" do
         with_max_links(1) do
           ls.create { add('/one'); add('/two') }
         end
-        file_should_exist(rails_path('public/sitemap_index.xml.gz'))
+        file_should_exist(rails_path('public/sitemap.xml.gz'))
         file_should_exist(rails_path('public/sitemap1.xml.gz'))
         file_should_exist(rails_path('public/sitemap2.xml.gz'))
+        file_should_not_exist(rails_path('public/sitemap3.xml.gz'))
+        gzipped_xml_file_should_validate_against_schema rails_path('public/sitemap.xml.gz'), 'siteindex'
+        gzipped_xml_file_should_validate_against_schema rails_path('public/sitemap1.xml.gz'), 'sitemap'
+        gzipped_xml_file_should_validate_against_schema rails_path('public/sitemap2.xml.gz'), 'sitemap'
       end
 
       it "should create index if more than one group" do
@@ -305,6 +330,9 @@ describe "SitemapGenerator" do
         file_should_exist(rails_path('public/sitemap.xml.gz'))
         file_should_exist(rails_path('public/group1.xml.gz'))
         file_should_exist(rails_path('public/group2.xml.gz'))
+        gzipped_xml_file_should_validate_against_schema rails_path('public/sitemap.xml.gz'), 'siteindex'
+        gzipped_xml_file_should_validate_against_schema rails_path('public/group1.xml.gz'), 'sitemap'
+        gzipped_xml_file_should_validate_against_schema rails_path('public/group2.xml.gz'), 'sitemap'
       end
     end
   end
