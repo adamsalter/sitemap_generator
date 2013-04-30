@@ -10,7 +10,7 @@ module SitemapGenerator
     attr_reader :default_host, :sitemaps_path, :filename, :create_index
     attr_accessor :verbose, :yahoo_app_id, :include_root, :include_index, :sitemaps_host, :adapter, :yield_sitemap
 
-    # Create a new sitemap index and sitemap files.  Pass a block calls to the following
+    # Create a new sitemap index and sitemap files.  Pass a block with calls to the following
     # methods:
     # * +add+   - Add a link to the current sitemap
     # * +group+ - Start a new group of sitemaps
@@ -225,10 +225,10 @@ module SitemapGenerator
         # we want the default behaviour i.e. only an index if more than one sitemap file.
         # Don't force index creation if the user specifically requested no index.  This
         # unfortunately means that if they set it to :auto they may be getting an index
-        # when they didn't want one, but you shouldn't be using groups if you only have
+        # when they didn't expect one, but you shouldn't be using groups if you only have
         # one sitemap and don't want an index.  Rather, just add the links directly in the create()
         # block.
-        @group.create_index = true if @group.create_index != false
+        @group.send(:create_index=, true, true) if @group.create_index != false
 
         if block_given?
           @group.interpreter.eval(:yield_sitemap => @yield_sitemap || SitemapGenerator.yield_sitemap?, &block)
@@ -581,9 +581,12 @@ module SitemapGenerator
 
       # Set the value of +create_index+ on the SitemapIndexLocation object of the
       # SitemapIndexFile.
-      def create_index=(value)
+      def create_index=(value, force=false)
         @create_index = value
-        @sitemap_index.location[:create_index] = value if @sitemap_index && !@sitemap_index.finalized? && !@protect_index
+        # Allow overriding the protected status of the index when we are creating a group.
+        # Because sometimes we need to force an index in that case.  But generally we don't
+        # want to allow people to mess with this value if the index is protected.
+        @sitemap_index.location[:create_index] = value if @sitemap_index && ((!@sitemap_index.finalized? && !@protect_index) || force)
       end
 
       # Set the namer to use to generate the sitemap (and index) file names.
