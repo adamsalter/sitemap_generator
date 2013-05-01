@@ -1,35 +1,33 @@
 require 'spec_helper'
 
 describe 'SitemapGenerator::Builder::SitemapFile' do
-  before :each do
-    @loc = SitemapGenerator::SitemapLocation.new(:namer => SitemapGenerator::SitemapNamer.new(:sitemap), :public_path => 'tmp/', :sitemaps_path => 'test/', :host => 'http://example.com/')
-    @s = SitemapGenerator::Builder::SitemapFile.new(@loc)
-  end
+  let(:location) { SitemapGenerator::SitemapLocation.new(:namer => SitemapGenerator::SitemapNamer.new(:sitemap), :public_path => 'tmp/', :sitemaps_path => 'test/', :host => 'http://example.com/') }
+  let(:sitemap)  { SitemapGenerator::Builder::SitemapFile.new(location) }
 
   it "should have a default namer" do
-    @s = SitemapGenerator::Builder::SitemapFile.new
-    @s.location.filename.should == 'sitemap1.xml.gz'
+    sitemap = SitemapGenerator::Builder::SitemapFile.new
+    sitemap.location.filename.should == 'sitemap1.xml.gz'
   end
 
   it "should return the name of the sitemap file" do
-    @s.location.filename.should == 'sitemap1.xml.gz'
+    sitemap.location.filename.should == 'sitemap1.xml.gz'
   end
 
   it "should return the URL" do
-    @s.location.url.should == 'http://example.com/test/sitemap1.xml.gz'
+    sitemap.location.url.should == 'http://example.com/test/sitemap1.xml.gz'
   end
 
   it "should return the path" do
-    @s.location.path.should == File.expand_path('tmp/test/sitemap1.xml.gz')
+    sitemap.location.path.should == File.expand_path('tmp/test/sitemap1.xml.gz')
   end
 
   it "should be empty" do
-    @s.empty?.should be_true
-    @s.link_count.should == 0
+    sitemap.empty?.should be_true
+    sitemap.link_count.should == 0
   end
 
   it "should not be finalized" do
-    @s.finalized?.should be_false
+    sitemap.finalized?.should be_false
   end
 
   it "should raise if no default host is set" do
@@ -39,41 +37,74 @@ describe 'SitemapGenerator::Builder::SitemapFile' do
   describe "lastmod" do
     it "should be the file last modified time" do
       lastmod = (Time.now - 1209600)
-      @s.location.reserve_name
-      File.expects(:mtime).with(@s.location.path).returns(lastmod)
-      @s.lastmod.should == lastmod
+      sitemap.location.reserve_name
+      File.expects(:mtime).with(sitemap.location.path).returns(lastmod)
+      sitemap.lastmod.should == lastmod
     end
 
     it "should be nil if the location has not reserved a name" do
       File.expects(:mtime).never
-      @s.lastmod.should be_nil
+      sitemap.lastmod.should be_nil
     end
-    
+
     it "should be nil if location has reserved a name and the file DNE" do
-      @s.location.reserve_name
+      sitemap.location.reserve_name
       File.expects(:mtime).raises(Errno::ENOENT)
-      @s.lastmod.should be_nil
+      sitemap.lastmod.should be_nil
     end
   end
 
   describe "new" do
+    let(:original_sitemap) { sitemap }
+    let(:new_sitemap)      { sitemap.new }
+
     before :each do
-      @orig_s = @s
-      @s = @s.new
+      original_sitemap
+      new_sitemap
     end
 
     it "should inherit the same options" do
       # The name is the same because the original sitemap was not finalized
-      @s.location.url.should == 'http://example.com/test/sitemap1.xml.gz'
-      @s.location.path.should == File.expand_path('tmp/test/sitemap1.xml.gz')
+      new_sitemap.location.url.should == 'http://example.com/test/sitemap1.xml.gz'
+      new_sitemap.location.path.should == File.expand_path('tmp/test/sitemap1.xml.gz')
     end
 
     it "should not share the same location instance" do
-      @s.location.should_not be(@orig_s.location)
+      new_sitemap.location.should_not be(original_sitemap.location)
     end
 
     it "should inherit the same namer instance" do
-      @s.location.namer.should == @orig_s.location.namer
+      new_sitemap.location.namer.should == original_sitemap.location.namer
+    end
+  end
+
+  describe "reserve_name" do
+    it "should reserve the name from the location" do
+      sitemap.reserved_name?.should be_false
+      sitemap.location.expects(:reserve_name).returns('name')
+      sitemap.reserve_name
+      sitemap.reserved_name?.should be_true
+      sitemap.instance_variable_get(:@reserved_name).should == 'name'
+    end
+
+    it "should be safe to call multiple times" do
+      sitemap.location.expects(:reserve_name).returns('name').once
+      sitemap.reserve_name
+      sitemap.reserve_name
+    end
+  end
+
+  describe "add" do
+    it "should use the host provided" do
+      url = SitemapGenerator::Builder::SitemapUrl.new('/one', :host => 'http://newhost.com/')
+      SitemapGenerator::Builder::SitemapUrl.expects(:new).with('/one', :host => 'http://newhost.com').returns(url)
+      sitemap.add '/one', :host => 'http://newhost.com'
+    end
+
+    it "should use the host from the location" do
+      url = SitemapGenerator::Builder::SitemapUrl.new('/one', :host => 'http://example.com/')
+      SitemapGenerator::Builder::SitemapUrl.expects(:new).with('/one', :host => 'http://example.com/').returns(url)
+      sitemap.add '/one'
     end
   end
 end

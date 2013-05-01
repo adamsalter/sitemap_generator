@@ -127,7 +127,7 @@ module SitemapGenerator
   class SitemapIndexLocation < SitemapLocation
     def initialize(opts={})
       if !opts[:filename] && !opts[:namer]
-        opts[:namer] = SitemapGenerator::SitemapIndexNamer.new(:sitemap_index)
+        opts[:namer] = SitemapGenerator::SitemapIndexNamer.new(:sitemap)
       end
       super(opts)
     end

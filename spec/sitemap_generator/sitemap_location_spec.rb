@@ -32,7 +32,7 @@ describe SitemapGenerator::SitemapLocation do
       @l.filename.should be_nil
     }.should raise_error
   end
-  
+
   it "should require a host" do
     @l = SitemapGenerator::SitemapLocation.new(:filename => nil, :namer => nil)
     lambda {
@@ -119,6 +119,6 @@ describe SitemapGenerator::SitemapIndexLocation do
     @l = SitemapGenerator::SitemapIndexLocation.new
     @l[:namer].should_not be_nil
     @l[:filename].should be_nil
-    @l.filename.should == 'sitemap_index.xml.gz'
+    @l.filename.should == 'sitemap.xml.gz'
   end
 end

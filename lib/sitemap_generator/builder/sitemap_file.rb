@@ -83,20 +83,20 @@ module SitemapGenerator
       # Call with:
       #   sitemap_url - a SitemapUrl instance
       #   sitemap, options - a Sitemap instance and options hash
-      #   path, options - a path for the URL and options hash
+      #   path, options - a path for the URL and options hash.  For supported options
+      #                   see the SitemapGenerator::Builder::SitemapUrl class.
       #
-      # KJV: We should be using the host from the Location object if no host is
-      # specified in the call to add().  The issue is noticeable when we add links
-      # to a sitemap direct as in the following example:
-      #   ls = SitemapGenerator::LinkSet.new(:default_host => 'http://abc.com')
-      #   ls.sitemap_index.add('/link')
-      # This raises a RuntimeError: Cannot generate a url without a host
-      # Expected: the link added to the sitemap should use the host from its
-      # location object if no host has been specified.
+      # The link added to the sitemap will use the host from its location object
+      # if no host has been specified.
       def add(link, options={})
         raise SitemapGenerator::SitemapFinalizedError if finalized?
 
-        sitemap_url = (link.is_a?(SitemapUrl) ? link : SitemapUrl.new(link, options) )
+        sitemap_url = if link.is_a?(SitemapUrl)
+          link
+        else
+          options[:host] ||= @location.host
+          SitemapUrl.new(link, options)
+        end
 
         xml = sitemap_url.to_xml
         raise SitemapGenerator::SitemapFullError if !file_can_fit?(xml)

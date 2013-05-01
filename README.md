@@ -73,7 +73,7 @@ Version 4.0 introduces a new **non-backwards compatible** naming scheme.  **If y
 
 * **The index is generated intelligently**.  SitemapGenerator now detects whether you need an index or not, and only generates one if you need it or have requested it.  So small sites (less than 50,000 links) won't have one, large sites will.  You don't have to worry about anything.  And with the `create_index` option, it's easier than ever to control index creation to suit your needs.
 
-* **The default index file name has changed** from `sitemap_index.xml.gz` to just `sitemap.xml.gz`.  So the `_index` part has been removed.  Your sitemaps will still be named `sitemap1.xml.gz`, `sitemap2.xml.gz`, `sitemap3.xml.gz` etc.
+* **The default index file name has changed** from `sitemap_index.xml.gz` to just `sitemap.xml.gz`.  So the `_index` part has been removed.  This is a more standard naming scheme for the sitemaps. Any further sitemaps are named `sitemap1.xml.gz`, `sitemap2.xml.gz`, `sitemap3.xml.gz` etc, just as before.
 
 * **Everyone now points search engines to the `sitemap.xml.gz` file**.  It doesn't matter whether your site has 10 links or a million links, just point to `sitemap.xml.gz`.  If your site needs an index, that is the index.  If it doesn't, then that's your sitemap.  Simple.
 
@@ -90,7 +90,7 @@ SitemapGenerator::Sitemap.create_index = true
 SitemapGenerator::Sitemap.sitemaps_namer = SitemapGenerator::SimpleNamer.new(:sitemap, :zero => '_index')
 ```
 
-This tells SitemapGenerator to always create an index file and to name it `sitemap_index.xml.gz`.  If you are already using custom namers, you don't need to set `sitemaps_namer`; your old namers will still work as before.
+This tells SitemapGenerator to always create an index file and to name it `sitemap_index.xml.gz`.  If you are already using custom namers, you don't need to set `sitemaps_namer`; your old namers should still work as before.  If you are using named groups, setting the sitemap namer in this way won't affect your groups, which will still be using the new naming scheme.  If this is an issue for you, you may have to create namers for your groups.
 
 ### I want it!  What do I need to do?
 
@@ -239,7 +239,7 @@ SitemapGenerator::Sitemap.ping_search_engines
 Alternatively you can pass in the full URL to your sitemap index in which case we would have just the following:
 
 ```ruby
-SitemapGenerator::Sitemap.ping_search_engines('http://example.com/sitemap_index.xml.gz')
+SitemapGenerator::Sitemap.ping_search_engines('http://example.com/sitemap.xml.gz')
 ```
 
 ### Crontab
@@ -261,7 +261,7 @@ end
 You should add the URL of the sitemap index file to `public/robots.txt` to help search engines find your sitemaps.  The URL should be the complete URL to the sitemap index.  For example:
 
 ```
-Sitemap: http://www.example.com/sitemap_index.xml.gz
+Sitemap: http://www.example.com/sitemap.xml.gz
 ```
 
 ## Deployments & Capistrano
@@ -281,7 +281,7 @@ To ensure that your application's sitemaps are available after a deployment you 
     after "deploy:update_code", "deploy:copy_old_sitemap"
     namespace :deploy do
       task :copy_old_sitemap do
-        run "if [ -e #{previous_release}/public/sitemap_index.xml.gz ]; then cp #{previous_release}/public/sitemap* #{current_release}/public/; fi"
+        run "if [ -e #{previous_release}/public/sitemap.xml.gz ]; then cp #{previous_release}/public/sitemap* #{current_release}/public/; fi"
       end
     end
     ```
@@ -296,9 +296,25 @@ To ensure that your application's sitemaps are available after a deployment you 
 
 ### Sitemaps with no Index File
 
-Sometimes you may not want the sitemap index file to be automatically created, for example when you have a small site with only one sitemap file.  Or you may only want an index file created if you have more than one sitemap file.  Or you may never want the index file to be created.
+The sitemap index file is created for you on-demand, meaning that if you have a large site with more than one sitemap file, you will have a sitemap index file to reference those sitemap files.  If however you have a small site with only one sitemap file, you don't require an index and so no index will be created.  In both cases the index and sitemap file's name, respectively, is `sitemap.xml.gz`.
 
-To handle these cases, take a look at the `create_index` option in the Sitemap Options section below.
+You may want to always create an index, even if you only have a small site.  Or you may never want to create an index.  For these cases, you can use the `create_index` option to control index creation.  You can read about this option in the Sitemap Options section below.
+
+To always create an index:
+```ruby
+SitemapGenerator::Sitemap.create_index = true
+```
+
+To never create an index:
+```ruby
+SitemapGenerator::Sitemap.create_index = false
+```
+Your sitemaps will still be called `sitemap.xml.gz`, `sitemap1.xml.gz`, `sitemap2.xml.gz`, etc.
+
+And the default "intelligent" behaviour:
+```ruby
+SitemapGenerator::Sitemap.create_index = :auto
+```
 
 ### Upload Sitemaps to a Remote Host
 
@@ -372,13 +388,13 @@ Outputs:
 
 ```
 + sitemaps/google/sitemap1.xml.gz             2 links /  822 Bytes /  328 Bytes gzipped
-+ sitemaps/google/sitemap_index.xml.gz          1 sitemaps /  389 Bytes /  217 Bytes gzipped
++ sitemaps/google/sitemap.xml.gz           1 sitemaps /  389 Bytes /  217 Bytes gzipped
 Sitemap stats: 2 links / 1 sitemaps / 0m00s
-+ sitemaps/bing/sitemap1.xml.gz             2 links /  820 Bytes /  330 Bytes gzipped
-+ sitemaps/bing/sitemap_index.xml.gz          1 sitemaps /  388 Bytes /  217 Bytes gzipped
++ sitemaps/bing/sitemap1.xml.gz               2 links /  820 Bytes /  330 Bytes gzipped
++ sitemaps/bing/sitemap.xml.gz             1 sitemaps /  388 Bytes /  217 Bytes gzipped
 Sitemap stats: 2 links / 1 sitemaps / 0m00s
-+ sitemaps/apple/sitemap1.xml.gz             2 links /  820 Bytes /  330 Bytes gzipped
-+ sitemaps/apple/sitemap_index.xml.gz          1 sitemaps /  388 Bytes /  214 Bytes gzipped
++ sitemaps/apple/sitemap1.xml.gz              2 links /  820 Bytes /  330 Bytes gzipped
++ sitemaps/apple/sitemap.xml.gz            1 sitemaps /  388 Bytes /  214 Bytes gzipped
 Sitemap stats: 2 links / 1 sitemaps / 0m00s
 ```
 
@@ -441,23 +457,23 @@ end
 A few things to note:
 
 * `SitemapGenerator::Sitemap` is a lazy-initialized sitemap object provided for your convenience.
-* Every sitemap must set `default_host`.  This is the hostname that is used when building links to add to the sitemap.
+* Every sitemap must set `default_host`.  This is the hostname that is used when building links to add to the sitemap (and all links in a sitemap must belong to the same host).
 * The `create` method takes a block with calls to `add` to add links to the sitemap.
-* The sitemaps are written to the `public/` directory, which is the default location.  You can specify a custom location using the `public_path` or `sitemaps_path` option.
+* The sitemaps are written to the `public/` directory in the directory from which the script is run.  You can specify a custom location using the `public_path` or `sitemaps_path` option.
 
 Now let's see what is output when we run this configuration with `rake sitemap:refresh:no_ping`:
 
 ```
 + sitemap1.xml.gz                   2 links /  923 Bytes /  329 Bytes gzipped
-+ sitemap_index.xml.gz           1 sitemaps /  364 Bytes /  199 Bytes gzipped
++ sitemap.xml.gz                 1 sitemaps /  364 Bytes /  199 Bytes gzipped
 Sitemap stats: 2 links / 1 sitemaps / 0m00s
 ```
 
-Weird!  The sitemap has two links, even though only added one!  This is because SitemapGenerator adds the root URL `/` by default.  (Note that prior to version 3.2 the  URL of the sitemap index file was also added to the sitemap by default but [this behaviour has been changed][include_index_change] because of Google complaining about nested indexing.)  You can change the default behaviour by setting the `include_root` or `include_index` option.
+Weird!  The sitemap has two links, even though we only added one!  This is because SitemapGenerator adds the root URL `/` for you by default.  (Note that prior to version 3.2 the  URL of the sitemap index file was also added to the sitemap by default but [this behaviour has been changed][include_index_change] because of Google complaining about nested indexing.)  You can change the default behaviour by setting the `include_root` or `include_index` option.
 
 Now let's take a look at the files that were created.  After uncompressing and XML-tidying the contents we have:
 
-* `public/sitemap_index.xml.gz`
+* `public/sitemap.xml.gz`
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -516,7 +532,7 @@ Looking at the output from running this sitemap, we see that we have a few more 
 
 ```
 + sitemap1.xml.gz                  12 links /     2.3 KB /  365 Bytes gzipped
-+ sitemap_index.xml.gz           1 sitemaps /  364 Bytes /  199 Bytes gzipped
++ sitemap.xml.gz                 1 sitemaps /  364 Bytes /  199 Bytes gzipped
 Sitemap stats: 12 links / 1 sitemaps / 0m00s
 ```
 
@@ -602,10 +618,10 @@ In this example, say we have already pre-generated three sitemap files: `sitemap
 
 ```ruby
 SitemapGenerator::Sitemap.default_host = "http://www.example.com"
+SitemapGenerator::Sitemap.namer = SitemapGenerator::SimpleNamer.new(:start => 4)
 SitemapGenerator::Sitemap.create do
   3.times do |i|
-    add_to_index sitemap.sitemaps_namer.to_s
-    sitemap.sitemaps_namer.next
+    add_to_index "sitemap#{i}.xml.gz"
   end
   add '/home'
   add '/another'
@@ -617,7 +633,7 @@ The output looks something like this:
 ```
 In /Users/karl/projects/sitemap_generator-test/public/
 + sitemap4.xml.gz                                          4 links /  347 Bytes
-+ sitemap_index.xml.gz                                  4 sitemaps /  242 Bytes
++ sitemap.xml.gz                                        4 sitemaps /  242 Bytes
 Sitemap stats: 4 links / 4 sitemaps / 0m00s
 ```
 
@@ -676,7 +692,7 @@ The following options are supported:
 
 * `filename` - Symbol.  The **base name for the files** that will be generated.  The default value is `:sitemap`.  This yields sitemaps with names like `sitemap1.xml.gz`, `sitemap2.xml.gz`, `sitemap3.xml.gz` etc, and a sitemap index named `sitemap_index.xml.gz`.  If we now set the value to `:geo` the sitemaps would be named `geo1.xml.gz`, `geo2.xml.gz`, `geo3.xml.gz` etc, and the sitemap index would be named `geo_index.xml.gz`.
 
-* `include_index` - Boolean.  Whether to **add a link to the sitemap index** to the current sitemap.  This points search engines to your Sitemap Index to include it in the indexing of your site.  2012-07: This is now turned off by default because Google may complain about there being 'Nested Sitemap indexes'.  Default is `false`.  Turned off when `sitemaps_host` is set or within a `group()` block.
+* `include_index` - Boolean.  Whether to **add a link pointing to the sitemap index** to the current sitemap.  This points search engines to your Sitemap Index to include it in the indexing of your site.  2012-07: This is now turned off by default because Google may complain about there being 'Nested Sitemap indexes'.  Default is `false`.  Turned off when `sitemaps_host` is set or within a `group()` block.
 
 * `include_root` - Boolean.  Whether to **add the root** url i.e. '/' to the current sitemap.  Default is `true`.  Turned off within a `group()` block.
 
@@ -690,7 +706,7 @@ different host than the rest of the links in the sitemap.  Something that the si
 * `namer` - A `SitemapGenerator::SimpleNamer` instance **for generating sitemap names**.  You can read about Sitemap Namers by reading the API docs.  Allows you to set the name, extension and number sequence for sitemap files, as well as modify the name of
 the first file in the sequence, which is typically the index file.
 
-* `sitemaps_path` - String. A **relative path** giving a directory under your `public_path` at which to write sitemaps.  The difference between the two options is that the `sitemaps_path` is used when generating a link to a sitemap file.  For example, if we set `SitemapGenerator::Sitemap.sitemaps_path = 'en/'` and use the default `public_path` sitemaps will be written to `public/en/`.  And when the sitemap index is added to our sitemap it would have a URL like `http://example.com/en/sitemap_index.xml.gz`.
+* `sitemaps_path` - String. A **relative path** giving a directory under your `public_path` at which to write sitemaps.  The difference between the two options is that the `sitemaps_path` is used when generating a link to a sitemap file.  For example, if we set `SitemapGenerator::Sitemap.sitemaps_path = 'en/'` and use the default `public_path` sitemaps will be written to `public/en/`.  The URL to the sitemap index would then be `http://example.com/en/sitemap.xml.gz`.
 
 * `verbose` - Boolean.  Whether to **output a sitemap summary** describing the sitemap files and giving statistics about your sitemap.  Default is `false`.  When using the Rake tasks `verbose` will be `true` unless you pass the `-s` option.
 
@@ -711,6 +727,7 @@ Sitemap Groups is a powerful feature that is also very simple to use.
 * The sitemap index file is shared by all groups.
 * Groups can handle any number of links.
 * Group sitemaps are finalized (written out) as they get full and at the end of each group.
+* It's a good idea to name your groups
 
 ### A Groups Example
 
@@ -736,14 +753,14 @@ end
 And the output from running the above:
 
 ```
-+ en/english1.xml.gz                1 links /  612 Bytes /  296 Bytes gzipped
-+ fr/french1.xml.gz                 1 links /  614 Bytes /  298 Bytes gzipped
++ en/english.xml.gz                 1 links /  612 Bytes /  296 Bytes gzipped
++ fr/french.xml.gz                  1 links /  614 Bytes /  298 Bytes gzipped
 + sitemap1.xml.gz                   3 links /  919 Bytes /  328 Bytes gzipped
-+ sitemap_index.xml.gz           3 sitemaps /  505 Bytes /  221 Bytes gzipped
++ sitemap.xml.gz                 3 sitemaps /  505 Bytes /  221 Bytes gzipped
 Sitemap stats: 5 links / 3 sitemaps / 0m00s
 ```
 
-So we have two sitemaps with one link each and one sitemap with three links.  The sitemaps from the groups are easy to spot by their filenames.  They are `english1.xml.gz` and `french1.xml.gz`.  They contain only one link each because **`include_index` and `include_root` are set to `false` by default** in a group.
+So we have two sitemaps with one link each and one sitemap with three links.  The sitemaps from the groups are easy to spot by their filenames.  They are `english.xml.gz` and `french.xml.gz`.  They contain only one link each because **`include_index` and `include_root` are set to `false` by default** in a group.
 
 On the other hand, the default sitemap which we added `/rss` to has three links.  The sitemap index and root url were added to it when we added `/rss`.  If we hadn't added that link `sitemap1.xml.gz` would not have been created.  So **when we are using groups, the default sitemap will only be created if we add links to it**.
 

@@ -36,6 +36,10 @@ module SitemapGenerator
       # index, and go and write out the first sitemap.  If it's the third or
       # greater sitemap, just finalize and write it out as usual, nothing more
       # needs to be done.
+      #
+      # If a link is being added to the index manually as a string, then we
+      # can assume that the index is required (unless create_index is false of course).
+      # This seems like the logical thing to do.
       alias_method :super_add, :add
       def add(link, options={})
         if file = link.is_a?(SitemapFile) && link
@@ -51,17 +55,19 @@ module SitemapGenerator
           # for there to be an index.
           if @link_count == 0
             @first_sitemap = SitemapGenerator::Builder::LinkHolder.new(file, options)
-            @link_count += 1      # pretend it's added
-          elsif @link_count == 1  # adding second link, need an index so reserve names & write out first sitemap
-            reserve_name unless @location.create_index == false # index gets first name
-            write_first_sitemap
-            file.write
-            super(SitemapGenerator::Builder::SitemapIndexUrl.new(file, options))
+            @link_count += 1     # pretend it's added, but don't add it yet
           else
+            # need an index so make sure name is reserved and first sitemap is written out
+            reserve_name unless @location.create_index == false
+            write_first_sitemap
             file.write
             super(SitemapGenerator::Builder::SitemapIndexUrl.new(file, options))
           end
         else
+          # A link is being added manually.  Obviously the user wants an index.
+          # This overrides the create_index setting.
+          reserve_name unless @location.create_index == false
+          options[:host] ||= @location.host # use the host from the location if none provided
           super(SitemapGenerator::Builder::SitemapIndexUrl.new(link, options))
         end
       end
@@ -104,7 +110,9 @@ module SitemapGenerator
         super if create_index?
       end
 
-      # Whether or not we need to create an index file.
+      # Whether or not we need to create an index file.  True if create_index is true
+      # or if create_index is :auto and we have more than one sitemap in the index.
+      # False otherwise.
       def create_index?
         @location.create_index == true || @location.create_index == :auto && @link_count > 1
       end

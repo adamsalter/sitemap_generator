@@ -230,7 +230,7 @@ describe SitemapGenerator::LinkSet do
     it "should not modify the index" do
       @ls.filename = :newname
       @ls.sitemap.location.filename.should =~ /newname/
-      @ls.sitemap_index.location.filename =~ /sitemap_index/
+      @ls.sitemap_index.location.filename =~ /sitemap/
     end
 
     it "should not modify the index" do

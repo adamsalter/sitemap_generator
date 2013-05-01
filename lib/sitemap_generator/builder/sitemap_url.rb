@@ -19,6 +19,7 @@ module SitemapGenerator
       # Requires a host to be set.  If passing a sitemap, the sitemap must have a +default_host+
       # configured.  If calling with a path and options, you must include the <tt>:host</tt> option.
       #
+      # * +host+
       # * +priority+
       # * +changefreq+
       # * +lastmod+

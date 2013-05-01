@@ -161,6 +161,114 @@ describe "SitemapGenerator" do
     end
   end
 
+  describe "should handle links added manually" do
+    before :each do
+      clean_sitemap_files_from_rails_app
+      ::SitemapGenerator::Sitemap.reset!
+      ::SitemapGenerator::Sitemap.default_host = "http://www.example.com"
+      ::SitemapGenerator::Sitemap.namer = ::SitemapGenerator::SimpleNamer.new(:sitemap, :start => 4)
+      ::SitemapGenerator::Sitemap.create do
+        3.times do |i|
+          add_to_index "sitemap#{i}.xml.gz"
+        end
+        add '/home'
+      end
+    end
+
+    it "should create the index and start the sitemap numbering from 4" do
+      file_should_exist(rails_path('public/sitemap.xml.gz'))
+      file_should_exist(rails_path('public/sitemap4.xml.gz'))
+      gzipped_xml_file_should_validate_against_schema rails_path('public/sitemap.xml.gz'), 'siteindex'
+      gzipped_xml_file_should_validate_against_schema rails_path('public/sitemap4.xml.gz'), 'sitemap'
+    end
+  end
+
+  describe "should handle links added manually" do
+    before :each do
+      clean_sitemap_files_from_rails_app
+      ::SitemapGenerator::Sitemap.reset!
+      ::SitemapGenerator::Sitemap.default_host = "http://www.example.com"
+      ::SitemapGenerator::Sitemap.include_root = false
+    end
+
+    it "should create the index" do
+      with_max_links(1) {
+        ::SitemapGenerator::Sitemap.create do
+          add_to_index "customsitemap.xml.gz"
+          add '/one'
+          add '/two'
+        end
+      }
+      file_should_exist(rails_path('public/sitemap.xml.gz'))
+      file_should_exist(rails_path('public/sitemap1.xml.gz'))
+      file_should_exist(rails_path('public/sitemap2.xml.gz'))
+      file_should_not_exist(rails_path('public/sitemap3.xml.gz'))
+      gzipped_xml_file_should_validate_against_schema rails_path('public/sitemap.xml.gz'), 'siteindex'
+    end
+
+    it "should create the index" do
+      with_max_links(1) {
+        ::SitemapGenerator::Sitemap.create do
+          add '/one'
+          add_to_index "customsitemap.xml.gz"
+          add '/two'
+        end
+      }
+      file_should_exist(rails_path('public/sitemap.xml.gz'))
+      file_should_exist(rails_path('public/sitemap1.xml.gz'))
+      file_should_exist(rails_path('public/sitemap2.xml.gz'))
+      file_should_not_exist(rails_path('public/sitemap3.xml.gz'))
+      gzipped_xml_file_should_validate_against_schema rails_path('public/sitemap.xml.gz'), 'siteindex'
+    end
+
+    it "should create an index when only manually added links" do
+      with_max_links(1) {
+        ::SitemapGenerator::Sitemap.create(:create_index => :auto) do
+          add_to_index "customsitemap1.xml.gz"
+        end
+      }
+      debugger
+      # KJV TODO FIX sitemap.xml isn't written out because only 1 link and create_index is :auto
+      file_should_exist(rails_path('public/sitemap.xml.gz'))
+      file_should_not_exist(rails_path('public/sitemap1.xml.gz'))
+      gzipped_xml_file_should_validate_against_schema rails_path('public/sitemap.xml.gz'), 'siteindex'
+    end
+
+    it "should create an index when only manually added links" do
+      with_max_links(1) {
+        ::SitemapGenerator::Sitemap.create(:create_index => :auto) do
+          add_to_index "customsitemap1.xml.gz"
+          add_to_index "customsitemap2.xml.gz"
+          add_to_index "customsitemap3.xml.gz"
+        end
+      }
+      file_should_exist(rails_path('public/sitemap.xml.gz'))
+      file_should_not_exist(rails_path('public/sitemap1.xml.gz'))
+      gzipped_xml_file_should_validate_against_schema rails_path('public/sitemap.xml.gz'), 'siteindex'
+    end
+
+    it "should not create an index" do
+      # Create index is explicity turned off and no links added to sitemap,
+      # respect the setting and don't create the index.  There is no sitemap file either.
+      ::SitemapGenerator::Sitemap.create(:create_index => false) do
+        add_to_index "customsitemap1.xml.gz"
+        add_to_index "customsitemap2.xml.gz"
+        add_to_index "customsitemap3.xml.gz"
+      end
+      file_should_not_exist(rails_path('public/sitemap.xml.gz'))
+      file_should_not_exist(rails_path('public/sitemap1.xml.gz'))
+    end
+
+    it "should not create an index" do
+      ::SitemapGenerator::Sitemap.create(:create_index => false) do
+        add '/one'
+      end
+      file_should_exist(rails_path('public/sitemap.xml.gz')) # the sitemap, not an index
+      file_should_not_exist(rails_path('public/sitemap1.xml.gz'))
+      gzipped_xml_file_should_validate_against_schema rails_path('public/sitemap.xml.gz'), 'sitemap'
+    end
+  end
+
   describe "sitemap path" do
     before :each do
       clean_sitemap_files_from_rails_app

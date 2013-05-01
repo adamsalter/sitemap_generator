@@ -1,5 +1,7 @@
 module SitemapGenerator
   # A class for generating sitemap names given the base for the filename.
+  # Deprecated.  Rather use the <tt>SitemapGenerator::SimpleNamer</tt> class and the
+  # +namer+ option on your sitemap object.
   #
   # === Example
   # namer = SitemapNamer.new(:sitemap)
@@ -50,7 +52,9 @@ module SitemapGenerator
     end
   end
 
-  # A Namer for Sitemap Indexes.  The name never changes.
+  # A Namer for Sitemap Indexes.
+  # Deprecated.  Rather use the <tt>SitemapGenerator::SimpleNamer</tt> class and the
+  # +namer+ option on your sitemap object.
   class SitemapIndexNamer < SitemapNamer
     def to_s
       "#{@base}#{@options[:extension]}"
@@ -68,14 +72,19 @@ module SitemapGenerator
   #   * sitemap3.xml.gz
   #   * ...
   #
+  # Arguments:
+  #   base - string or symbol that forms the base of the generated filename e.g.
+  #          if `:geo` files are generated like `geo.xml.gz`, `geo1.xml.gz`, `geo2.xml.gz` etc.
+  #
   # Options:
   #   :extension - Default: '.xml.gz'. File extension to append.
   #   :start     - Default: 1. Numerical index at which to start counting.
-  #   :zero      - Default: nil.  Could be a string or number that gives part
-  #                of the first name in the sequence.  So in the old naming scheme
-  #                setting this to '_index' would produce 'sitemap_index.xml.gz' as
+  #   :zero      - Default: nil.  A string or number that is appended to +base+
+  #                to create the first name in the sequence.  So setting this
+  #                to '_index' would produce 'sitemap_index.xml.gz' as
   #                the first name.  Thereafter, the numerical index defined by +start+
-  #                is used.
+  #                is used, and subsequent names would be 'sitemap1.xml.gz', 'sitemap2.xml.gz', etc.
+  #                In these examples the `base` string is assumed to be 'sitemap'.
   class SimpleNamer < SitemapNamer
     def initialize(base, options={})
       super_options = SitemapGenerator::Utilities.reverse_merge(options,

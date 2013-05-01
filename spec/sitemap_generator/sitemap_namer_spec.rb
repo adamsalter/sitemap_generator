@@ -66,6 +66,7 @@ describe SitemapGenerator::SitemapIndexNamer do
     namer.to_s.should == default
     namer.next.to_s.should == default
     namer.previous.to_s.should == default
+    SitemapGenerator::SitemapIndexNamer.new(:sitemap).to_s.should == 'sitemap.xml.gz'
   end
 end
 

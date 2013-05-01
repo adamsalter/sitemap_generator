@@ -84,10 +84,12 @@ module SitemapGenerator
     #   The names are generated like "#{filename}.xml.gz", "#{filename}1.xml.gz", "#{filename}2.xml.gz"
     #   with the first file being the index if you have more than one sitemap file.
     #
-    # * <tt>:include_index</tt> - Boolean.  Whether to <b>add a link to the sitemap index<b>
+    # * <tt>:include_index</tt> - Boolean.  Whether to <b>add a link pointing to the sitemap index<b>
     #   to the current sitemap.  This points search engines to your Sitemap Index to
     #   include it in the indexing of your site.  Default is `false`.  Turned off when
-    #  `sitemaps_host` is set or within a `group()` block.
+    #  `sitemaps_host` is set or within a `group()` block.  Turned off because Google can complain
+    #   about nested indexing and because if a robot is already reading your sitemap, they
+    #   probably know about the index.
     #
     # * <tt>:include_root</tt> - Boolean.  Whether to **add the root** url i.e. '/' to the
     #   current sitemap.  Default is `true`.  Turned off within a `group()` block.
@@ -259,20 +261,20 @@ module SitemapGenerator
     # a string interpolation that will be replaced by the CGI escaped sitemap
     # index URL.  If you have any literal percent characters in your URL you
     # need to escape them with `%%`.  For example if your sitemap index URL
-    # is `http://example.com/sitemap_index.xml.gz` and your
+    # is `http://example.com/sitemap.xml.gz` and your
     # ping url is `http://example.com/100%%/ping?url=%s`
-    # then the final URL that is pinged will be `http://example.com/100%/ping?url=http%3A%2F%2Fexample.com%2Fsitemap_index.xml.gz`
+    # then the final URL that is pinged will be `http://example.com/100%/ping?url=http%3A%2F%2Fexample.com%2Fsitemap.xml.gz`
     #
     # == Examples
     #
-    # Both of these examples will ping the default search engines in addition to `http://superengine.com/ping?url=http%3A%2F%2Fexample.com%2Fsitemap_index.xml.gz`
+    # Both of these examples will ping the default search engines in addition to `http://superengine.com/ping?url=http%3A%2F%2Fexample.com%2Fsitemap.xml.gz`
     #
     #   SitemapGenerator::Sitemap.host('http://example.com/')
     #   SitemapGenerator::Sitemap.ping_search_engines(:super_engine => 'http://superengine.com/ping?url=%s')
     #
     # Is equivalent to:
     #
-    #   SitemapGenerator::Sitemap.ping_search_engines('http://example.com/sitemap_index.xml.gz', :super_engine => 'http://superengine.com/ping?url=%s')
+    #   SitemapGenerator::Sitemap.ping_search_engines('http://example.com/sitemap.xml.gz', :super_engine => 'http://superengine.com/ping?url=%s')
     def ping_search_engines(*args)
       require 'cgi/session'
       require 'open-uri'
@@ -430,8 +432,7 @@ module SitemapGenerator
     # Finalize a sitemap by including it in the index and outputting a summary line.
     # Do nothing if it has already been finalized.
     #
-    # Don't finalize if the sitemap is empty and a group has been created.  The reason
-    # being that the group will have written out its sitemap.
+    # Don't finalize if the sitemap is empty.
     #
     # Add the default links if they have not been added yet and no groups have been created.
     # If the default links haven't been added we know that the sitemap is empty,
@@ -445,7 +446,7 @@ module SitemapGenerator
       # the index keeps track of how many links are in our sitemaps and we need this info
       # for the summary line.  Also the index determines which file gets the first name
       # so everything has to go via the index.
-      add_to_index(sitemap)
+      add_to_index(sitemap) unless sitemap.empty?
     end
 
     # Finalize a sitemap index and output a summary line.  Do nothing if it has already
