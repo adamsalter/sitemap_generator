@@ -66,8 +66,13 @@ module SitemapGenerator
         else
           # A link is being added manually.  Obviously the user wants an index.
           # This overrides the create_index setting.
-          reserve_name unless @location.create_index == false
-          options[:host] ||= @location.host # use the host from the location if none provided
+          unless @location.create_index == false
+            @create_index = true
+            reserve_name
+          end
+
+          # Use the host from the location if none provided
+          options[:host] ||= @location.host
           super(SitemapGenerator::Builder::SitemapIndexUrl.new(link, options))
         end
       end
@@ -111,10 +116,11 @@ module SitemapGenerator
       end
 
       # Whether or not we need to create an index file.  True if create_index is true
-      # or if create_index is :auto and we have more than one sitemap in the index.
-      # False otherwise.
+      # or if create_index is :auto and we have more than one link in the index.
+      # If a link is added manually and create_index is not false, we force index
+      # creation because they obviously intend for there to be an index.  False otherwise.
       def create_index?
-        @location.create_index == true || @location.create_index == :auto && @link_count > 1
+        @create_index || @location.create_index == true || @location.create_index == :auto && @link_count > 1
       end
 
       protected

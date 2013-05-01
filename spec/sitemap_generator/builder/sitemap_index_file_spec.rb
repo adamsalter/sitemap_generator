@@ -84,16 +84,18 @@ describe 'SitemapGenerator::Builder::SitemapIndexFile' do
       SitemapGenerator::Builder::SitemapIndexUrl.expects(:new).with('/one', :host => 'http://example.com/').returns(url)
       index.add '/one'
     end
-  end
 
-  describe "when adding a link manually" do
-    it "should reserve a name" do
-      index.expects(:reserve_name)
-      index.add '/link'
-    end
+    describe "when adding manually" do
+      it "should reserve a name" do
+        index.expects(:reserve_name)
+        index.add '/link'
+      end
 
-    it "should create the index" do
-      index.add '/link'
+      it "should create index" do
+        index.create_index?.should be_false
+        index.add '/one'
+        index.create_index?.should be_true
+      end
     end
   end
 end

@@ -727,6 +727,9 @@ describe SitemapGenerator::LinkSet do
   end
 
   describe "create_index" do
+    let(:location) { SitemapGenerator::SitemapLocation.new(:namer => SitemapGenerator::SitemapNamer.new(:sitemap), :public_path => 'tmp/', :sitemaps_path => 'test/', :host => 'http://example.com/') }
+    let(:sitemap)  { SitemapGenerator::Builder::SitemapFile.new(location) }
+
     describe "when false" do
       let(:ls)  { SitemapGenerator::LinkSet.new(:default_host => default_host, :create_index => false) }
 
@@ -769,19 +772,52 @@ describe SitemapGenerator::LinkSet do
         ls.send(:finalize_sitemap!)
       end
 
-      it "should not write the index when it has only one link" do
-        ls.sitemap_index.add '/test', :host => default_host
+      it "should write the index when a link is added manually" do
+        ls.sitemap_index.add '/test'
+        ls.sitemap_index.empty?.should be_false
+        ls.send(:finalize_sitemap_index!)
+        ls.sitemap_index.written?.should be_true
+      end
+
+      it "should not write the index when only one sitemap is added (considered internal usage)" do
+        ls.sitemap_index.add sitemap
         ls.sitemap_index.empty?.should be_false
         ls.send(:finalize_sitemap_index!)
         ls.sitemap_index.written?.should be_false
       end
 
-      it "should write the index when it has more than one link" do
-        ls.sitemap_index.add '/test1', :host => default_host
-        ls.sitemap_index.add '/test2', :host => default_host
+      it "should write the index when more than one sitemap is added (considered internal usage)" do
+        ls.sitemap_index.add sitemap
+        ls.sitemap_index.add sitemap.new
         ls.send(:finalize_sitemap_index!)
         ls.sitemap_index.written?.should be_true
       end
+
+      it "should write the index when it has more than one link" do
+        ls.sitemap_index.add '/test1'
+        ls.sitemap_index.add '/test2'
+        ls.send(:finalize_sitemap_index!)
+        ls.sitemap_index.written?.should be_true
+      end
+    end
+  end
+      
+  describe "when sitemap empty" do
+    before :each do
+      ls.include_root = false
+    end
+    
+    it "should not be written" do
+      ls.sitemap.empty?.should be_true
+      ls.expects(:add_to_index).never
+      ls.send(:finalize_sitemap!)
+    end
+    
+    it "should be written" do
+      ls.sitemap.add '/test'
+      ls.sitemap.empty?.should be_false
+      ls.expects(:add_to_index).with(ls.sitemap)
+      ls.send(:finalize_sitemap!)
     end
   end
 end

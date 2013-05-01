@@ -227,8 +227,6 @@ describe "SitemapGenerator" do
           add_to_index "customsitemap1.xml.gz"
         end
       }
-      debugger
-      # KJV TODO FIX sitemap.xml isn't written out because only 1 link and create_index is :auto
       file_should_exist(rails_path('public/sitemap.xml.gz'))
       file_should_not_exist(rails_path('public/sitemap1.xml.gz'))
       gzipped_xml_file_should_validate_against_schema rails_path('public/sitemap.xml.gz'), 'siteindex'
