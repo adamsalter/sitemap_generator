@@ -7,7 +7,7 @@ group :development, :test do
   gem 'mocha'
   gem 'nokogiri'
   gem 'rake'
-  gem 'rcov'
   gem 'rspec'
-  # gem 'ruby-debug19', :require => 'ruby-debug'
+  #gem 'ruby-debug19', :require => 'ruby-debug'
+  #gem 'simplecov', :require => false
 end
