@@ -82,7 +82,7 @@ module SitemapGenerator
 
               builder.news :access, news_data[:access] if news_data[:access]
               builder.news :genres, news_data[:genres] if news_data[:genres]
-              builder.news :publication_date, news_data[:publication_date] if news_data[:publication_date]
+              builder.news :publication_date, w3c_date(news_data[:publication_date]) if news_data[:publication_date]
               builder.news :title, news_data[:title] if news_data[:title]
               builder.news :keywords, news_data[:keywords] if news_data[:keywords]
               builder.news :stock_tickers, news_data[:stock_tickers] if news_data[:stock_tickers]
