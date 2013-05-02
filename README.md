@@ -301,17 +301,20 @@ The sitemap index file is created for you on-demand, meaning that if you have a 
 You may want to always create an index, even if you only have a small site.  Or you may never want to create an index.  For these cases, you can use the `create_index` option to control index creation.  You can read about this option in the Sitemap Options section below.
 
 To always create an index:
+
 ```ruby
 SitemapGenerator::Sitemap.create_index = true
 ```
 
 To never create an index:
+
 ```ruby
 SitemapGenerator::Sitemap.create_index = false
 ```
 Your sitemaps will still be called `sitemap.xml.gz`, `sitemap1.xml.gz`, `sitemap2.xml.gz`, etc.
 
 And the default "intelligent" behaviour:
+
 ```ruby
 SitemapGenerator::Sitemap.create_index = :auto
 ```
