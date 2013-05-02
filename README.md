@@ -342,7 +342,7 @@ Sitemap Generator uses CarrierWave to support uploading to Amazon S3 store, Rack
 * `adapter` - instance of `SitemapGenerator::WaveAdapter`
 
     For Example:
-    
+
      ```ruby
      SitemapGenerator::Sitemap.default_host = "http://www.example.com"
      SitemapGenerator::Sitemap.sitemaps_host = "http://s3.amazonaws.com/sitemap-generator/"
@@ -358,7 +358,7 @@ Sitemap Generator uses CarrierWave to support uploading to Amazon S3 store, Rack
     ```
 
     You generate your sitemaps as usual using `rake sitemap:refresh`.
-    
+
     Note that SitemapGenerator will automatically turn off `include_index` in this case because
     the `sitemaps_host` does not match the `default_host`.  The link to the sitemap index file
     that would otherwise be included would point to a different host than the rest of the links
@@ -367,8 +367,8 @@ Sitemap Generator uses CarrierWave to support uploading to Amazon S3 store, Rack
 
 4. Verify to google that you own the s3 url
 
-    In order for Google to use your sitemap, you need to prove you own the s3 bucket through [google webmaster tools](https://www.google.com/webmasters/tools/home?hl=en).  In the example above, you would add the site http://s3.amazonaws.com/sitemap-generator/sitemaps.  Once you have verified you own the directory then add your sitemap_index.xml.gz to this list of sitemaps for the site.
-    
+    In order for Google to use your sitemap, you need to prove you own the s3 bucket through [google webmaster tools](https://www.google.com/webmasters/tools/home?hl=en).  In the example above, you would add the site `http://s3.amazonaws.com/sitemap-generator/sitemaps`.  Once you have verified you own the directory then add your `sitemap.xml.gz` to this list of sitemaps for the site.
+
 ### Generating Multiple Sitemaps
 
 Each call to `create` creates a new sitemap index and associated sitemaps.  You can call `create` as many times as you want within your sitemap configuration.
@@ -717,7 +717,7 @@ The following options are supported:
 
 * `default_host` - String.  Required.  **Host including protocol** to use when building a link to add to your sitemap.  For example `http://example.com`.  Calling `add '/home'` would then generate the URL `http://example.com/home` and add that to the sitemap.  You can pass a `:host` option in your call to `add` to override this value on a per-link basis.  For example calling `add '/home', :host => 'https://example.com'` would generate the URL `https://example.com/home`, for that link only.
 
-* `filename` - Symbol.  The **base name for the files** that will be generated.  The default value is `:sitemap`.  This yields sitemaps with names like `sitemap1.xml.gz`, `sitemap2.xml.gz`, `sitemap3.xml.gz` etc, and a sitemap index named `sitemap_index.xml.gz`.  If we now set the value to `:geo` the sitemaps would be named `geo1.xml.gz`, `geo2.xml.gz`, `geo3.xml.gz` etc, and the sitemap index would be named `geo_index.xml.gz`.
+* `filename` - Symbol.  The **base name for the files** that will be generated.  The default value is `:sitemap`.  This yields files with names like `sitemap.xml.gz`, `sitemap1.xml.gz`, `sitemap2.xml.gz`, `sitemap3.xml.gz` etc.  If we now set the value to `:geo` the files would be named `geo.xml.gz`, `geo1.xml.gz`, `geo2.xml.gz`, `geo3.xml.gz` etc.
 
 * `include_index` - Boolean.  Whether to **add a link pointing to the sitemap index** to the current sitemap.  This points search engines to your Sitemap Index to include it in the indexing of your site.  2012-07: This is now turned off by default because Google may complain about there being 'Nested Sitemap indexes'.  Default is `false`.  Turned off when `sitemaps_host` is set or within a `group()` block.
 
@@ -729,7 +729,7 @@ The following options are supported:
 automatically turned off when the `sitemaps_host` does not match `default_host`.
 Because the link to the sitemap index file that would otherwise be added would point to a different host than the rest of the links in the sitemap.  Something that the sitemap rules forbid.
 
-* `namer` - A `SitemapGenerator::SimpleNamer` instance **for generating sitemap names**.  You can read about Sitemap Namers by reading the API docs.  Allows you to set the name, extension and number sequence for sitemap files, as well as modify the name of the first file in the sequence, which is often the index file.  A simple example if we want to generate files like 'newname.xml.gz', 'newname1.xml.gz', etc is `SitemapGenerator::SimpleNamer.new(:newname)`.  I've deprecated the old namer options `sitemaps_namer` and `sitemaps_index_namer` in favour of this integrated approach, however those should still work.
+* `namer` - A `SitemapGenerator::SimpleNamer` instance **for generating sitemap names**.  You can read about Sitemap Namers by reading the API docs.  Allows you to set the name, extension and number sequence for sitemap files, as well as modify the name of the first file in the sequence, which is often the index file.  A simple example if we want to generate files like 'newname.xml.gz', 'newname1.xml.gz', etc is `SitemapGenerator::SimpleNamer.new(:newname)`.  I've deprecated the old namer options `sitemaps_namer` and `sitemap_index_namer` in favour of this integrated approach, however those should still work.
 
 * `sitemaps_path` - String. A **relative path** giving a directory under your `public_path` at which to write sitemaps.  The difference between the two options is that the `sitemaps_path` is used when generating a link to a sitemap file.  For example, if we set `SitemapGenerator::Sitemap.sitemaps_path = 'en/'` and use the default `public_path` sitemaps will be written to `public/en/`.  The URL to the sitemap index would then be `http://example.com/en/sitemap.xml.gz`.
 
