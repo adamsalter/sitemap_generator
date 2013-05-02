@@ -178,8 +178,8 @@ module SitemapGenerator
       # Replace the last 3 characters of string with ... if the string is as big
       # or bigger than max.
       def ellipsis(string, max)
-        if string.size >= max
-          string[0, max - 3] + '...'
+        if string.size > max
+          (string[0, max - 3] || '') + '...'
         else
           string
         end
