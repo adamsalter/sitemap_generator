@@ -50,7 +50,7 @@ Output:
 
 ```
 In /Users/karl/projects/sitemap_generator-test/public/
-+ sitemap.xml.gz                                          3 links /  357 Bytes
++ sitemap.xml.gz                                           3 links /  364 Bytes
 Sitemap stats: 3 links / 1 sitemaps / 0m00s
 
 Successful ping of Google
@@ -464,27 +464,17 @@ A few things to note:
 Now let's see what is output when we run this configuration with `rake sitemap:refresh:no_ping`:
 
 ```
-+ sitemap1.xml.gz                   2 links /  923 Bytes /  329 Bytes gzipped
-+ sitemap.xml.gz                 1 sitemaps /  364 Bytes /  199 Bytes gzipped
+In /Users/karl/projects/sitemap_generator-test/public/
++ sitemap.xml.gz                                           2 links /  347 Bytes
 Sitemap stats: 2 links / 1 sitemaps / 0m00s
 ```
 
-Weird!  The sitemap has two links, even though we only added one!  This is because SitemapGenerator adds the root URL `/` for you by default.  (Note that prior to version 3.2 the  URL of the sitemap index file was also added to the sitemap by default but [this behaviour has been changed][include_index_change] because of Google complaining about nested indexing.)  You can change the default behaviour by setting the `include_root` or `include_index` option.
+Weird!  The sitemap has two links, even though we only added one!  This is because SitemapGenerator adds the root URL `/` for you by default.  (Note that prior to version 3.2 the  URL of the sitemap index file was also added to the sitemap by default but [this behaviour has been changed][include_index_change] because of Google complaining about nested indexing.  This also doesn't make sense anymore because indexes are not always needed.)  You can change the default behaviour by setting the `include_root` or `include_index` option.
 
-Now let's take a look at the files that were created.  After uncompressing and XML-tidying the contents we have:
+Now let's take a look at the file that was created.  After uncompressing and XML-tidying the contents we have:
+
 
 * `public/sitemap.xml.gz`
-
-```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<sitemapindex xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/siteindex.xsd">
-  <sitemap>
-    <loc>http://www.example.com/sitemap1.xml.gz</loc>
-  </sitemap>
-</sitemapindex>
-```
-
-* `public/sitemap1.xml.gz`
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -505,6 +495,39 @@ Now let's take a look at the files that were created.  After uncompressing and X
 ```
 
 The sitemaps conform to the [Sitemap 0.9 protocol][sitemap_protocol].  Notice the value for `priority` and `changefreq` on the root link, the one that was added for us?  The values tell us that this link is the highest priority and should be checked regularly because it are constantly changing.  You can specify your own values for these options in your call to `add`.
+
+In this example no sitemap index was created because we have so few links, so none was needed.  If we run the same example above and set `create_index = true` we can take a look at what an index file looks like:
+
+```ruby
+SitemapGenerator::Sitemap.default_host = "http://www.example.com"
+SitemapGenerator::Sitemap.create_index = true
+SitemapGenerator::Sitemap.create do
+  add '/welcome'
+end
+```
+
+And the output:
+
+```
+In /Users/karl/projects/sitemap_generator-test/public/
++ sitemap1.xml.gz                                          2 links /  347 Bytes
++ sitemap.xml.gz                                        1 sitemaps /  228 Bytes
+Sitemap stats: 2 links / 1 sitemaps / 0m00s
+```
+
+Now if we look at the uncompressed and formatted contents of `sitemap.xml.gz` we can see that it is a sitemap index and `sitemap1.xml.gz` is a sitemap:
+
+* `public/sitemap.xml.gz`
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<sitemapindex xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/siteindex.xsd">
+  <sitemap>
+    <loc>http://www.example.com/sitemap1.xml.gz</loc>
+    <lastmod>2013-05-01T18:10:26-07:00</lastmod>
+  </sitemap>
+</sitemapindex>
+```
 
 ### Adding Links
 
@@ -531,8 +554,7 @@ In the example about we pass a `lastmod` (last modified) option with the value o
 Looking at the output from running this sitemap, we see that we have a few more links than before:
 
 ```
-+ sitemap1.xml.gz                  12 links /     2.3 KB /  365 Bytes gzipped
-+ sitemap.xml.gz                 1 sitemaps /  364 Bytes /  199 Bytes gzipped
++ sitemap.xml.gz                   12 links /     2.3 KB /  365 Bytes gzipped
 Sitemap stats: 12 links / 1 sitemaps / 0m00s
 ```
 
@@ -566,7 +588,7 @@ add content_path(content), :lastmod => content.updated_at
 
 * `host` - Default: `default_host` (String).
 
-  Host to use when building the URL.  Example:
+  Host to use when building the URL.  It's not technically valid to specify a different host for a link in a sitemap according to the spec, but this facility exists in case you have a need.  Example:
 
 ```ruby
 add '/login', :host => 'https://securehost.com'
@@ -609,6 +631,8 @@ SitemapGenerator::Sitemap.create do
   # ...
 end
 ```
+
+When you add links in this way, an index is always created, unless you've explicitly set `create_index` to `false`.
 
 ### Accessing the LinkSet instance
 
