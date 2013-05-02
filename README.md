@@ -928,7 +928,7 @@ end
 
 * `:href` - Required, string.
 * `:lang`  - Required, string.
-* `:nofollow` - Optionall, boolean. Used to mark link as "nofollow"
+* `:nofollow` - Optional, boolean. Used to mark link as "nofollow".
 
 ## Raison d'être
 
