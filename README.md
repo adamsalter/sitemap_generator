@@ -87,10 +87,10 @@ You don't care, you just want to get on with your day.  To resort to pre-version
 
 ```ruby
 SitemapGenerator::Sitemap.create_index = true
-SitemapGenerator::Sitemap.sitemaps_namer = SitemapGenerator::SimpleNamer.new(:sitemap, :zero => '_index')
+SitemapGenerator::Sitemap.namer = SitemapGenerator::SimpleNamer.new(:sitemap, :zero => '_index')
 ```
 
-This tells SitemapGenerator to always create an index file and to name it `sitemap_index.xml.gz`.  If you are already using custom namers, you don't need to set `sitemaps_namer`; your old namers should still work as before.  If you are using named groups, setting the sitemap namer in this way won't affect your groups, which will still be using the new naming scheme.  If this is an issue for you, you may have to create namers for your groups.
+This tells SitemapGenerator to always create an index file and to name it `sitemap_index.xml.gz`.  If you are already using custom namers, you don't need to set `namer`; your old namers should still work as before.  If you are using named groups, setting the sitemap namer in this way won't affect your groups, which will still be using the new naming scheme.  If this is an issue for you, you may have to create namers for your groups.
 
 ### I want it!  What do I need to do?
 
@@ -103,7 +103,7 @@ That's it!  Welcome to the future!
 
 ## Changelog
 
-* **v4.0: NEW, NON-BACKWARDS COMPATIBLE CHANGES.**  See above for more info. `create_index` defaults to `:auto`.  Define `SitemapGenerator::SimpleNamer` class for simpler custom namers compatible with the new naming conventions.
+* **v4.0: NEW, NON-BACKWARDS COMPATIBLE CHANGES.**  See above for more info. `create_index` defaults to `:auto`.  Define `SitemapGenerator::SimpleNamer` class for simpler custom namers compatible with the new naming conventions.  Deprecate `sitemaps_namer`, `sitemap_index_namer` and their respective namer classes.  It's more just that their usage is discouraged.
 * v3.4: Support [alternate links][alternate_links] for urls; Support configurable options in the `SitemapGenerator::S3Adapter`
 * v3.3: **Support creating sitemaps with no index file**.  A big thank-you to [Eric Hochberger][ehoch] for generously paying for this feature.
 * v3.2.1: Fix syntax error in SitemapGenerator::S3Adapter
@@ -370,7 +370,7 @@ longer an issue because [`include_index` is off by default][include_index_change
 Each call to `create` creates a new sitemap index and associated sitemaps.  You can call `create` as many times as you want within your sitemap configuration.
 
 You must remember to use a different filename or location for each set of sitemaps, otherwise they will
-overwrite each other.  You can use the `filename`, `sitemaps_namer` and `sitemaps_path` options for this.
+overwrite each other.  You can use the `filename`, `namer` and `sitemaps_path` options for this.
 
 In the following example we generate three sitemaps each in its own subdirectory:
 
@@ -618,9 +618,9 @@ In this example, say we have already pre-generated three sitemap files: `sitemap
 
 ```ruby
 SitemapGenerator::Sitemap.default_host = "http://www.example.com"
-SitemapGenerator::Sitemap.namer = SitemapGenerator::SimpleNamer.new(:start => 4)
+SitemapGenerator::Sitemap.namer = SitemapGenerator::SimpleNamer.new(:sitemap, :start => 4)
 SitemapGenerator::Sitemap.create do
-  3.times do |i|
+  (1..3).each do |i|
     add_to_index "sitemap#{i}.xml.gz"
   end
   add '/home'
@@ -632,9 +632,9 @@ The output looks something like this:
 
 ```
 In /Users/karl/projects/sitemap_generator-test/public/
-+ sitemap4.xml.gz                                          4 links /  347 Bytes
++ sitemap4.xml.gz                                          3 links /  355 Bytes
 + sitemap.xml.gz                                        4 sitemaps /  242 Bytes
-Sitemap stats: 4 links / 4 sitemaps / 0m00s
+Sitemap stats: 3 links / 4 sitemaps / 0m00s
 ```
 
 ### Speeding Things Up
@@ -672,9 +672,8 @@ This is useful if you are setting a lot of options.
 Finally, passed as options in a call to `group`:
 
 ```ruby
-SitemapGenerator::Sitemap.create do
-  group(:default_host => 'http://example.com',
-        :sitemaps_path => 'sitemaps/') do
+SitemapGenerator::Sitemap.create(:default_host => 'http://example.com') do
+  group(:filename => :somegroup, :sitemaps_path => 'sitemaps/') do
     add '/home'
   end
 end
@@ -700,11 +699,9 @@ The following options are supported:
 
 * `sitemaps_host` - String.  **Host including protocol** to use when generating a link to a sitemap file i.e. the hostname of the server where the sitemaps are hosted.  The value will differ from the hostname in your sitemap links.  For example: `'http://amazon.aws.com/'`.  Note that `include_index` is
 automatically turned off when the `sitemaps_host` does not match `default_host`.
-Because the link to the sitemap index file that would otherwise be added would point to a
-different host than the rest of the links in the sitemap.  Something that the sitemap rules forbid.
+Because the link to the sitemap index file that would otherwise be added would point to a different host than the rest of the links in the sitemap.  Something that the sitemap rules forbid.
 
-* `namer` - A `SitemapGenerator::SimpleNamer` instance **for generating sitemap names**.  You can read about Sitemap Namers by reading the API docs.  Allows you to set the name, extension and number sequence for sitemap files, as well as modify the name of
-the first file in the sequence, which is typically the index file.
+* `namer` - A `SitemapGenerator::SimpleNamer` instance **for generating sitemap names**.  You can read about Sitemap Namers by reading the API docs.  Allows you to set the name, extension and number sequence for sitemap files, as well as modify the name of the first file in the sequence, which is often the index file.  A simple example if we want to generate files like 'newname.xml.gz', 'newname1.xml.gz', etc is `SitemapGenerator::SimpleNamer.new(:newname)`.  I've deprecated the old namer options `sitemaps_namer` and `sitemaps_index_namer` in favour of this integrated approach, however those should still work.
 
 * `sitemaps_path` - String. A **relative path** giving a directory under your `public_path` at which to write sitemaps.  The difference between the two options is that the `sitemaps_path` is used when generating a link to a sitemap file.  For example, if we set `SitemapGenerator::Sitemap.sitemaps_path = 'en/'` and use the default `public_path` sitemaps will be written to `public/en/`.  The URL to the sitemap index would then be `http://example.com/en/sitemap.xml.gz`.
 
@@ -753,16 +750,17 @@ end
 And the output from running the above:
 
 ```
-+ en/english.xml.gz                 1 links /  612 Bytes /  296 Bytes gzipped
-+ fr/french.xml.gz                  1 links /  614 Bytes /  298 Bytes gzipped
-+ sitemap1.xml.gz                   3 links /  919 Bytes /  328 Bytes gzipped
-+ sitemap.xml.gz                 3 sitemaps /  505 Bytes /  221 Bytes gzipped
-Sitemap stats: 5 links / 3 sitemaps / 0m00s
+In /Users/karl/projects/sitemap_generator-test/public/
++ en/english.xml.gz                                        1 links /  328 Bytes
++ fr/french.xml.gz                                         1 links /  329 Bytes
++ sitemap1.xml.gz                                          2 links /  346 Bytes
++ sitemap.xml.gz                                        3 sitemaps /  252 Bytes
+Sitemap stats: 4 links / 3 sitemaps / 0m00s
 ```
 
-So we have two sitemaps with one link each and one sitemap with three links.  The sitemaps from the groups are easy to spot by their filenames.  They are `english.xml.gz` and `french.xml.gz`.  They contain only one link each because **`include_index` and `include_root` are set to `false` by default** in a group.
+So we have two sitemaps with one link each and one sitemap with two links.  The sitemaps from the groups are easy to spot by their filenames.  They are `english.xml.gz` and `french.xml.gz`.  They contain only one link each because **`include_index` and `include_root` are set to `false` by default** in a group.
 
-On the other hand, the default sitemap which we added `/rss` to has three links.  The sitemap index and root url were added to it when we added `/rss`.  If we hadn't added that link `sitemap1.xml.gz` would not have been created.  So **when we are using groups, the default sitemap will only be created if we add links to it**.
+On the other hand, the default sitemap which we added `/rss` to has two links.  The root url was added to it when we added `/rss`.  If we hadn't added that link `sitemap1.xml.gz` would not have been created.  So **when we are using groups, the default sitemap will only be created if we add links to it**.
 
 **The sitemap index file is shared by all groups**.  You can change its filename by setting `SitemapGenerator::Sitemap.filename` or by passing the `:filename` option to `create`.
 
@@ -780,6 +778,7 @@ A news item can be added to a sitemap URL by passing a `:news` hash to `add`.  T
 #### Example
 
 ```ruby
+SitemapGenerator::Sitemap.default_host = "http://www.example.com"
 SitemapGenerator::Sitemap.create do
   add('/index.html', :news => {
       :publication_name => "Example",
@@ -813,6 +812,7 @@ Images can be added to a sitemap URL by passing an `:images` array to `add`.  Ea
 #### Example
 
 ```ruby
+SitemapGenerator::Sitemap.default_host = "http://www.example.com"
 SitemapGenerator::Sitemap.create do
   add('/index.html', :images => [{
     :loc => 'http://www.example.com/image.png',
@@ -838,14 +838,17 @@ To add more than one video to a url, pass an array of video hashes using the `:v
 #### Example
 
 ```ruby
-add('/index.html', :video => {
-  :thumbnail_loc => 'http://www.example.com/video1_thumbnail.png',
-  :title => 'Title',
-  :description => 'Description',
-  :content_loc => 'http://www.example.com/cool_video.mpg',
-  :tags => %w[one two three],
-  :category => 'Category'
-})
+SitemapGenerator::Sitemap.default_host = "http://www.example.com"
+SitemapGenerator::Sitemap.create do
+  add('/index.html', :video => {
+    :thumbnail_loc => 'http://www.example.com/video1_thumbnail.png',
+    :title => 'Title',
+    :description => 'Description',
+    :content_loc => 'http://www.example.com/cool_video.mpg',
+    :tags => %w[one two three],
+    :category => 'Category'
+  })
+end
 ```
 
 #### Supported options
@@ -861,6 +864,7 @@ Pages with geo data can be added by passing a `:geo` Hash to `add`.  The Hash on
 #### Example:
 
 ```ruby
+SitemapGenerator::Sitemap.default_host = "http://www.example.com"
 SitemapGenerator::Sitemap.create do
   add('/stores/1234.xml', :geo => { :format => 'kml' })
 end
@@ -882,6 +886,7 @@ Check out the Google specification [here][alternate_links].
 #### Example
 
 ```ruby
+SitemapGenerator::Sitemap.default_host = "http://www.example.com"
 SitemapGenerator::Sitemap.create do
   add('/index.html', :alternate => {
     :href => 'http://www.example.de/index.html',
@@ -941,10 +946,12 @@ Tested and working on:
 
 ## Wishlist & Coming Soon
 
-* Rails framework agnosticism; support for other frameworks like Merb
-
 
 ## Thanks (in no particular order)
+
+I've kind of stopped maintaining the list of contributors.  To all those who have contributed code or a donation, many thanks!
+
+Some past contributors:
 
 * [Eric Hochberger][ehoch]
 * [Rodrigo Flores](https://github.com/rodrigoflores) for News sitemaps
