@@ -918,7 +918,8 @@ SitemapGenerator::Sitemap.default_host = "http://www.example.com"
 SitemapGenerator::Sitemap.create do
   add('/index.html', :alternate => {
     :href => 'http://www.example.de/index.html',
-    :lang => 'de'
+    :lang => 'de',
+    :nofollow => true
   })
 end
 ```
@@ -927,7 +928,7 @@ end
 
 * `:href` - Required, string.
 * `:lang`  - Required, string.
-
+* `:nofollow` - Optionall, boolean. Used to mark link as "nofollow"
 
 ## Raison d'être
 
