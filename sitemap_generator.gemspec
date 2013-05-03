@@ -15,4 +15,14 @@ Gem::Specification.new do |s|
   s.add_dependency 'builder'
   s.test_files  = Dir.glob(['spec/**/*']) - Dir.glob(['spec/mock_*', 'spec/mock_*/**/*'])
   s.files       = Dir.glob(["[A-Z]*", "{lib,rails,templates}/**/*"]) - Dir.glob('*.orig')
+
+  s.post_install_message = <<-EOM
+NOTE: SitemapGenerator 4.x uses a new file naming scheme which is more standards-compliant.
+If you're upgrading from 3.x, please see the release note in the README:
+
+https://github.com/kjvarga/sitemap_generator#important-changes-in-version-4
+
+The simple answer is that your index file is now called sitemap.xml.gz
+and not sitemap_index.xml.gz, but please take a look and see what else has changed.
+EOM
 end

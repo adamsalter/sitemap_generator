@@ -1,7 +1,7 @@
 PATH
   remote: ./
   specs:
-    sitemap_generator (4.0)
+    sitemap_generator (4.0.1)
       builder
 
 GEM
@@ -13,7 +13,7 @@ GEM
     mocha (0.10.0)
       metaclass (~> 0.0.1)
     nokogiri (1.5.0)
-    rake (0.9.2.2)
+    rake (10.0.4)
     rspec (2.8.0)
       rspec-core (~> 2.8.0)
       rspec-expectations (~> 2.8.0)
