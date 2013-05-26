@@ -7,7 +7,7 @@ Sitemaps adhere to the [Sitemap 0.9 protocol][sitemap_protocol] specification.
 ## Features
 
 * Framework agnostic
-* Supports [News sitemaps][sitemap_news], [Video sitemaps][sitemap_video], [Image sitemaps][sitemap_images], [Geo sitemaps][sitemap_geo], [Mobile sitemaps][sitemap_mobile] and [Alternate Links][alternate_links]
+* Supports [News sitemaps][sitemap_news], [Video sitemaps][sitemap_video], [Image sitemaps][sitemap_images], [Geo sitemaps][sitemap_geo], [Mobile sitemaps][sitemap_mobile], [PageMap sitemaps][sitemap_pagemap] and [Alternate Links][alternate_links]
 * Supports read-only filesystems like Heroku via uploading to a remote host like Amazon S3
 * Compatible with Rails 2 & 3 and tested with Ruby REE, 1.9.2 & 1.9.3
 * Adheres to the [Sitemap 0.9 protocol][sitemap_protocol]
@@ -907,6 +907,35 @@ end
 * `:format` Required, either 'kml' or 'georss'
 
 
+### PageMap Sitemaps
+
+Pagemaps can be added by passing a `:pagemap` Hash to `add`. The Hash must contain one or more `:dataobject`, each containing a `:type` and `:id`, and an array of `:attributes` Hashes with two keys: `:name` and `:value`.  For more information consult the [official documentation on PageMaps][using_pagemaps].
+
+#### Example:
+
+```ruby
+SitemapGenerator::Sitemap.default_host = "http://www.example.com"
+SitemapGenerator::Sitemap.create do
+  add('/blog/post', :pagemap => {
+    :dataobjects => [
+      {
+        type: 'document',
+        id: 'hibachi',
+        attributes: [
+          {name: 'name', value: 'Dragon'},
+          {name: 'review', value: '3.5'},
+        ]
+      }
+    ]
+  })
+end
+```
+
+#### Supported options
+
+* `:format` Required, either 'kml' or 'georss'
+
+
 ### Alternate Links
 
 A useful feature for internationalization is to specify alternate links for a url.
@@ -1010,6 +1039,7 @@ Copyright (c) 2009 Karl Varga released under the MIT license
 [sitemap_news]:http://www.google.com/support/webmasters/bin/topic.py?hl=en&topic=10078
 [sitemap_geo]:http://www.google.com/support/webmasters/bin/topic.py?hl=en&topic=14688
 [sitemap_mobile]:http://support.google.com/webmasters/bin/answer.py?hl=en&answer=34648
+[sitemap_pagemap]:https://developers.google.com/custom-search/docs/structured_data#addtositemap
 [sitemap_protocol]:http://sitemaps.org/protocol.php
 [video_tags]:http://www.google.com/support/webmasters/bin/answer.py?hl=en&answer=80472#4
 [image_tags]:http://www.google.com/support/webmasters/bin/answer.py?hl=en&answer=178636
