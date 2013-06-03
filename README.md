@@ -828,15 +828,15 @@ end
 
 #### Supported options
 
-* `:publication_name`
-* `:publication_language`
-* `:publication_date`
-* `:genres`
-* `:access`
-* `:title`
-* `:keywords`
-* `:stock_tickers`
-
+* `:news` - Hash
+    * `:publication_name`
+    * `:publication_language`
+    * `:publication_date`
+    * `:genres`
+    * `:access`
+    * `:title`
+    * `:keywords`
+    * `:stock_tickers`
 
 ### Image Sitemaps
 
@@ -855,12 +855,12 @@ end
 
 #### Supported options
 
-* `:loc` Required, location of the image
-* `:caption`
-* `:geo_location`
-* `:title`
-* `:license`
-
+* `:images` - Array of hashes
+    * `:loc` Required, location of the image
+    * `:caption`
+    * `:geo_location`
+    * `:title`
+    * `:license`
 
 ### Video Sitemaps
 
@@ -886,9 +886,27 @@ end
 
 #### Supported options
 
-* `:thumbnail_loc` - Required, string.
-
-
+* `:video`/`:videos` - Hash or array of hashes, respectively
+    * `:thumbnail_loc` - String, URL of the thumbnail image.
+    * `:title` - String, title of the video.
+    * `:description` - String, description of the video.
+    * `:content_loc` - String, URL.  One of content_loc or player_loc must be present.
+    * `:player_loc` - String, URL.  One of content_loc or player_loc must be present.
+    * `:allow_embed` - Boolean, attribute of player_loc.
+    * `:autoplay` - Boolean, default true.  Attribute of player_loc.
+    * `:duration` - Integer or string.  Duration in seconds.
+    * `:expiration_date`
+    * `:rating`
+    * `:view_count` - Integer or string.
+    * `:publication_date`
+    * `:tags` - Array of string tags.
+    * `:tag` - String, single tag.
+    * `:category`
+    * `:family_friendly`- Boolean
+    * `:gallery_loc` - String, URL.
+    * `:gallery_title` - Title attribute of the gallery location element
+    * `:uploader`
+    * `:uploader_info` - Info attribute of uploader element
 
 ### Geo Sitemaps
 
@@ -905,12 +923,22 @@ end
 
 #### Supported options
 
-* `:format` Required, either 'kml' or 'georss'
-
+* `:geo` - Hash
+    * `:format` - Required, string, either `'kml'` or `'georss'`
 
 ### PageMap Sitemaps
 
-Pagemaps can be added by passing a `:pagemap` Hash to `add`. The Hash must contain one or more `:dataobject`, each containing a `:type` and `:id`, and an array of `:attributes` Hashes with two keys: `:name` and `:value`.  For more information consult the [official documentation on PageMaps][using_pagemaps].
+Pagemaps can be added by passing a `:pagemap` hash to `add`. The hash must contain a `:dataobjects` key with an array of dataobject hashes. Each dataobject hash contains a `:type` and `:id`, and an optional array of `:attributes`.  Each attribute hash can contain two keys: `:name` and `:value`, with string values.  For more information consult the [official documentation on PageMaps][using_pagemaps].
+
+#### Supported options
+
+* `:pagemap` - Hash
+    * `:dataobjects` - Required, array of hashes
+        * `:type` - Required, string, type of the object
+        * `:id` - String, ID of the object
+        * `:attributes` - Array of hashes
+            * `:name` - Required, string, name of the attribute.
+            * `:value` - String, value of the attribute.
 
 #### Example:
 
@@ -918,24 +946,17 @@ Pagemaps can be added by passing a `:pagemap` Hash to `add`. The Hash must conta
 SitemapGenerator::Sitemap.default_host = "http://www.example.com"
 SitemapGenerator::Sitemap.create do
   add('/blog/post', :pagemap => {
-    :dataobjects => [
-      {
-        type: 'document',
-        id: 'hibachi',
-        attributes: [
-          {name: 'name', value: 'Dragon'},
-          {name: 'review', value: '3.5'},
-        ]
-      }
-    ]
+    :dataobjects => [{
+      :type => 'document',
+      :id   => 'hibachi',
+      :attributes => [
+        { :name => 'name',   :value => 'Dragon' },
+        { :name => 'review', :value => '3.5' },
+      ]
+    }]
   })
 end
 ```
-
-#### Supported options
-
-* `:format` Required, either 'kml' or 'georss'
-
 
 ### Alternate Links
 
@@ -960,9 +981,10 @@ end
 
 #### Supported options
 
-* `:href` - Required, string.
-* `:lang`  - Required, string.
-* `:nofollow` - Optional, boolean. Used to mark link as "nofollow".
+* `:alternate`/`:alternates` - Hash or array of hashes, respectively
+    * `:href` - Required, string.
+    * `:lang`  - Required, string.
+    * `:nofollow` - Optional, boolean. Used to mark link as "nofollow".
 
 ## Raison d'être
 

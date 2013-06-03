@@ -47,4 +47,23 @@ describe SitemapGenerator::Utilities do
       SitemapGenerator::Utilities.falsy?(nil).should be_false
     end
   end
+
+  describe "as_array" do
+    it "should return an array unchanged" do
+      SitemapGenerator::Utilities.as_array([]).should == []
+      SitemapGenerator::Utilities.as_array([1]).should == [1]
+      SitemapGenerator::Utilities.as_array([1,2,3]).should == [1,2,3]
+    end
+
+    it "should return empty array on nil" do
+      SitemapGenerator::Utilities.as_array(nil).should == []
+    end
+
+    it "should make array of item otherwise" do
+      SitemapGenerator::Utilities.as_array('').should == ['']
+      SitemapGenerator::Utilities.as_array(1).should == [1]
+      SitemapGenerator::Utilities.as_array('hello').should == ['hello']
+      SitemapGenerator::Utilities.as_array({}).should == [{}]
+    end
+  end
 end

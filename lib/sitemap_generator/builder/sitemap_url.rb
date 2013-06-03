@@ -40,6 +40,7 @@ module SitemapGenerator
         SitemapGenerator::Utilities.assert_valid_keys(options, :priority, :changefreq, :lastmod, :host, :images, :video, :geo, :news, :videos, :mobile, :alternate, :alternates, :pagemap)
         SitemapGenerator::Utilities.reverse_merge!(options, :priority => 0.5, :changefreq => 'weekly', :lastmod => Time.now, :images => [], :news => {}, :videos => [], :mobile => false, :alternates => [])
         raise "Cannot generate a url without a host" unless SitemapGenerator::Utilities.present?(options[:host])
+
         if video = options.delete(:video)
           options[:videos] = video.is_a?(Array) ? options[:videos].concat(video) : options[:videos] << video
         end
@@ -145,11 +146,10 @@ module SitemapGenerator
           end
 
           unless SitemapGenerator::Utilities.blank?(self[:pagemap])
-            pagemap = self[:pagemap]
-            builder.pagemap :PageMap, xmlns: 'http://www.google.com/schemas/sitemap-pagemap/1.0' do
-              pagemap[:dataobjects].each do |dataobject|
+            builder.pagemap :PageMap do
+              SitemapGenerator::Utilities.as_array(self[:pagemap][:dataobjects]).each do |dataobject|
                 builder.pagemap :DataObject, type: dataobject[:type], id: dataobject[:id] do
-                  dataobject[:attributes].each do |attribute|
+                  SitemapGenerator::Utilities.as_array(dataobject[:attributes]).each do |attribute|
                     builder.pagemap :Attribute, attribute[:value], name: attribute[:name]
                   end
                 end

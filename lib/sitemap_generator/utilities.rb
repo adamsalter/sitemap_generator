@@ -49,6 +49,18 @@ module SitemapGenerator
       hash
     end
 
+    # Make a list of `value` if it is not a list already.  If `value` is
+    # nil, an empty list is returned.  If `value` is already a list, return it unchanged.
+    def as_array(value)
+      if value.nil?
+        []
+      elsif value.is_a?(Array)
+        value
+      else
+        [value]
+      end
+    end
+    
     # Rounds the float with the specified precision.
     #
     #   x = 1.337

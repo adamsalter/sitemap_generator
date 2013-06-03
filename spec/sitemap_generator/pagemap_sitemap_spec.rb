@@ -34,8 +34,6 @@ describe "SitemapGenerator" do
     loc.text.should == 'http://www.example.com/my_page.html'
 
     pagemap = doc.at_xpath("//PageMap")
-
-    pagemap.namespace_definitions.first.href.should == 'http://www.google.com/schemas/sitemap-pagemap/1.0'
     pagemap.children.count.should == 2
     pagemap.at_xpath('//DataObject').attributes['type'].value.should == 'document'
     pagemap.at_xpath('//DataObject').attributes['id'].value.should == 'hibachi'
