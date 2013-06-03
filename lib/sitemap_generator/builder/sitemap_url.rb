@@ -148,9 +148,9 @@ module SitemapGenerator
           unless SitemapGenerator::Utilities.blank?(self[:pagemap])
             builder.pagemap :PageMap do
               SitemapGenerator::Utilities.as_array(self[:pagemap][:dataobjects]).each do |dataobject|
-                builder.pagemap :DataObject, type: dataobject[:type], id: dataobject[:id] do
+                builder.pagemap :DataObject, :type => dataobject[:type], :id => dataobject[:id] do
                   SitemapGenerator::Utilities.as_array(dataobject[:attributes]).each do |attribute|
-                    builder.pagemap :Attribute, attribute[:value], name: attribute[:name]
+                    builder.pagemap :Attribute, attribute[:value], :name => attribute[:name]
                   end
                 end
               end
