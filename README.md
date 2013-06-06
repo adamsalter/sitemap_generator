@@ -9,7 +9,7 @@ Sitemaps adhere to the [Sitemap 0.9 protocol][sitemap_protocol] specification.
 * Framework agnostic
 * Supports [News sitemaps][sitemap_news], [Video sitemaps][sitemap_video], [Image sitemaps][sitemap_images], [Geo sitemaps][sitemap_geo], [Mobile sitemaps][sitemap_mobile], [PageMap sitemaps][sitemap_pagemap] and [Alternate Links][alternate_links]
 * Supports read-only filesystems like Heroku via uploading to a remote host like Amazon S3
-* Compatible with Rails 2 & 3 and tested with Ruby REE, 1.9.2 & 1.9.3
+* Compatible with Rails 2, 3 & 4 and tested with Ruby REE, 1.9.2 & 1.9.3
 * Adheres to the [Sitemap 0.9 protocol][sitemap_protocol]
 * Handles millions of links
 * Automatically compresses your sitemaps
@@ -19,6 +19,8 @@ Sitemaps adhere to the [Sitemap 0.9 protocol][sitemap_protocol] specification.
 * Intelligent sitemap indexing
 
 ### Show Me
+
+This is a simple standalone example.  For Rails installation see the Install section.
 
 Install:
 
@@ -37,7 +39,7 @@ SitemapGenerator::Sitemap.create do
   add '/home', :changefreq => 'daily', :priority => 0.9
   add '/contact_us', :changefreq => 'weekly'
 end
-SitemapGenerator::Sitemap.ping_search_engines # called for you when you use the rake task
+SitemapGenerator::Sitemap.ping_search_engines # Not needed if you use the rake tasks
 ```
 
 Run it:
@@ -103,7 +105,7 @@ That's it!  Welcome to the future!
 
 ## Changelog
 
-* v4.1.0: [PageMap sitemap][using_pagemaps] support.
+* v4.1.0: [PageMap sitemap][using_pagemaps] support.  Tested with Rails 4 pre-release.
 * v4.0.1: Add a post install message regarding the naming convention change.
 * **v4.0: NEW, NON-BACKWARDS COMPATIBLE CHANGES.**  See above for more info. `create_index` defaults to `:auto`.  Define `SitemapGenerator::SimpleNamer` class for simpler custom namers compatible with the new naming conventions.  Deprecate `sitemaps_namer`, `sitemap_index_namer` and their respective namer classes.  It's more just that their usage is discouraged.  Support `nofollow` option on alternate links.  Fix formatting of `publication_date` in News sitemaps.
 * v3.4: Support [alternate links][alternate_links] for urls; Support configurable options in the `SitemapGenerator::S3Adapter`
@@ -164,6 +166,8 @@ require 'sitemap_generator/tasks'
 The Rake tasks expect your sitemap to be at `config/sitemap.rb` but if you need to change that call like so: `rake sitemap:refresh CONFIG_FILE="path/to/sitemap.rb"`
 
 ### Rails
+
+SitemapGenerator works will all versions of Rails and has been tested in Rails 2, 3 and 4.
 
 Add the gem to your `Gemfile`:
 
