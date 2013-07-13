@@ -281,9 +281,11 @@ module SitemapGenerator
       require 'timeout'
 
       engines = args.last.is_a?(Hash) ? args.pop : {}
-      index_url = CGI.escape(args.shift || sitemap_index_url)
+      unescaped_url = args.shift || sitemap_index_url
+      index_url = CGI.escape(unescaped_url)
 
       output("\n")
+      output("Pinging with URL #{unescaped_url}:")
       search_engines.merge(engines).each do |engine, link|
         link = link % index_url
         name = Utilities.titleize(engine.to_s)
@@ -291,7 +293,7 @@ module SitemapGenerator
           Timeout::timeout(10) {
             open(link)
           }
-          output("Successful ping of #{name}")
+          output("  Successful ping of #{name}")
         rescue Timeout::Error, StandardError => e
           output("Ping failed for #{name}: #{e.inspect} (URL #{link})")
         end
@@ -319,9 +321,14 @@ module SitemapGenerator
       @sitemap_index ||= SitemapGenerator::Builder::SitemapIndexFile.new(sitemap_index_location)
     end
 
-    # Return the full url to the sitemap index file.
+    # Return the full url to the sitemap index file.  When `create_index` is `false`
+    # the first sitemap is technically the index, so this will be its URL.  It's important
+    # to use this method to get the index url because `sitemap_index.location.url`  will
+    # not be correct in such situations.
+    #
+    # KJV: This is somewhat confusing.
     def sitemap_index_url
-      sitemap_index.location.url
+      sitemap_index.index_url
     end
 
     # All done.  Write out remaining files.

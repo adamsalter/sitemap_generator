@@ -1,4 +1,5 @@
 require 'spec_helper'
+require 'cgi'
 
 class Holder
   class << self
@@ -351,32 +352,51 @@ describe "SitemapGenerator" do
     end
 
     describe "when true" do
-      let(:ls) { SitemapGenerator::LinkSet.new(:include_root => false, :default_host => 'http://example.com', :create_index => true) }
+      let(:ls) {
+        SitemapGenerator::LinkSet.new(
+          :include_root => false,
+          :default_host => 'http://example.com',
+          :create_index => true)
+      }
 
       it "should always create index" do
         with_max_links(1) do
           ls.create { add('/one') }
         end
+        ls.sitemap_index.link_count.should == 1 # one sitemap
         file_should_exist(rails_path('public/sitemap.xml.gz'))
         file_should_exist(rails_path('public/sitemap1.xml.gz'))
         file_should_not_exist(rails_path('public/sitemap2.xml.gz'))
         gzipped_xml_file_should_validate_against_schema rails_path('public/sitemap.xml.gz'), 'siteindex'
         gzipped_xml_file_should_validate_against_schema rails_path('public/sitemap1.xml.gz'), 'sitemap'
+
+        # Test that the index url is reported correctly
+        ls.search_engines = { :google => 'http://google.com/?url=%s' }
+        ls.expects(:open).with("http://google.com/?url=#{CGI.escape('http://example.com/sitemap.xml.gz')}")
+        ls.ping_search_engines
       end
 
       it "should always create index" do
         with_max_links(1) do
           ls.create { add('/one'); add('/two') }
         end
+        ls.sitemap_index.link_count.should == 2 # two sitemaps
         file_should_exist(rails_path('public/sitemap.xml.gz'))
         file_should_exist(rails_path('public/sitemap1.xml.gz'))
         file_should_exist(rails_path('public/sitemap2.xml.gz'))
         gzipped_xml_file_should_validate_against_schema rails_path('public/sitemap.xml.gz'), 'siteindex'
         gzipped_xml_file_should_validate_against_schema rails_path('public/sitemap1.xml.gz'), 'sitemap'
         gzipped_xml_file_should_validate_against_schema rails_path('public/sitemap2.xml.gz'), 'sitemap'
+
+        # Test that the index url is reported correctly
+        ls.search_engines = { :google => 'http://google.com/?url=%s' }
+        ls.expects(:open).with("http://google.com/?url=#{CGI.escape('http://example.com/sitemap.xml.gz')}")
+        ls.ping_search_engines
       end
     end
 
+    # Technically when there's no index, the first sitemap is the "index"
+    # regardless of how many sitemaps were created, or if create_index is false.
     describe "when false" do
       let(:ls) { SitemapGenerator::LinkSet.new(:include_root => false, :default_host => 'http://example.com', :create_index => false) }
 
@@ -384,20 +404,32 @@ describe "SitemapGenerator" do
         with_max_links(1) do
           ls.create { add('/one') }
         end
+        ls.sitemap_index.link_count.should == 1 # one sitemap
         file_should_exist(rails_path('public/sitemap.xml.gz'))
         file_should_not_exist(rails_path('public/sitemap1.xml.gz'))
         gzipped_xml_file_should_validate_against_schema rails_path('public/sitemap.xml.gz'), 'sitemap'
+
+        # Test that the index url is reported correctly
+        ls.search_engines = { :google => 'http://google.com/?url=%s' }
+        ls.expects(:open).with("http://google.com/?url=#{CGI.escape('http://example.com/sitemap.xml.gz')}")
+        ls.ping_search_engines
       end
 
       it "should never create index" do
         with_max_links(1) do
           ls.create { add('/one'); add('/two') }
         end
+        ls.sitemap_index.link_count.should == 2 # two sitemaps
         file_should_exist(rails_path('public/sitemap.xml.gz'))
         file_should_exist(rails_path('public/sitemap1.xml.gz'))
         file_should_not_exist(rails_path('public/sitemap2.xml.gz'))
         gzipped_xml_file_should_validate_against_schema rails_path('public/sitemap.xml.gz'), 'sitemap'
         gzipped_xml_file_should_validate_against_schema rails_path('public/sitemap1.xml.gz'), 'sitemap'
+
+        # Test that the index url is reported correctly
+        ls.search_engines = { :google => 'http://google.com/?url=%s' }
+        ls.expects(:open).with("http://google.com/?url=#{CGI.escape('http://example.com/sitemap.xml.gz')}")
+        ls.ping_search_engines
       end
     end
 
@@ -408,15 +440,22 @@ describe "SitemapGenerator" do
         with_max_links(1) do
           ls.create { add('/one') }
         end
+        ls.sitemap_index.link_count.should == 1 # one sitemap
         file_should_exist(rails_path('public/sitemap.xml.gz'))
         file_should_not_exist(rails_path('public/sitemap1.xml.gz'))
         gzipped_xml_file_should_validate_against_schema rails_path('public/sitemap.xml.gz'), 'sitemap'
+
+        # Test that the index url is reported correctly
+        ls.search_engines = { :google => 'http://google.com/?url=%s' }
+        ls.expects(:open).with("http://google.com/?url=#{CGI.escape('http://example.com/sitemap.xml.gz')}")
+        ls.ping_search_engines
       end
 
       it "should create index if more than one sitemap file" do
         with_max_links(1) do
           ls.create { add('/one'); add('/two') }
         end
+        ls.sitemap_index.link_count.should == 2 # two sitemaps
         file_should_exist(rails_path('public/sitemap.xml.gz'))
         file_should_exist(rails_path('public/sitemap1.xml.gz'))
         file_should_exist(rails_path('public/sitemap2.xml.gz'))
@@ -424,6 +463,11 @@ describe "SitemapGenerator" do
         gzipped_xml_file_should_validate_against_schema rails_path('public/sitemap.xml.gz'), 'siteindex'
         gzipped_xml_file_should_validate_against_schema rails_path('public/sitemap1.xml.gz'), 'sitemap'
         gzipped_xml_file_should_validate_against_schema rails_path('public/sitemap2.xml.gz'), 'sitemap'
+
+        # Test that the index url is reported correctly
+        ls.search_engines = { :google => 'http://google.com/?url=%s' }
+        ls.expects(:open).with("http://google.com/?url=#{CGI.escape('http://example.com/sitemap.xml.gz')}")
+        ls.ping_search_engines
       end
 
       it "should create index if more than one group" do
@@ -433,12 +477,18 @@ describe "SitemapGenerator" do
             group(:filename => :group2) { add('/two') };
           end
         end
+        ls.sitemap_index.link_count.should == 2 # two sitemaps
         file_should_exist(rails_path('public/sitemap.xml.gz'))
         file_should_exist(rails_path('public/group1.xml.gz'))
         file_should_exist(rails_path('public/group2.xml.gz'))
         gzipped_xml_file_should_validate_against_schema rails_path('public/sitemap.xml.gz'), 'siteindex'
         gzipped_xml_file_should_validate_against_schema rails_path('public/group1.xml.gz'), 'sitemap'
         gzipped_xml_file_should_validate_against_schema rails_path('public/group2.xml.gz'), 'sitemap'
+
+        # Test that the index url is reported correctly
+        ls.search_engines = { :google => 'http://google.com/?url=%s' }
+        ls.expects(:open).with("http://google.com/?url=#{CGI.escape('http://example.com/sitemap.xml.gz')}")
+        ls.ping_search_engines
       end
     end
   end

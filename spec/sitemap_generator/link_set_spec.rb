@@ -152,7 +152,7 @@ describe SitemapGenerator::LinkSet do
         :search_engines => { :google => 'http://google.com/?url=%s' })
       index_url = ls.sitemap_index_url
       ls.expects(:open).with("http://google.com/?url=#{CGI.escape(index_url)}")
-      ls.ping_search_engines(index_url)
+      ls.ping_search_engines
     end
 
     it "should include the given search engines" do
@@ -777,6 +777,9 @@ describe SitemapGenerator::LinkSet do
         ls.sitemap_index.empty?.should be_false
         ls.send(:finalize_sitemap_index!)
         ls.sitemap_index.written?.should be_true
+
+        # Test that the index url is reported correctly
+        ls.sitemap_index.index_url.should == 'http://example.com/sitemap.xml.gz'
       end
 
       it "should not write the index when only one sitemap is added (considered internal usage)" do
@@ -784,6 +787,9 @@ describe SitemapGenerator::LinkSet do
         ls.sitemap_index.empty?.should be_false
         ls.send(:finalize_sitemap_index!)
         ls.sitemap_index.written?.should be_false
+
+        # Test that the index url is reported correctly
+        ls.sitemap_index.index_url.should == sitemap.location.url
       end
 
       it "should write the index when more than one sitemap is added (considered internal usage)" do
@@ -791,6 +797,10 @@ describe SitemapGenerator::LinkSet do
         ls.sitemap_index.add sitemap.new
         ls.send(:finalize_sitemap_index!)
         ls.sitemap_index.written?.should be_true
+
+        # Test that the index url is reported correctly
+        ls.sitemap_index.index_url.should == ls.sitemap_index.location.url
+        ls.sitemap_index.index_url.should == 'http://example.com/sitemap.xml.gz'
       end
 
       it "should write the index when it has more than one link" do
@@ -798,21 +808,24 @@ describe SitemapGenerator::LinkSet do
         ls.sitemap_index.add '/test2'
         ls.send(:finalize_sitemap_index!)
         ls.sitemap_index.written?.should be_true
+
+        # Test that the index url is reported correctly
+        ls.sitemap_index.index_url.should == 'http://example.com/sitemap.xml.gz'
       end
     end
   end
-      
+
   describe "when sitemap empty" do
     before :each do
       ls.include_root = false
     end
-    
+
     it "should not be written" do
       ls.sitemap.empty?.should be_true
       ls.expects(:add_to_index).never
       ls.send(:finalize_sitemap!)
     end
-    
+
     it "should be written" do
       ls.sitemap.add '/test'
       ls.sitemap.empty?.should be_false

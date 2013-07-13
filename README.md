@@ -105,6 +105,7 @@ That's it!  Welcome to the future!
 
 ## Changelog
 
+* v4.1.1: Support setting the S3 region.  Fixed bug where incorrect URL was being used in the ping to search engines - only affected sites with a single sitemap file and no index file.  Output the URL being pinged in the verbose output.  Test in Rails 4.
 * v4.1.0: [PageMap sitemap][using_pagemaps] support.  Tested with Rails 4 pre-release.
 * v4.0.1: Add a post install message regarding the naming convention change.
 * **v4.0: NEW, NON-BACKWARDS COMPATIBLE CHANGES.**  See above for more info. `create_index` defaults to `:auto`.  Define `SitemapGenerator::SimpleNamer` class for simpler custom namers compatible with the new naming conventions.  Deprecate `sitemaps_namer`, `sitemap_index_namer` and their respective namer classes.  It's more just that their usage is discouraged.  Support `nofollow` option on alternate links.  Fix formatting of `publication_date` in News sitemaps.

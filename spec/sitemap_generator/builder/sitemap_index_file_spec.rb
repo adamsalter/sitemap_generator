@@ -98,4 +98,27 @@ describe 'SitemapGenerator::Builder::SitemapIndexFile' do
       end
     end
   end
+
+  describe "index_url" do
+    it "when not creating an index, should be the first sitemap url" do
+      index.instance_variable_set(:@create_index, false)
+      index.instance_variable_set(:@first_sitemap_url, 'http://test.com/index.xml')
+      index.create_index?.should be_false
+      index.index_url.should == 'http://test.com/index.xml'
+    end
+
+    it "if there's no first sitemap url, should default to the index location url" do
+      index.instance_variable_set(:@create_index, false)
+      index.instance_variable_set(:@first_sitemap_url, nil)
+      index.create_index?.should be_false
+      index.index_url.should == index.location.url
+      index.index_url.should == 'http://example.com/test/sitemap.xml.gz'
+    end
+
+    it "when creating an index, should be the index location url" do
+      index.instance_variable_set(:@create_index, true)
+      index.index_url.should == index.location.url
+      index.index_url.should == 'http://example.com/test/sitemap.xml.gz'
+    end
+  end
 end
