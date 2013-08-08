@@ -8,7 +8,8 @@ describe "SitemapGenerator" do
       :alternates => [
         {
           :lang => 'de',
-          :href => 'http://www.example.de/link_with_alternate.html'
+          :href => 'http://www.example.de/link_with_alternate.html',
+          :media => 'only screen and (max-width: 640px)'
         }
       ]
     ).to_xml
@@ -23,6 +24,7 @@ describe "SitemapGenerator" do
     alternate.attribute('rel').value.should == 'alternate'
     alternate.attribute('hreflang').value.should == 'de'
     alternate.attribute('href').value.should == 'http://www.example.de/link_with_alternate.html'
+    alternate.attribute('media').value.should == 'only screen and (max-width: 640px)'
   end
 
   it "should add alternate links to sitemap with rel nofollow" do
@@ -32,7 +34,8 @@ describe "SitemapGenerator" do
         {
           :lang => 'de',
           :href => 'http://www.example.de/link_with_alternate.html',
-          :nofollow => true
+          :nofollow => true,
+          :media => 'only screen and (max-width: 640px)'
         }
       ]
     ).to_xml
@@ -47,6 +50,7 @@ describe "SitemapGenerator" do
     alternate.attribute('rel').value.should == 'alternate nofollow'
     alternate.attribute('hreflang').value.should == 'de'
     alternate.attribute('href').value.should == 'http://www.example.de/link_with_alternate.html'
+    alternate.attribute('media').value.should == 'only screen and (max-width: 640px)'
   end
 
 end
