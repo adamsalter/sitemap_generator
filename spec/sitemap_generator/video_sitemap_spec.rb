@@ -28,7 +28,11 @@ describe "SitemapGenerator" do
       :family_friendly => true,
       :view_count => 123,
       :duration => 456,
-      :rating => 0.499999999
+      :rating => 0.499999999,
+      :price => 123.45,
+      :price_currency => 'CAD',
+      :price_resolution => 'HD',
+      :price_type => 'rent'
     }
   end
 
@@ -42,7 +46,7 @@ describe "SitemapGenerator" do
 
   # Return a Nokogiri document from the XML.  The root of the document is the <URL> element.
   def video_doc(xml)
-    Nokogiri::XML.parse("<root xmlns:video='http://www.google.com/schemas/sitemap-video/1.1'>#{xml}</root>")
+    Nokogiri::XML.parse("<root xmlns:video='#{SitemapGenerator::SCHEMAS['video']}'>#{xml}</root>")
   end
 
   # Validate the contents of the video element
@@ -65,7 +69,11 @@ describe "SitemapGenerator" do
     video_doc.at_xpath("video:player_loc").attribute('autoplay').text.should    == video_options[:autoplay]
     video_doc.at_xpath("video:uploader").text.should      == video_options[:uploader]
     video_doc.at_xpath("video:uploader").attribute("info").text.should == video_options[:uploader_info]
-    xml_fragment_should_validate_against_schema(video_doc, 'http://www.google.com/schemas/sitemap-video/1.1', 'sitemap-video')
+    video_doc.at_xpath("video:price").text.should == video_options[:price].to_s
+    video_doc.at_xpath("video:price").attribute("resolution").text.should == video_options[:price_resolution].to_s
+    video_doc.at_xpath("video:price").attribute("type").text.should == video_options[:price_type].to_s
+    video_doc.at_xpath("video:price").attribute("currency").text.should == video_options[:price_currency].to_s
+    xml_fragment_should_validate_against_schema(video_doc, 'sitemap-video', 'xmlns:video' => SitemapGenerator::SCHEMAS['video'])
   end
 
   it "should add a valid video sitemap element" do

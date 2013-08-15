@@ -72,73 +72,73 @@ module SitemapGenerator
         builder.url do
           builder.loc        self[:loc]
           builder.lastmod    w3c_date(self[:lastmod])      if self[:lastmod]
-          builder.changefreq self[:changefreq]             if self[:changefreq]
+          builder.changefreq self[:changefreq].to_s        if self[:changefreq]
           builder.priority   format_float(self[:priority]) if self[:priority]
 
           unless SitemapGenerator::Utilities.blank?(self[:news])
             news_data = self[:news]
             builder.news:news do
               builder.news:publication do
-                builder.news :name, news_data[:publication_name] if news_data[:publication_name]
-                builder.news :language, news_data[:publication_language] if news_data[:publication_language]
+                builder.news :name, news_data[:publication_name].to_s if news_data[:publication_name]
+                builder.news :language, news_data[:publication_language].to_s if news_data[:publication_language]
               end
 
-              builder.news :access, news_data[:access] if news_data[:access]
-              builder.news :genres, news_data[:genres] if news_data[:genres]
+              builder.news :access, news_data[:access].to_s if news_data[:access]
+              builder.news :genres, news_data[:genres].to_s if news_data[:genres]
               builder.news :publication_date, w3c_date(news_data[:publication_date]) if news_data[:publication_date]
-              builder.news :title, news_data[:title] if news_data[:title]
-              builder.news :keywords, news_data[:keywords] if news_data[:keywords]
-              builder.news :stock_tickers, news_data[:stock_tickers] if news_data[:stock_tickers]
+              builder.news :title, news_data[:title].to_s if news_data[:title]
+              builder.news :keywords, news_data[:keywords].to_s if news_data[:keywords]
+              builder.news :stock_tickers, news_data[:stock_tickers].to_s if news_data[:stock_tickers]
             end
           end
 
           self[:images].each do |image|
             builder.image:image do
               builder.image :loc, image[:loc]
-              builder.image :caption, image[:caption]             if image[:caption]
-              builder.image :geo_location, image[:geo_location]   if image[:geo_location]
-              builder.image :title, image[:title]                 if image[:title]
-              builder.image :license, image[:license]             if image[:license]
+              builder.image :caption, image[:caption].to_s             if image[:caption]
+              builder.image :geo_location, image[:geo_location].to_s   if image[:geo_location]
+              builder.image :title, image[:title].to_s                 if image[:title]
+              builder.image :license, image[:license].to_s             if image[:license]
             end
           end
 
           self[:videos].each do |video|
             builder.video :video do
-              builder.video :thumbnail_loc, video[:thumbnail_loc]
-              builder.video :title, video[:title]
-              builder.video :description, video[:description]
-              builder.video :content_loc, video[:content_loc]           if video[:content_loc]
+              builder.video :thumbnail_loc, video[:thumbnail_loc].to_s
+              builder.video :title, video[:title].to_s
+              builder.video :description, video[:description].to_s
+              builder.video :content_loc, video[:content_loc].to_s           if video[:content_loc]
               if video[:player_loc]
                 loc_attributes = { :allow_embed => yes_or_no_with_default(video[:allow_embed], true) }
-                loc_attributes[:autoplay] = video[:autoplay] if SitemapGenerator::Utilities.present?(video[:autoplay])
-                builder.video :player_loc, video[:player_loc], loc_attributes
+                loc_attributes[:autoplay] = video[:autoplay].to_s if SitemapGenerator::Utilities.present?(video[:autoplay])
+                builder.video :player_loc, video[:player_loc].to_s, loc_attributes
               end
-              builder.video :duration, video[:duration]                 if video[:duration]
+              builder.video :duration, video[:duration].to_s                 if video[:duration]
               builder.video :expiration_date,  w3c_date(video[:expiration_date])  if video[:expiration_date]
               builder.video :rating, format_float(video[:rating])       if video[:rating]
-              builder.video :view_count, video[:view_count]             if video[:view_count]
+              builder.video :view_count, video[:view_count].to_s             if video[:view_count]
               builder.video :publication_date, w3c_date(video[:publication_date]) if video[:publication_date]
-              video[:tags].each {|tag| builder.video :tag, tag }        if video[:tags]
-              builder.video :tag, video[:tag]                           if video[:tag]
-              builder.video :category, video[:category]                 if video[:category]
+              video[:tags].each {|tag| builder.video :tag, tag.to_s }        if video[:tags]
+              builder.video :tag, video[:tag].to_s                           if video[:tag]
+              builder.video :category, video[:category].to_s                 if video[:category]
               builder.video :family_friendly,  yes_or_no_with_default(video[:family_friendly], true) if video.has_key?(:family_friendly)
-              builder.video :gallery_loc, video[:gallery_loc], :title => video[:gallery_title] if video[:gallery_loc]
+              builder.video :gallery_loc, video[:gallery_loc].to_s, :title => video[:gallery_title].to_s if video[:gallery_loc]
+              builder.video :price, video[:price].to_s, prepare_video_price_attribs(video) if SitemapGenerator::Utilities.present?(video[:price])
               if video[:uploader]
-                builder.video :uploader, video[:uploader], video[:uploader_info] ? { :info => video[:uploader_info] } : {}
+                builder.video :uploader, video[:uploader].to_s, video[:uploader_info] ? { :info => video[:uploader_info].to_s } : {}
               end
-              builder.video :price, video[:price], :currency => video[:price_currency] if video[:price].to_i > 0
             end
           end
 
           self[:alternates].each do |alternate|
             rel = alternate[:nofollow] ? 'alternate nofollow' : 'alternate'
-            builder.xhtml :link, :rel => rel, :hreflang => alternate[:lang], :href => alternate[:href]
+            builder.xhtml :link, :rel => rel, :hreflang => alternate[:lang].to_s, :href => alternate[:href].to_s
           end
 
           unless SitemapGenerator::Utilities.blank?(self[:geo])
             geo = self[:geo]
             builder.geo :geo do
-              builder.geo :format, geo[:format] if geo[:format]
+              builder.geo :format, geo[:format].to_s if geo[:format]
             end
           end
 
@@ -149,9 +149,9 @@ module SitemapGenerator
           unless SitemapGenerator::Utilities.blank?(self[:pagemap])
             builder.pagemap :PageMap do
               SitemapGenerator::Utilities.as_array(self[:pagemap][:dataobjects]).each do |dataobject|
-                builder.pagemap :DataObject, :type => dataobject[:type], :id => dataobject[:id] do
+                builder.pagemap :DataObject, :type => dataobject[:type].to_s, :id => dataobject[:id].to_s do
                   SitemapGenerator::Utilities.as_array(dataobject[:attributes]).each do |attribute|
-                    builder.pagemap :Attribute, attribute[:value], :name => attribute[:name]
+                    builder.pagemap :Attribute, attribute[:value].to_s, :name => attribute[:name].to_s
                   end
                 end
               end
@@ -167,6 +167,14 @@ module SitemapGenerator
 
       protected
 
+      def prepare_video_price_attribs(video)
+        attribs = {}
+        attribs[:currency] = video[:price_currency].to_s # required
+        attribs[:type] = video[:price_type] if SitemapGenerator::Utilities.present?(video[:price_type])
+        attribs[:resolution] = video[:price_resolution] if SitemapGenerator::Utilities.present?(video[:price_resolution])
+        attribs
+      end
+      
       def prepare_news(news)
         SitemapGenerator::Utilities.assert_valid_keys(news, :publication_name, :publication_language, :publication_date, :genres, :access, :title, :keywords, :stock_tickers) unless news.empty?
         news

@@ -14,7 +14,7 @@ describe "SitemapGenerator" do
     ).to_xml
 
     # Check that the options were parsed correctly
-    doc = Nokogiri::XML.parse("<root xmlns:geo='http://www.google.com/geo/schemas/sitemap/1.0'>#{geo_xml_fragment}</root>")
+    doc = Nokogiri::XML.parse("<root xmlns:geo='#{SitemapGenerator::SCHEMAS['geo']}'>#{geo_xml_fragment}</root>")
     url = doc.at_xpath("//url")
     url.should_not be_nil
     url.at_xpath("loc").text.should == loc
@@ -25,6 +25,6 @@ describe "SitemapGenerator" do
 
     # Google's documentation and published schema don't match some valid elements may
     # not validate.
-    xml_fragment_should_validate_against_schema(geo, 'http://www.google.com/geo/schemas/sitemap/1.0', 'sitemap-geo')
+    xml_fragment_should_validate_against_schema(geo, 'sitemap-geo', 'xmlns:geo' => SitemapGenerator::SCHEMAS['geo'])
   end
 end

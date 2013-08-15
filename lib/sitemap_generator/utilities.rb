@@ -151,5 +151,16 @@ module SitemapGenerator
     def falsy?(value)
       ['0', 0, 'f', 'false', false].include?(value)
     end
+    
+    # Append a slash to `path` if it does not already end in a slash.
+    # Returns a string.  Expects a string or Pathname object.
+    def append_slash(path)
+      strpath = path.to_s
+      if strpath[-1] != nil && strpath[-1].chr != '/'
+        strpath + '/'
+      else
+        strpath 
+      end
+    end
   end
 end

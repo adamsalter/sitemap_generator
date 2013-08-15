@@ -20,7 +20,7 @@ describe "SitemapGenerator" do
       }
     }).to_xml
 
-    doc = Nokogiri::XML.parse("<root xmlns:news='http://www.google.com/schemas/sitemap-news/0.9'>#{news_xml_fragment}</root>")
+    doc = Nokogiri::XML.parse("<root xmlns:news='#{SitemapGenerator::SCHEMAS['news']}'>#{news_xml_fragment}</root>")
 
     url = doc.at_xpath("//url")
     loc = url.at_xpath("loc")
@@ -37,6 +37,6 @@ describe "SitemapGenerator" do
     news.at_xpath("//news:name").text.should == "Example"
     news.at_xpath("//news:language").text.should == "en"
 
-    xml_fragment_should_validate_against_schema(news, 'http://www.google.com/schemas/sitemap-news/0.9', 'sitemap-news')
+    xml_fragment_should_validate_against_schema(news, 'sitemap-news', 'xmlns:news' => SitemapGenerator::SCHEMAS['news'])
   end
 end

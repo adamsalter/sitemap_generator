@@ -10,7 +10,7 @@ module SitemapGenerator
 
     [:public_path, :sitemaps_path].each do |method|
       define_method(method) do
-        Pathname.new(self[method].nil? ? '' : self[method].to_s)
+        Pathname.new(SitemapGenerator::Utilities.append_slash(self[method]))
       end
     end
 

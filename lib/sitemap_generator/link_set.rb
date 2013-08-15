@@ -34,7 +34,7 @@ module SitemapGenerator
       set_options(opts)
       if verbose
         start_time = Time.now
-        puts "In #{sitemap_index.location.public_path}"
+        puts "In '#{sitemap_index.location.public_path}':"
       end
       interpreter.eval(:yield_sitemap => yield_sitemap?, &block)
       finalize!
@@ -285,7 +285,7 @@ module SitemapGenerator
       index_url = CGI.escape(unescaped_url)
 
       output("\n")
-      output("Pinging with URL #{unescaped_url}:")
+      output("Pinging with URL '#{unescaped_url}':")
       search_engines.merge(engines).each do |engine, link|
         link = link % index_url
         name = Utilities.titleize(engine.to_s)
@@ -506,8 +506,10 @@ module SitemapGenerator
       #
       # Set to nil to use the current directory.
       def public_path=(value)
-        @public_path = Pathname.new(value.to_s)
-        @public_path = SitemapGenerator.app.root + @public_path if @public_path.relative?
+        @public_path = Pathname.new(SitemapGenerator::Utilities.append_slash(value))
+        if @public_path.relative?
+          @public_path = SitemapGenerator.app.root + @public_path 
+        end
         update_location_info(:public_path, @public_path)
         @public_path
       end

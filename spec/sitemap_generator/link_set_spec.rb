@@ -72,15 +72,26 @@ describe SitemapGenerator::LinkSet do
 
   describe "sitemaps public_path" do
     it "should default to public/" do
-      ls.public_path.should ==  SitemapGenerator.app.root + 'public/'
-      ls.sitemap.location.public_path.should == ls.public_path
-      ls.sitemap_index.location.public_path.should == ls.public_path
+      path = SitemapGenerator.app.root + 'public/'
+      ls.public_path.should == path
+      ls.sitemap.location.public_path.should == path
+      ls.sitemap_index.location.public_path.should == path
     end
 
     it "should change when the public_path is changed" do
+      path = SitemapGenerator.app.root + 'tmp/'
+      ls.public_path = 'tmp/'
+      ls.public_path.should == path
+      ls.sitemap.location.public_path.should == path
+      ls.sitemap_index.location.public_path.should == path
+    end
+    
+    it "should append a slash to the path" do
+      path = SitemapGenerator.app.root + 'tmp/'
       ls.public_path = 'tmp'
-      ls.sitemap.location.public_path.should == ls.public_path
-      ls.sitemap_index.location.public_path.should == ls.public_path
+      ls.public_path.should == path
+      ls.sitemap.location.public_path.should == path
+      ls.sitemap_index.location.public_path.should == path
     end
   end
 
@@ -95,6 +106,13 @@ describe SitemapGenerator::LinkSet do
     it "should change when the sitemaps_path is changed" do
       ls.default_host = 'http://one.com'
       ls.sitemaps_path = 'sitemaps/'
+      ls.sitemap.location.url.should == 'http://one.com/sitemaps/sitemap.xml.gz'
+      ls.sitemap_index.location.url.should == 'http://one.com/sitemaps/sitemap.xml.gz'
+    end
+    
+    it "should append a slash to the path" do
+      ls.default_host = 'http://one.com'
+      ls.sitemaps_path = 'sitemaps'
       ls.sitemap.location.url.should == 'http://one.com/sitemaps/sitemap.xml.gz'
       ls.sitemap_index.location.url.should == 'http://one.com/sitemaps/sitemap.xml.gz'
     end
@@ -317,7 +335,7 @@ describe SitemapGenerator::LinkSet do
         path = 'new/path'
         group = ls.group(:sitemaps_path => path)
         group.sitemaps_path.should == path
-        group.sitemap.location.sitemaps_path.to_s.should == path
+        group.sitemap.location.sitemaps_path.to_s.should == 'new/path/'
       end
     end
 
@@ -489,7 +507,7 @@ describe SitemapGenerator::LinkSet do
       path = 'new/path'
       ls.create(:sitemaps_path => path)
       ls.sitemaps_path.should == path
-      ls.sitemap.location.sitemaps_path.to_s.should == path
+      ls.sitemap.location.sitemaps_path.to_s.should == 'new/path/'
     end
 
     it "should set the default_host" do

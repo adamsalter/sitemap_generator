@@ -28,15 +28,15 @@ module SitemapGenerator
           <?xml version="1.0" encoding="UTF-8"?>
             <urlset
               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-              xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"
               xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
                 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd"
               xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-              xmlns:video="http://www.google.com/schemas/sitemap-video/1.1"
-              xmlns:geo="http://www.google.com/geo/schemas/sitemap/1.0"
-              xmlns:news="http://www.google.com/schemas/sitemap-news/0.9"
-              xmlns:mobile="http://www.google.com/schemas/sitemap-mobile/1.0"
-              xmlns:pagemap="http://www.google.com/schemas/sitemap-pagemap/1.0"
+              xmlns:image="#{SitemapGenerator::SCHEMAS['image']}"              
+              xmlns:video="#{SitemapGenerator::SCHEMAS['video']}"
+              xmlns:geo="#{SitemapGenerator::SCHEMAS['geo']}"
+              xmlns:news="#{SitemapGenerator::SCHEMAS['news']}"
+              xmlns:mobile="#{SitemapGenerator::SCHEMAS['mobile']}"
+              xmlns:pagemap="#{SitemapGenerator::SCHEMAS['pagemap']}"
               xmlns:xhtml="http://www.w3.org/1999/xhtml"
             >
         HTML

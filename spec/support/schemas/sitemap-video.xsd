@@ -50,9 +50,19 @@
   </xsd:restriction>
 </xsd:simpleType>
 
-<xsd:simpleType name="tNonNegativeDecimal">
-  <xsd:restriction base="xsd:decimal">
-    <xsd:minInclusive value="0"/>
+<xsd:simpleType name="tPlatformList">
+  <xsd:annotation>
+    <xsd:documentation>
+      Space-separated platform names.
+
+      Platform names:
+      web - desktop and laptop browsers.
+      mobile - mobile devices such as phones and tablets.
+      tv - tv platforms such as GoogleTV.
+    </xsd:documentation>
+  </xsd:annotation>
+  <xsd:restriction base="xsd:string">
+    <xsd:pattern value="((web|mobile|tv)( (web|mobile|tv))*)?"/>
   </xsd:restriction>
 </xsd:simpleType>
 
@@ -63,11 +73,12 @@
         <xsd:annotation>
           <xsd:documentation>
             A URL pointing to the URL for the video thumbnail image file. We can
-            accept most image sizes/types but recommend your thumbs are at least
-            120x90 pixels in .jpg, .png, or. gif formats.
+            accept most image sizes/types but recommend your thumbnails are at
+            least 120x90 pixels in .jpg, .png, or. gif formats.
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
+
       <xsd:element name="title">
         <xsd:annotation>
           <xsd:documentation>
@@ -80,6 +91,7 @@
           </xsd:restriction>
         </xsd:simpleType>
       </xsd:element>
+
       <xsd:element name="description">
         <xsd:annotation>
           <xsd:documentation>
@@ -92,6 +104,7 @@
           </xsd:restriction>
         </xsd:simpleType>
       </xsd:element>
+
       <xsd:element name="content_loc" minOccurs="0" type="xsd:anyURI">
         <xsd:annotation>
           <xsd:documentation>
@@ -107,6 +120,7 @@
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
+
       <xsd:element name="player_loc" minOccurs="0">
         <xsd:annotation>
           <xsd:documentation>
@@ -148,6 +162,7 @@
           </xsd:simpleContent>
         </xsd:complexType>
       </xsd:element>
+
       <xsd:element name="duration" minOccurs="0">
         <xsd:annotation>
           <xsd:documentation>
@@ -160,6 +175,7 @@
           </xsd:restriction>
         </xsd:simpleType>
       </xsd:element>
+
       <xsd:element name="expiration_date" minOccurs="0">
         <xsd:annotation>
           <xsd:documentation>
@@ -181,6 +197,7 @@
           </xsd:union>
         </xsd:simpleType>
       </xsd:element>
+
       <xsd:element name="rating" minOccurs="0">
         <xsd:annotation>
           <xsd:documentation>
@@ -194,6 +211,7 @@
           </xsd:restriction>
         </xsd:simpleType>
       </xsd:element>
+
       <xsd:element name="content_segment_loc"
           minOccurs="0"
           maxOccurs="unbounded">
@@ -231,6 +249,7 @@
           </xsd:simpleContent>
         </xsd:complexType>
       </xsd:element>
+
       <xsd:element name="view_count"
           minOccurs="0"
           type="xsd:nonNegativeInteger">
@@ -240,6 +259,7 @@
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
+
       <xsd:element name="publication_date" minOccurs="0">
         <xsd:annotation>
           <xsd:documentation>
@@ -260,6 +280,7 @@
           </xsd:union>
         </xsd:simpleType>
       </xsd:element>
+
       <xsd:element name="tag" type="xsd:string" minOccurs="0" maxOccurs="32">
         <xsd:annotation>
           <xsd:documentation>
@@ -273,10 +294,11 @@
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
+
       <xsd:element name="category" minOccurs="0">
         <xsd:annotation>
           <xsd:documentation>
-            The video's category. For example, cooking. In general, categories
+            The video's category - for example, cooking. In general, categories
             are broad groupings of content by subject. For example, a site about
             cooking could have categories for Broiling, Baking, and Grilling.
           </xsd:documentation>
@@ -287,6 +309,7 @@
           </xsd:restriction>
         </xsd:simpleType>
       </xsd:element>
+
       <xsd:element name="family_friendly" minOccurs="0" type="tYesNo">
         <xsd:annotation>
           <xsd:documentation>
@@ -295,6 +318,7 @@
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
+
       <xsd:element name="restriction" minOccurs="0">
         <xsd:annotation>
           <xsd:documentation>
@@ -324,6 +348,7 @@
           </xsd:simpleContent>
         </xsd:complexType>
       </xsd:element>
+
       <xsd:element name="gallery_loc" minOccurs="0">
         <xsd:annotation>
           <xsd:documentation>
@@ -345,21 +370,27 @@
           </xsd:simpleContent>
         </xsd:complexType>
       </xsd:element>
+
       <xsd:element name="price" minOccurs="0" maxOccurs="unbounded">
         <xsd:annotation>
           <xsd:documentation>
             The price to download or view the video. More than one
             &lt;video:price&gt; element can be listed (for example, in order to
-            specify various currencies).
+            specify various currencies). The price value must either be a
+            non-negative decimal or be empty. If a price value is specified, the
+            currency attribute is required. If no price value is specified, the
+            type attribute must be valid and present. The resolution attribute
+            is optional.
           </xsd:documentation>
         </xsd:annotation>
         <xsd:complexType>
           <xsd:simpleContent>
-            <xsd:extension base="tNonNegativeDecimal">
-              <xsd:attribute name="currency" use="required">
+            <xsd:extension base="xsd:string">
+              <xsd:attribute name="currency">
                 <xsd:annotation>
                   <xsd:documentation>
-                    The currency in ISO 4217 format.
+                    The currency in ISO 4217 format. This attribute is required
+                    if a value is given for price.
                   </xsd:documentation>
                 </xsd:annotation>
                 <xsd:simpleType>
@@ -368,10 +399,42 @@
                   </xsd:restriction>
                 </xsd:simpleType>
               </xsd:attribute>
+              <xsd:attribute name="type">
+                <xsd:annotation>
+                  <xsd:documentation>
+                    The type (purchase or rent) of price. This value is required
+                    if there is no value given for price.
+                  </xsd:documentation>
+                </xsd:annotation>
+                <xsd:simpleType>
+                  <xsd:restriction base="xsd:string">
+                    <xsd:enumeration value="purchase"/>
+                    <xsd:enumeration value="PURCHASE"/>
+                    <xsd:enumeration value="rent"/>
+                    <xsd:enumeration value="RENT"/>
+                  </xsd:restriction>
+                </xsd:simpleType>
+              </xsd:attribute>
+              <xsd:attribute name="resolution">
+                <xsd:annotation>
+                  <xsd:documentation>
+                    The resolution of the video at this price (SD or HD).
+                  </xsd:documentation>
+                </xsd:annotation>
+                <xsd:simpleType>
+                  <xsd:restriction base="xsd:string">
+                    <xsd:enumeration value="sd"/>
+                    <xsd:enumeration value="SD"/>
+                    <xsd:enumeration value="hd"/>
+                    <xsd:enumeration value="HD"/>
+                  </xsd:restriction>
+                </xsd:simpleType>
+              </xsd:attribute>
             </xsd:extension>
           </xsd:simpleContent>
         </xsd:complexType>
       </xsd:element>
+
       <xsd:element name="requires_subscription" minOccurs="0" type="tYesNo">
         <xsd:annotation>
           <xsd:documentation>
@@ -380,6 +443,7 @@
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
+
       <xsd:element name="uploader" minOccurs="0">
         <xsd:annotation>
           <xsd:documentation>
@@ -397,6 +461,176 @@
                     &lt;loc&gt; tag.
                   </xsd:documentation>
                 </xsd:annotation>
+              </xsd:attribute>
+            </xsd:extension>
+          </xsd:simpleContent>
+        </xsd:complexType>
+      </xsd:element>
+
+      <xsd:element name="tvshow" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            Encloses all information about a single TV video.
+          </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="show_title" type="xsd:string">
+              <xsd:annotation>
+                <xsd:documentation>
+                  The title of the TV show. This should be the same for all
+                  episodes from the same series.
+                </xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="video_type">
+              <xsd:annotation>
+                <xsd:documentation>
+                  Describes the relationship of the video to the specified
+                  TV show/episode.
+                </xsd:documentation>
+              </xsd:annotation>
+              <xsd:simpleType>
+                <xsd:restriction base="xsd:string">
+                  <!-- Complete episode -->
+                  <xsd:enumeration value="full"/>
+                  <!-- Episode promo -->
+                  <xsd:enumeration value="preview"/>
+                  <!-- Episode clip -->
+                  <xsd:enumeration value="clip"/>
+                  <!-- Interview -->
+                  <xsd:enumeration value="interview"/>
+                  <!-- News related to the content -->
+                  <xsd:enumeration value="news"/>
+                  <!-- If none of the above options accurately describe
+                       the relationship -->
+                  <xsd:enumeration value="other"/>
+                </xsd:restriction>
+              </xsd:simpleType>
+            </xsd:element>
+            <xsd:element name="episode_title" type="xsd:string" minOccurs="0">
+              <xsd:annotation>
+                <xsd:documentation>
+                  The title of the episode—for example, "Flesh and Bone" is the
+                  title of the Season 1, Episode 8 episode of Battlestar
+                  Galactica. This tag is not necessary if the video is not
+                  related to a specific episode (for example, if it's a trailer
+                  for an entire series or season).
+                </xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="season_number" minOccurs="0">
+              <xsd:annotation>
+                <xsd:documentation>
+                  Only for shows with a per-season schedule.
+                </xsd:documentation>
+              </xsd:annotation>
+              <xsd:simpleType>
+                <xsd:restriction base="xsd:integer">
+                  <xsd:minInclusive value="1"/>
+                </xsd:restriction>
+              </xsd:simpleType>
+            </xsd:element>
+            <xsd:element name="episode_number" minOccurs="0">
+              <xsd:annotation>
+                <xsd:documentation>
+                  The episode number in number format. For TV shoes with a
+                  per-season schedule, the first episode of each series should
+                  be numbered 1.
+                </xsd:documentation>
+              </xsd:annotation>
+              <xsd:simpleType>
+                <xsd:restriction base="xsd:integer">
+                  <xsd:minInclusive value="1"/>
+                </xsd:restriction>
+              </xsd:simpleType>
+            </xsd:element>
+            <xsd:element name="premier_date" minOccurs="0">
+              <xsd:annotation>
+                <xsd:documentation>
+                  The date the content of the video was first broadcast, in
+                  W3C format (for example, 2010-11-05.)
+                </xsd:documentation>
+              </xsd:annotation>
+              <xsd:simpleType>
+                <xsd:union>
+                  <xsd:simpleType>
+                    <xsd:restriction base="xsd:date"/>
+                  </xsd:simpleType>
+                  <xsd:simpleType>
+                    <xsd:restriction base="xsd:dateTime"/>
+                  </xsd:simpleType>
+                </xsd:union>
+              </xsd:simpleType>
+            </xsd:element>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+
+      <xsd:element name="platform" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            A list of platforms where the video may or may not be played.
+            If there is no &lt;video:platform&gt; tag, it is assumed that
+            the video can be played on all platforms.
+          </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType>
+          <xsd:simpleContent>
+            <xsd:extension base="tPlatformList">
+              <xsd:attribute name="relationship" use="required">
+                <xsd:annotation>
+                  <xsd:documentation>
+                    Attribute "relationship" specifies whether the video is
+                    restricted or permitted for the specified platforms.
+                  </xsd:documentation>
+                </xsd:annotation>
+                <xsd:simpleType>
+                  <xsd:restriction base="xsd:string">
+                    <xsd:enumeration value="allow"/>
+                    <xsd:enumeration value="deny"/>
+                  </xsd:restriction>
+                </xsd:simpleType>
+              </xsd:attribute>
+            </xsd:extension>
+          </xsd:simpleContent>
+        </xsd:complexType>
+      </xsd:element>
+
+      <xsd:element name="live" minOccurs="0" type="tYesNo">
+        <xsd:annotation>
+          <xsd:documentation>
+            Whether the video is a live internet broadcast.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+
+      <xsd:element name="id" minOccurs="0" maxOccurs="unbounded">
+        <xsd:annotation>
+          <xsd:documentation>
+            An unambiguous identifier for the video within a given
+            identification context.
+          </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType>
+          <xsd:simpleContent>
+            <xsd:extension base="xsd:string">
+              <xsd:attribute name="type" use="required">
+                <xsd:annotation>
+                  <xsd:documentation>
+                    The identification context.
+                  </xsd:documentation>
+                </xsd:annotation>
+                <xsd:simpleType>
+                  <xsd:restriction base="xsd:string">
+                    <xsd:enumeration value="tms:series"/>
+                    <xsd:enumeration value="tms:program"/>
+                    <xsd:enumeration value="rovi:series"/>
+                    <xsd:enumeration value="rovi:program"/>
+                    <xsd:enumeration value="freebase"/>
+                    <xsd:enumeration value="url"/>
+                  </xsd:restriction>
+                </xsd:simpleType>
               </xsd:attribute>
             </xsd:extension>
           </xsd:simpleContent>

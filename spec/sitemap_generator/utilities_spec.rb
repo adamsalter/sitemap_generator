@@ -66,4 +66,14 @@ describe SitemapGenerator::Utilities do
       SitemapGenerator::Utilities.as_array({}).should == [{}]
     end
   end
+  
+  describe "append_slash" do
+    SitemapGenerator::Utilities.append_slash('').should == ''
+    SitemapGenerator::Utilities.append_slash(nil).should == ''
+    SitemapGenerator::Utilities.append_slash(Pathname.new('')).should == ''
+    SitemapGenerator::Utilities.append_slash('tmp').should == 'tmp/'
+    SitemapGenerator::Utilities.append_slash(Pathname.new('tmp')).should == 'tmp/'
+    SitemapGenerator::Utilities.append_slash('tmp/').should == 'tmp/'
+    SitemapGenerator::Utilities.append_slash(Pathname.new('tmp/')).should == 'tmp/'
+  end
 end

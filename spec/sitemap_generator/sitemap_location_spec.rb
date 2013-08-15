@@ -112,6 +112,37 @@ describe SitemapGenerator::SitemapLocation do
       location.filesize
     end
   end
+  
+  describe "public_path" do
+    it "should append a trailing slash" do
+      location = SitemapGenerator::SitemapLocation.new(:public_path => 'public/google')
+      location.public_path.to_s.should == 'public/google/'
+      location[:public_path] = 'new/path'
+      location.public_path.to_s.should == 'new/path/'
+      location[:public_path] = 'already/slashed/'
+      location.public_path.to_s.should == 'already/slashed/'
+    end
+  end
+  
+  describe "sitemaps_path" do
+    it "should append a trailing slash" do
+      location = SitemapGenerator::SitemapLocation.new(:sitemaps_path => 'public/google')
+      location.sitemaps_path.to_s.should == 'public/google/'
+      location[:sitemaps_path] = 'new/path'
+      location.sitemaps_path.to_s.should == 'new/path/'
+      location[:sitemaps_path] = 'already/slashed/'
+      location.sitemaps_path.to_s.should == 'already/slashed/'
+    end
+  end
+  
+  describe "url" do
+    it "should handle paths not ending in slash" do
+      location = SitemapGenerator::SitemapLocation.new(
+          :public_path => 'public/google', :filename => 'xxx', 
+          :host => default_host, :sitemaps_path => 'sub/dir')
+      location.url.should == default_host + '/sub/dir/xxx'
+    end
+  end
 end
 
 describe SitemapGenerator::SitemapIndexLocation do

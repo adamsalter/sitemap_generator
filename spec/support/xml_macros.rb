@@ -8,6 +8,10 @@ module XmlMacros
     end
   end
 
+  # Validate XML against a local schema file.
+  #
+  # `schema_name` gives the name of the schema file to validate against.  The schema
+  # file is looked for in `spec/support/schemas/<schema_name>.xsd`.
   def xml_data_should_validate_against_schema(xml, schema_name)
     xml = xml.is_a?(String) ? xml : xml.to_s
     doc = Nokogiri::XML(xml)
@@ -26,15 +30,23 @@ module XmlMacros
   #
   #    Element 'video': No matching global declaration available for the validation root.
   #
-  # <tt>xmlns</tt> the XML namespace of the root element.
-  # <tt>xml_fragment</tt> XML string
+  # <tt>xml</tt> The XML fragment
+  # <tt>schema_name</tt> the name of the schema file to validate against.  The schema
+  # file is looked for in `spec/support/schemas/<schema_name>.xsd`.
+  # <tt>xmlns</tt> A hash with only one key which gives the XML namespace and associated
+  # URI.  Sometimes one needs to specify a prefix to the namespace, in which case this would
+  # look like: 'xmlns:video' => 'http://www.google.com/schemas/sitemap-video/1.1'
   #
   # Example:
-  #   xml_fragment_should_validate('<video/>', { 'video' => 'http://www.google.com/schemas/sitemap-video/1.1' })
-  def xml_fragment_should_validate_against_schema(xml, xmlns, schema_name)
+  #   xml_fragment_should_validate_against_schema('<video/>', 'sitemap-video', 'xmlns:video' => 'http://www.google.com/schemas/sitemap-video/1.1')
+  #   
+  #   This validates the given XML using the spec/support/schemas/sitemap-video.xsd`
+  #   schema.  The XML namespace `xmlns:video='http://www.google.com/schemas/sitemap-video/1.1'` is automatically
+  #   added to the root element for you.
+  def xml_fragment_should_validate_against_schema(xml, schema_name, xmlns={})
     xml = xml.is_a?(String) ? xml : xml.to_s
     doc = Nokogiri::XML(xml)
-    doc.root['xmlns'] = xmlns
+    doc.root.send(:[]=, *xmlns.first)
     xml_data_should_validate_against_schema(doc, schema_name)
   end
 

@@ -105,6 +105,7 @@ That's it!  Welcome to the future!
 
 ## Changelog
 
+* v4.2: Update Google ping URL.  Quote the ping URL in the output.  Support Video `video:price` element ([#117][https://github.com/kjvarga/sitemap_generator/issues/117]).  Support symbols as well as strings for most arguments to `add()` ([#113][https://github.com/kjvarga/sitemap_generator/issues/113]).  Ensure that `public_path` and `sitemaps_path` end with a slash (`/`) ([#113][https://github.com/kjvarga/sitemap_generator/issues/118]).
 * v4.1.1: Support setting the S3 region.  Fixed bug where incorrect URL was being used in the ping to search engines - only affected sites with a single sitemap file and no index file.  Output the URL being pinged in the verbose output.  Test in Rails 4.
 * v4.1.0: [PageMap sitemap][using_pagemaps] support.  Tested with Rails 4 pre-release.
 * v4.0.1: Add a post install message regarding the naming convention change.
@@ -912,6 +913,10 @@ end
     * `:gallery_title` - Title attribute of the gallery location element
     * `:uploader`
     * `:uploader_info` - Info attribute of uploader element
+    * `:price` - Only one price supported at this time
+        * `:price_currency` - Required.  In [ISO_4217][iso_4217] format.
+        * `:price_type` - Optional. `rent` or `own`
+        * `:price_resolution` - Optional. `HD` or `SD`
 
 ### Geo Sitemaps
 
@@ -1078,3 +1083,4 @@ Copyright (c) 2009 Karl Varga released under the MIT license
 [ehoch]:https://github.com/ehoch
 [alternate_links]:http://support.google.com/webmasters/bin/answer.py?hl=en&answer=2620865
 [using_pagemaps]:https://developers.google.com/custom-search/docs/structured_data#pagemaps
+[iso_4217]:http://en.wikipedia.org/wiki/ISO_4217
