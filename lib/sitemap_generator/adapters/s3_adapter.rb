@@ -9,11 +9,13 @@ module SitemapGenerator
       @fog_provider = opts[:fog_provider] || ENV['FOG_PROVIDER']
       @fog_directory = opts[:fog_directory] || ENV['FOG_DIRECTORY']
       @fog_region = opts[:fog_region] || ENV['FOG_REGION']
+      @file_adapter = opts[:file_adapter] || SitemapGenerator::FileAdapter.new()
     end
 
     # Call with a SitemapLocation and string data
     def write(location, raw_data)
-      SitemapGenerator::FileAdapter.new.write(location, raw_data)
+      #SitemapGenerator::FileAdapter.new.write(location, raw_data)
+      @file_adapter.write(location, raw_data)
 
       credentials = { 
         :aws_access_key_id     => @aws_access_key_id,
