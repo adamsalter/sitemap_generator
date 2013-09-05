@@ -1,6 +1,6 @@
 module SitemapGenerator
   class FileAdapter
-    def write(location, raw_data)
+    def write(location, raw_data, gzip_file = false)
       # Ensure that the directory exists
       dir = location.directory
       if !File.exists?(dir)
@@ -9,7 +9,13 @@ module SitemapGenerator
         raise SitemapError.new("#{dir} should be a directory!")
       end
 
-      gzip(open(location.path, 'wb'), raw_data)
+      stream = open(location.path, 'wb')
+      if gzip_file
+        gzip(stream, raw_data)
+      else
+        stream.write raw_data
+        stream.close
+      end
     end
 
     def gzip(stream, data)
