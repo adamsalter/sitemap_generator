@@ -12,8 +12,8 @@ module SitemapGenerator
     end
 
     # Call with a SitemapLocation and string data
-    def write(location, raw_data, gzip_file)
-      SitemapGenerator::FileAdapter.new.write(location, raw_data, gzip_file)
+    def write(location, raw_data)
+      SitemapGenerator::FileAdapter.new.write(location, raw_data)
 
       credentials = { 
         :aws_access_key_id     => @aws_access_key_id,

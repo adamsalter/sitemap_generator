@@ -38,7 +38,6 @@ module SitemapGenerator
       opts[:public_path] ||= SitemapGenerator.app.root + 'public/'
       opts[:namer] = SitemapGenerator::SitemapNamer.new(:sitemap) if !opts[:filename] && !opts[:namer]
       opts[:verbose] = !!opts[:verbose]
-      opts[:gzip_file] = !!opts[:gzip_file]
       self.merge!(opts)
     end
 
@@ -121,7 +120,7 @@ module SitemapGenerator
     end
 
     def write(data)
-      adapter.write(self, data, self[:gzip_file])
+      adapter.write(self, data)
     end
   end
 

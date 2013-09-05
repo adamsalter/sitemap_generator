@@ -1,6 +1,6 @@
 module SitemapGenerator
   class FileAdapter
-    def write(location, raw_data, gzip_file = false)
+    def write(location, raw_data)
       # Ensure that the directory exists
       dir = location.directory
       if !File.exists?(dir)
@@ -10,11 +10,10 @@ module SitemapGenerator
       end
 
       stream = open(location.path, 'wb')
-      if gzip_file
+      if location.path.ends_with? '.gz'
         gzip(stream, raw_data)
       else
-        stream.write raw_data
-        stream.close
+        plain(stream, raw_data)
       end
     end
 
@@ -22,6 +21,11 @@ module SitemapGenerator
       gz = Zlib::GzipWriter.new(stream)
       gz.write data
       gz.close
+    end
+
+    def plain(stream, data)
+      stream.write data
+      stream.close
     end
   end
 end
