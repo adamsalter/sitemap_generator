@@ -13,7 +13,7 @@ Sitemaps adhere to the [Sitemap 0.9 protocol][sitemap_protocol] specification.
 * Adheres to the [Sitemap 0.9 protocol][sitemap_protocol]
 * Handles millions of links
 * Automatically compresses your sitemaps
-* Notifies search engines (Google, Bing, SitemapWriter) of new sitemaps
+* Notifies search engines (Google, Bing) of new sitemaps
 * Ensures your old sitemaps stay in place if the new sitemap fails to generate
 * Gives you complete control over your sitemap contents and naming scheme
 * Intelligent sitemap indexing
@@ -57,7 +57,6 @@ Sitemap stats: 3 links / 1 sitemaps / 0m00s
 
 Successful ping of Google
 Successful ping of Bing
-Successful ping of Sitemap Writer
 ```
 
 
@@ -219,7 +218,7 @@ SitemapGenerator.verbose = false
 
 ### Pinging Search Engines
 
-Using `rake sitemap:refresh` will notify major search engines to let them know that a new sitemap is available (Google, Bing, SitemapWriter).  To generate new sitemaps without notifying search engines (for example when running in a local environment) use `rake sitemap:refresh:no_ping`.
+Using `rake sitemap:refresh` will notify major search engines to let them know that a new sitemap is available (Google, Bing).  To generate new sitemaps without notifying search engines (for example when running in a local environment) use `rake sitemap:refresh:no_ping`.
 
 If you want to customize the hash of search engines you can access it at:
 
