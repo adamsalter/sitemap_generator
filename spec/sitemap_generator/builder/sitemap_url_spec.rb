@@ -164,4 +164,19 @@ describe SitemapGenerator::Builder::SitemapUrl do
       url.send(:format_float, 3.444444).should == '3.4'
     end
   end
+
+  describe "expires" do
+    let(:url)  { SitemapGenerator::Builder::SitemapUrl.new('/path', :host => 'http://example.com', :expires => time) }
+    let(:time) { Time.at(0).utc }
+
+    it "should include the option" do
+      url[:expires].should == time
+    end
+
+    it "should format it and include it in the XML" do
+      xml = url.to_xml
+      doc = Nokogiri::XML("<root xmlns='http://www.sitemaps.org/schemas/sitemap/0.9' xmlns:xhtml='http://www.w3.org/1999/xhtml'>#{xml}</root>")
+      doc.css('url expires').text.should == url.send(:w3c_date, time)
+    end
+  end
 end

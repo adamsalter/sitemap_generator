@@ -176,7 +176,7 @@ module SitemapGenerator
         attribs[:resolution] = video[:price_resolution] if SitemapGenerator::Utilities.present?(video[:price_resolution])
         attribs
       end
-      
+
       def prepare_news(news)
         SitemapGenerator::Utilities.assert_valid_keys(news, :publication_name, :publication_language, :publication_date, :genres, :access, :title, :keywords, :stock_tickers) unless news.empty?
         news
