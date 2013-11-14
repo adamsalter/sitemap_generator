@@ -1,4 +1,8 @@
-require 'carrierwave'
+begin
+  require 'carrierwave'
+rescue LoadError
+  raise LoadError.new("Missing required 'carrierwave'.  Please 'gem install carrierwave' and require it in your application.")
+end
 
 module SitemapGenerator
   class WaveAdapter < ::CarrierWave::Uploader::Base

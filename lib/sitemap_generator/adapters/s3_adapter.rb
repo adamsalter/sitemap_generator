@@ -1,4 +1,8 @@
-require 'fog'
+begin
+  require 'fog'
+rescue LoadError
+  raise LoadError.new("Missing required 'fog'.  Please 'gem install fog' and require it in your application.")
+end
 
 module SitemapGenerator
   class S3Adapter
@@ -15,7 +19,7 @@ module SitemapGenerator
     def write(location, raw_data)
       SitemapGenerator::FileAdapter.new.write(location, raw_data)
 
-      credentials = { 
+      credentials = {
         :aws_access_key_id     => @aws_access_key_id,
         :aws_secret_access_key => @aws_secret_access_key,
         :provider              => @fog_provider,
