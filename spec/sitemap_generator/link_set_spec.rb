@@ -85,7 +85,7 @@ describe SitemapGenerator::LinkSet do
       ls.sitemap.location.public_path.should == path
       ls.sitemap_index.location.public_path.should == path
     end
-    
+
     it "should append a slash to the path" do
       path = SitemapGenerator.app.root + 'tmp/'
       ls.public_path = 'tmp'
@@ -109,7 +109,7 @@ describe SitemapGenerator::LinkSet do
       ls.sitemap.location.url.should == 'http://one.com/sitemaps/sitemap.xml.gz'
       ls.sitemap_index.location.url.should == 'http://one.com/sitemaps/sitemap.xml.gz'
     end
-    
+
     it "should append a slash to the path" do
       ls.default_host = 'http://one.com'
       ls.sitemaps_path = 'sitemaps'
@@ -129,12 +129,12 @@ describe SitemapGenerator::LinkSet do
   describe "search_engines" do
     it "should have search engines by default" do
       ls.search_engines.should be_a(Hash)
-      ls.search_engines.size.should == 3
+      ls.search_engines.size.should == 2
     end
 
     it "should support being modified" do
       ls.search_engines[:newengine] = 'abc'
-      ls.search_engines.size.should == 4
+      ls.search_engines.size.should == 3
     end
 
     it "should support being set to nil" do
