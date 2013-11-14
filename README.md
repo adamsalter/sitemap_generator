@@ -104,7 +104,8 @@ That's it!  Welcome to the future!
 
 ## Changelog
 
-* v4.2: Update Google ping URL.  Quote the ping URL in the output.  Support Video `video:price` element ([#117][https://github.com/kjvarga/sitemap_generator/issues/117]).  Support symbols as well as strings for most arguments to `add()` ([#113][https://github.com/kjvarga/sitemap_generator/issues/113]).  Ensure that `public_path` and `sitemaps_path` end with a slash (`/`) ([#113][https://github.com/kjvarga/sitemap_generator/issues/118]).
+* v4.3.0: Support `media` attibute on alternate links ([#125](https://github.com/kjvarga/sitemap_generator/issues/125)).  Changed `SitemapGenerator::S3Adapter` to write files in a single operation, avoiding potential permissions errors when listing a directory prior to writing ([#130](https://github.com/kjvarga/sitemap_generator/issues/130)).  Remove Sitemap Writer from ping task ([#129](https://github.com/kjvarga/sitemap_generator/issues/129)).  Support `url:expires` element ([#126](https://github.com/kjvarga/sitemap_generator/issues/126)).
+* v4.2.0: Update Google ping URL.  Quote the ping URL in the output.  Support Video `video:price` element ([#117](https://github.com/kjvarga/sitemap_generator/issues/117)).  Support symbols as well as strings for most arguments to `add()` ([#113](https://github.com/kjvarga/sitemap_generator/issues/113)).  Ensure that `public_path` and `sitemaps_path` end with a slash (`/`) ([#113](https://github.com/kjvarga/sitemap_generator/issues/118)).
 * v4.1.1: Support setting the S3 region.  Fixed bug where incorrect URL was being used in the ping to search engines - only affected sites with a single sitemap file and no index file.  Output the URL being pinged in the verbose output.  Test in Rails 4.
 * v4.1.0: [PageMap sitemap][using_pagemaps] support.  Tested with Rails 4 pre-release.
 * v4.0.1: Add a post install message regarding the naming convention change.
