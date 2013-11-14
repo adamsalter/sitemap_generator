@@ -76,7 +76,7 @@ module SitemapGenerator
           builder.expires    w3c_date(self[:expires])      if self[:expires]
           builder.changefreq self[:changefreq].to_s        if self[:changefreq]
           builder.priority   format_float(self[:priority]) if self[:priority]
-          
+
           unless SitemapGenerator::Utilities.blank?(self[:news])
             news_data = self[:news]
             builder.news:news do
@@ -134,7 +134,7 @@ module SitemapGenerator
 
           self[:alternates].each do |alternate|
             rel = alternate[:nofollow] ? 'alternate nofollow' : 'alternate'
-            builder.xhtml :link, :rel => rel, :hreflang => alternate[:lang].to_s, :href => alternate[:href].to_s
+            builder.xhtml :link, :rel => rel, :hreflang => alternate[:lang].to_s, :href => alternate[:href].to_s, :media => alternate[:media].to_s
           end
 
           unless SitemapGenerator::Utilities.blank?(self[:geo])
