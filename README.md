@@ -104,6 +104,7 @@ That's it!  Welcome to the future!
 
 ## Changelog
 
+* v4.3.1: Support integer timestamps.  Update README for new features added in last release.
 * v4.3.0: Support `media` attibute on alternate links ([#125](https://github.com/kjvarga/sitemap_generator/issues/125)).  Changed `SitemapGenerator::S3Adapter` to write files in a single operation, avoiding potential permissions errors when listing a directory prior to writing ([#130](https://github.com/kjvarga/sitemap_generator/issues/130)).  Remove Sitemap Writer from ping task ([#129](https://github.com/kjvarga/sitemap_generator/issues/129)).  Support `url:expires` element ([#126](https://github.com/kjvarga/sitemap_generator/issues/126)).
 * v4.2.0: Update Google ping URL.  Quote the ping URL in the output.  Support Video `video:price` element ([#117](https://github.com/kjvarga/sitemap_generator/issues/117)).  Support symbols as well as strings for most arguments to `add()` ([#113](https://github.com/kjvarga/sitemap_generator/issues/113)).  Ensure that `public_path` and `sitemaps_path` end with a slash (`/`) ([#113](https://github.com/kjvarga/sitemap_generator/issues/118)).
 * v4.1.1: Support setting the S3 region.  Fixed bug where incorrect URL was being used in the ping to search engines - only affected sites with a single sitemap file and no index file.  Output the URL being pinged in the verbose output.  Test in Rails 4.
@@ -602,7 +603,7 @@ For other options be sure to check out the **Sitemap Extensions** section below.
 add '/contact_us', :changefreq => 'monthly'
 ```
 
-* `lastmod` - Default: `Time.now` (Time).
+* `lastmod` - Default: `Time.now` (Integer, Time, Date, DateTime, String).
 
   The date and time of last modification.  Example:
 
@@ -625,6 +626,13 @@ add '/login', :host => 'https://securehost.com'
 ```ruby
 add '/about', :priority => 0.75
 ```
+
+* `expires` - Optional (Integer, Time, Date, DateTime, String)
+
+  [expires][Request removal of this URL from search engines' indexes].   Example (uses ActiveSupport):
+
+```ruby
+add '/about', :expires => Time.now + 2.weeks
 
 
 ### Adding Links to the Sitemap Index
@@ -1004,6 +1012,7 @@ end
     * `:href` - Required, string.
     * `:lang`  - Required, string.
     * `:nofollow` - Optional, boolean. Used to mark link as "nofollow".
+    * `:media` - Optional, string.  Specify [media][media targets for responsive design pages].
 
 ## Raison d'être
 
@@ -1093,3 +1102,5 @@ Copyright (c) 2009 Karl Varga released under the MIT license
 [alternate_links]:http://support.google.com/webmasters/bin/answer.py?hl=en&answer=2620865
 [using_pagemaps]:https://developers.google.com/custom-search/docs/structured_data#pagemaps
 [iso_4217]:http://en.wikipedia.org/wiki/ISO_4217
+[media]:https://developers.google.com/webmasters/smartphone-sites/details
+[expires]:https://support.google.com/customsearch/answer/2631051?hl=en

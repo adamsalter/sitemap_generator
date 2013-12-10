@@ -112,6 +112,10 @@ describe SitemapGenerator::Builder::SitemapUrl do
       time.expects(:strftime).times(2).returns('+0800', '1970-01-01T00:00:00')
       new_url.send(:w3c_date, time).should == '1970-01-01T00:00:00+08:00'
     end
+
+    it "should support integers" do
+      new_url.send(:w3c_date, Time.at(0).to_i).should == '1970-01-01T00:00:00+00:00'
+    end
   end
 
   describe "yes_or_no" do

@@ -204,6 +204,8 @@ module SitemapGenerator
             date.new_offset(0)
           elsif date.respond_to?(:utc)
             date.utc
+          elsif date.is_a?(Integer)
+            Time.at(date).utc
           else
             nil
           end
