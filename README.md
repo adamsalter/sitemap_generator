@@ -354,21 +354,22 @@ Sitemap Generator uses CarrierWave to support uploading to Amazon S3 store, Rack
 
 1. Please see [this wiki page][remote_hosts] for more information about setting up CarrierWave, SitemapGenerator and Rails.
 
-2. Once you have CarrierWave setup and configured all you need to do is set some options in your sitemap config, such as:
-
-* `default_host` - your website host name
-* `sitemaps_host` - the remote host where your sitemaps will be hosted
-* `public_path` - the directory to write sitemaps to locally e.g. `tmp/`
-* `sitemaps_path` - set to a directory/path if you don't want to upload to the root of your `sitemaps_host`
-* `adapter` - instance of `SitemapGenerator::WaveAdapter`
-
-    For Example:
+2. Once you have CarrierWave setup and configured all you need to do is set some options in your sitemap config, such as
 
      ```ruby
+     # Your website's host name
      SitemapGenerator::Sitemap.default_host = "http://www.example.com"
+     
+     # The remote host where your sitemaps will be hosted
      SitemapGenerator::Sitemap.sitemaps_host = "http://s3.amazonaws.com/sitemap-generator/"
+     
+     # The directory to write sitemaps to locally
      SitemapGenerator::Sitemap.public_path = 'tmp/'
+     
+     # Set this to a directory/path if you don't want to upload to the root of your `sitemaps_host`
      SitemapGenerator::Sitemap.sitemaps_path = 'sitemaps/'
+     
+     # Instance of `SitemapGenerator::WaveAdapter`
      SitemapGenerator::Sitemap.adapter = SitemapGenerator::WaveAdapter.new
      ```
 
