@@ -93,14 +93,6 @@ module SitemapGenerator
         @sitemaps_link_count
       end
 
-      # Return a summary string
-      def summary(opts={})
-        uncompressed_size = number_to_human_size(@filesize)
-        compressed_size =   number_to_human_size(@location.filesize)
-        path = ellipsis(@location.path_in_public, 44) # 47 - 3
-        "+ #{'%-44s' % path} #{'%10s' % @link_count} sitemaps / #{'%10s' % compressed_size}"
-      end
-
       def stats_summary(opts={})
         str = "Sitemap stats: #{number_with_delimiter(@sitemaps_link_count)} links / #{@link_count} sitemaps"
         str += " / %dm%02ds" % opts[:time_taken].divmod(60) if opts[:time_taken]

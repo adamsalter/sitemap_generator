@@ -31,7 +31,7 @@ module SitemapGenerator
               xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
                 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd"
               xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-              xmlns:image="#{SitemapGenerator::SCHEMAS['image']}"              
+              xmlns:image="#{SitemapGenerator::SCHEMAS['image']}"
               xmlns:video="#{SitemapGenerator::SCHEMAS['video']}"
               xmlns:geo="#{SitemapGenerator::SCHEMAS['geo']}"
               xmlns:news="#{SitemapGenerator::SCHEMAS['news']}"
@@ -138,7 +138,6 @@ module SitemapGenerator
         reserve_name
         @location.write(@xml_wrapper_start + @xml_content + @xml_wrapper_end)
         @xml_content = @xml_wrapper_start = @xml_wrapper_end = ''
-        puts summary if @location.verbose?
         @written = true
       end
 
@@ -164,14 +163,6 @@ module SitemapGenerator
         location = @location.dup
         location.delete(:filename) if location.namer
         self.class.new(location)
-      end
-
-      # Return a summary string
-      def summary(opts={})
-        uncompressed_size = number_to_human_size(@filesize)
-        compressed_size   = number_to_human_size(@location.filesize)
-        path = ellipsis(@location.path_in_public, 47)
-        "+ #{'%-47s' % path} #{'%10s' % @link_count} links / #{'%10s' % compressed_size}"
       end
 
       protected

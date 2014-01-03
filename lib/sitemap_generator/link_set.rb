@@ -4,8 +4,8 @@ require 'builder'
 # which lists all the sitemap files written.
 module SitemapGenerator
   class LinkSet
-    @@requires_finalization_opts = [:filename, :sitemaps_path, :sitemaps_namer, :sitemaps_host, :namer]
-    @@new_location_opts = [:filename, :sitemaps_path, :sitemaps_namer, :namer]
+    @@requires_finalization_opts = [:filename, :sitemaps_path, :sitemaps_host, :namer]
+    @@new_location_opts = [:filename, :sitemaps_path, :namer]
 
     attr_reader :default_host, :sitemaps_path, :filename, :create_index
     attr_accessor :verbose, :yahoo_app_id, :include_root, :include_index, :sitemaps_host, :adapter, :yield_sitemap
@@ -115,24 +115,19 @@ module SitemapGenerator
     #     * `false` - Boolean; write out only uncompressed files.
     #     * `:all_but_first` - Symbol; leave the first file uncompressed but compress any remaining files.
     #
-    # === Deprecated
-    #
-    # * <tt>:sitemaps_namer</tt> - Deprecated, use <tt>:namer</tt>.  A <tt>SitemapGenerator::SitemapNamer</tt> instance for generating the sitemap names.
-    # * <tt>:sitemap_index_namer</tt> - Deprecated, use <tt>:namer</tt>.  A <tt>SitemapGenerator::SitemapIndexNamer</tt> instance for generating the sitemap index name.
-    #
     # KJV: When adding a new option be sure to include it in `options_for_group()` if
     # the option should be inherited by groups.
     def initialize(options={})
       options = SitemapGenerator::Utilities.reverse_merge(options,
         :include_root => true,
         :include_index => false,
-        :compress => true,
         :filename => :sitemap,
         :search_engines => {
           :google         => "http://www.google.com/webmasters/tools/ping?sitemap=%s",
           :bing           => "http://www.bing.com/webmaster/ping.aspx?siteMap=%s"
         },
-        :create_index => :auto
+        :create_index => :auto,
+        :compress => true
       )
       options.each_pair { |k, v| instance_variable_set("@#{k}".to_sym, v) }
 
@@ -384,7 +379,7 @@ module SitemapGenerator
     # doesn't override the latter.
     def set_options(opts={})
       opts = opts.dup
-      %w(filename namer sitemaps_namer).each do |key|
+      %w(filename namer).each do |key|
         if value = opts.delete(key.to_sym)
           send("#{key}=", value)
         end
@@ -482,7 +477,6 @@ module SitemapGenerator
       @sitemap_index = nil if @sitemap_index && @sitemap_index.finalized? && !@protect_index
       @sitemap = nil if @sitemap && @sitemap.finalized?
       self.namer.reset
-      self.sitemaps_namer.reset if self.sitemaps_namer
       @added_default_links = false
     end
 
@@ -553,7 +547,7 @@ module SitemapGenerator
       # <tt>sitemap.xml.gz, sitemap1.xml.gz, sitemap2.xml.gz, ...</tt>
       def filename=(value)
         @filename = value
-        self.namer = SitemapGenerator::SimpleNamer.new(@filename, :compress => self.compress)
+        self.namer = SitemapGenerator::SimpleNamer.new(@filename)
       end
 
       # Set the search engines hash to a new hash of search engine names mapped to
@@ -578,7 +572,8 @@ module SitemapGenerator
           :public_path => public_path,
           :sitemaps_path => @sitemaps_path,
           :adapter => @adapter,
-          :verbose => verbose
+          :verbose => verbose,
+          :compress => @compress
         )
       end
 
@@ -591,7 +586,8 @@ module SitemapGenerator
           :sitemaps_path => @sitemaps_path,
           :adapter => @adapter,
           :verbose => verbose,
-          :create_index => @create_index
+          :create_index => @create_index,
+          :compress => @compress
         )
       end
 
@@ -623,7 +619,7 @@ module SitemapGenerator
       # the current sitemap and if there is no sitemap, creates a new one using
       # the current filename.
       def namer
-        @namer ||= @sitemap && @sitemap.location.namer || SitemapGenerator::SimpleNamer.new(@filename, :compress => compress)
+        @namer ||= @sitemap && @sitemap.location.namer || SitemapGenerator::SimpleNamer.new(@filename)
       end
 
       # Set the value of the compress setting.

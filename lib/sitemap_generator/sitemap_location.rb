@@ -1,5 +1,8 @@
+require 'sitemap_generator/helpers/number_helper'
+
 module SitemapGenerator
   class SitemapLocation < Hash
+    PATH_OUTPUT_WIDTH = 47 # Character width of the path in the summary lines
 
     [:host, :adapter].each do |method|
       define_method(method) do
@@ -18,22 +21,25 @@ module SitemapGenerator
     # generates names like <tt>sitemap.xml.gz</tt>, <tt>sitemap1.xml.gz</tt>, <tt>sitemap2.xml.gz</tt> and so on.
     #
     # === Options
-    # * <tt>adapter</tt> - SitemapGenerator::Adapter subclass
-    # * <tt>filename</tt> - full name of the file e.g. <tt>'sitemap1.xml.gz'<tt>
-    # * <tt>host</tt> - host name for URLs.  The full URL to the file is then constructed from
+    # * <tt>:adapter</tt> - SitemapGenerator::Adapter subclass
+    # * <tt>:filename</tt> - full name of the file e.g. <tt>'sitemap1.xml.gz'<tt>
+    # * <tt>:host</tt> - host name for URLs.  The full URL to the file is then constructed from
     #   the <tt>host</tt>, <tt>sitemaps_path</tt> and <tt>filename</tt>
-    # * <tt>namer</tt> - a SitemapGenerator::SimpleNamer instance.  Can be passed instead of +filename+.
-    # * <tt>public_path</tt> - path to the "public" directory, or the directory you want to
+    # * <tt>:namer</tt> - a SitemapGenerator::SimpleNamer instance.  Can be passed instead of +filename+.
+    # * <tt>:public_path</tt> - path to the "public" directory, or the directory you want to
     #   write sitemaps in.  Default is a directory <tt>public/</tt>
     #   in the current working directory, or relative to the Rails root
     #   directory if running under Rails.
-    # * <tt>sitemaps_path</tt> - gives the path relative to the <tt>public_path</tt> in which to
+    # * <tt>:sitemaps_path</tt> - gives the path relative to the <tt>public_path</tt> in which to
     #   write sitemaps e.g. <tt>sitemaps/</tt>.
-    # * <tt>verbose</tt> - whether to output summary into to STDOUT.  Default +false+.
-    # * <tt>create_index</tt> - whether to create a sitemap index.  Default `:auto`.  See <tt>LinkSet::create_index=</tt>
+    # * <tt>:verbose</tt> - whether to output summary into to STDOUT.  Default +false+.
+    # * <tt>:create_index</tt> - whether to create a sitemap index.  Default `:auto`.  See <tt>LinkSet::create_index=</tt>
     #   for possible values. Only applies to the SitemapIndexLocation object.
+    # * <tt>compress</tt> - The LinkSet compress setting.  Default: true.  If `false` any `.gz` extension is
+    #   stripped from the filename.  If `:all_but_first`, only the `.gz` extension of the first
+    #   filename is stripped off.  If `true` the extensions are left unchanged.
     def initialize(opts={})
-      SitemapGenerator::Utilities.assert_valid_keys(opts, [:adapter, :public_path, :sitemaps_path, :host, :filename, :namer, :verbose, :create_index])
+      SitemapGenerator::Utilities.assert_valid_keys(opts, [:adapter, :public_path, :sitemaps_path, :host, :filename, :namer, :verbose, :create_index, :compress])
       opts[:adapter] ||= SitemapGenerator::FileAdapter.new
       opts[:public_path] ||= SitemapGenerator.app.root + 'public/'
       opts[:namer] = SitemapGenerator::SitemapNamer.new(:sitemap) if !opts[:filename] && !opts[:namer]
@@ -78,6 +84,16 @@ module SitemapGenerator
       raise SitemapGenerator::SitemapError, "No filename or namer set" unless self[:filename] || self[:namer]
       unless self[:filename]
         self.send(:[]=, :filename, self[:namer].to_s, :super => true)
+
+        # Post-process the filename for our compression settings.
+        # Strip the `.gz` from the extension if we aren't compressing this file.
+        # If you're setting the filename manually, :all_but_first won't work as
+        # expected.  Ultimately I should force using a namer in all circumstances.
+        # Changing the filename here will affect how the FileAdapter writes out the file.
+        if @options[:compress] == false ||
+           (self[:namer] && self[:namer].start? && @options[:compress] == :all_but_first)
+          self[:filename].gsub(/\.gz$/, '')
+        end
       end
       self[:filename]
     end
@@ -119,8 +135,18 @@ module SitemapGenerator
       super(key, value)
     end
 
+    # Write `data` out to a file.
+    # Output a summary line if verbose is true.
     def write(data)
       adapter.write(self, data)
+      puts summary if verbose?
+    end
+
+    # Return a summary string
+    def summary
+      filesize = number_to_human_size(self.filesize)
+      path = ellipsis(self.path_in_public, self::PATH_OUTPUT_WIDTH)
+      "+ #{'%-'+self::PATH_OUTPUT_WIDTH+'s' % path} #{'%10s' % @link_count} links / #{'%10s' % filesize}"
     end
   end
 
@@ -139,6 +165,13 @@ module SitemapGenerator
     # kind of options class.
     def create_index
       self[:create_index]
+    end
+
+    # Return a summary string
+    def summary
+      filesize = number_to_human_size(self.filesize)
+      path = ellipsis(self.path_in_public, self::PATH_OUTPUT_WIDTH - 3)
+      "+ #{'%-'+self::PATH_OUTPUT_WIDTH+'s' % path} #{'%10s' % @link_count} sitemaps / #{'%10s' % filesize}"
     end
   end
 end

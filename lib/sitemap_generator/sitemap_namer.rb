@@ -25,9 +25,6 @@ module SitemapGenerator
   #                the first name.  Thereafter, the numerical index defined by +start+
   #                is used, and subsequent names would be 'sitemap1.xml.gz', 'sitemap2.xml.gz', etc.
   #                In these examples the `base` string is assumed to be 'sitemap'.
-  #   :compress  - Default: true.  The LinkSet compress setting.  If `false` any `.gz` extension is
-  #                stripped from the filename.  If `:all_but_first`, only the `.gz` extension of the first
-  #                filename is stripped off.  If `true` the extensions are left unchanged.
   class SimpleNamer < SitemapNamer
     def initialize(base, options={})
       super_options = SitemapGenerator::Utilities.reverse_merge(options,
@@ -38,13 +35,6 @@ module SitemapGenerator
 
     def to_s
       extension = @options[:extension]
-
-      # Strip the `.gz` from the extension if we aren't compressing this file.
-      if (start? && @options[:compress] == :all_but_first) ||
-         (@options[:compress] == false)
-        extension.gsub(/\.gz/, '')
-      end
-
       "#{@base}#{@count}#{extension}"
     end
 
