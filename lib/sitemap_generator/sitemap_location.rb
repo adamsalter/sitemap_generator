@@ -30,8 +30,8 @@ module SitemapGenerator
     # * <tt>sitemaps_path</tt> - gives the path relative to the <tt>public_path</tt> in which to
     #   write sitemaps e.g. <tt>sitemaps/</tt>.
     # * <tt>verbose</tt> - whether to output summary into to STDOUT.  Default +false+.
-    # * <tt>create_index</tt> - whether to create a sitemap index.  Default `:auto`.  See LinkSet.
-    #                           Only applies to the SitemapIndexLocation object.
+    # * <tt>create_index</tt> - whether to create a sitemap index.  Default `:auto`.  See <tt>LinkSet::create_index=</tt>
+    #   for possible values. Only applies to the SitemapIndexLocation object.
     def initialize(opts={})
       SitemapGenerator::Utilities.assert_valid_keys(opts, [:adapter, :public_path, :sitemaps_path, :host, :filename, :namer, :verbose, :create_index])
       opts[:adapter] ||= SitemapGenerator::FileAdapter.new
@@ -132,7 +132,10 @@ module SitemapGenerator
       super(opts)
     end
 
-    # Really just a placeholder for an option which should really go into some
+    # Whether to create a sitemap index.  Default `:auto`.  See <tt>LinkSet::create_index=</tt>
+    # for possible values.
+    #
+    # A placeholder for an option which should really go into some
     # kind of options class.
     def create_index
       self[:create_index]

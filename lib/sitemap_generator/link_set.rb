@@ -110,8 +110,10 @@ module SitemapGenerator
     #   and index file names.  See <tt>:filename</tt> if you don't need to do anything fancy, and can
     #   accept the default naming conventions.
     #
-    # * <tt>:gzip_initial</tt> - Boolean. Whether to compress the first sitemap file produced. Default
-    #   is +true+.
+    # * <tt>:compress</tt> - Specifies which files to compress with gzip.  Default is `true`. Accepted values:
+    #     * `true` - Boolean; compress all files.
+    #     * `false` - Boolean; write out only uncompressed files.
+    #     * `:all_but_first` - Symbol; leave the first file uncompressed but compress any remaining files.
     #
     # === Deprecated
     #
@@ -124,7 +126,7 @@ module SitemapGenerator
       options = SitemapGenerator::Utilities.reverse_merge(options,
         :include_root => true,
         :include_index => false,
-        :gzip_initial => true,
+        :compress => true,
         :filename => :sitemap,
         :search_engines => {
           :google         => "http://www.google.com/webmasters/tools/ping?sitemap=%s",
@@ -416,7 +418,8 @@ module SitemapGenerator
         :verbose,
         :default_host,
         :adapter,
-        :create_index
+        :create_index,
+        :compress
       ].inject({}) do |hash, key|
         if value = instance_variable_get(:"@#{key}")
           hash[key] = value
@@ -511,7 +514,7 @@ module SitemapGenerator
       def public_path=(value)
         @public_path = Pathname.new(SitemapGenerator::Utilities.append_slash(value))
         if @public_path.relative?
-          @public_path = SitemapGenerator.app.root + @public_path 
+          @public_path = SitemapGenerator.app.root + @public_path
         end
         update_location_info(:public_path, @public_path)
         @public_path
@@ -550,7 +553,7 @@ module SitemapGenerator
       # <tt>sitemap.xml.gz, sitemap1.xml.gz, sitemap2.xml.gz, ...</tt>
       def filename=(value)
         @filename = value
-        self.namer = SitemapGenerator::SimpleNamer.new(@filename)
+        self.namer = SitemapGenerator::SimpleNamer.new(@filename, :compress => self.compress)
       end
 
       # Set the search engines hash to a new hash of search engine names mapped to
@@ -571,7 +574,7 @@ module SitemapGenerator
       def sitemap_location
         SitemapGenerator::SitemapLocation.new(
           :host => sitemaps_host,
-          :namer => sitemaps_namer || namer,  # sitemaps_namer is deprecated
+          :namer => namer,
           :public_path => public_path,
           :sitemaps_path => @sitemaps_path,
           :adapter => @adapter,
@@ -583,7 +586,7 @@ module SitemapGenerator
       def sitemap_index_location
         SitemapGenerator::SitemapLocation.new(
           :host => sitemaps_host,
-          :namer => sitemap_index_namer || namer,  # sitemap_index_namer is deprecated
+          :namer => namer,
           :public_path => public_path,
           :sitemaps_path => @sitemaps_path,
           :adapter => @adapter,
@@ -594,6 +597,12 @@ module SitemapGenerator
 
       # Set the value of +create_index+ on the SitemapIndexLocation object of the
       # SitemapIndexFile.
+      #
+      # Whether to create a sitemap index file.  Supported values: `true`, `false`, `:auto`.
+      # If `true` an index file is always created, regardless of how many links
+      # are in your sitemap.  If `false` an index file is never created.
+      # If `:auto` an index file is created only if your sitemap has more than
+      # one sitemap file.
       def create_index=(value, force=false)
         @create_index = value
         # Allow overriding the protected status of the index when we are creating a group.
@@ -614,19 +623,28 @@ module SitemapGenerator
       # the current sitemap and if there is no sitemap, creates a new one using
       # the current filename.
       def namer
-        @namer ||= @sitemap && @sitemap.location.namer || SitemapGenerator::SimpleNamer.new(@filename, :gzip_zero => gzip_initial?)
+        @namer ||= @sitemap && @sitemap.location.namer || SitemapGenerator::SimpleNamer.new(@filename, :compress => compress)
       end
 
-      def gzip_initial=(value)
-        @gzip_initial = value
+      # Set the value of the compress setting.
+      #
+      # Values:
+      #   * `true` - Boolean; compress all files
+      #   * `false` - Boolean; write out only uncompressed files
+      #   * `:all_but_first` - Symbol; leave the first file uncompressed but compress any remaining files.
+      #
+      # Any custom `namer` instances you use depend on this value, so if you set your namer before setting
+      # this value, the namer will be updated for you.  However, if you set your namer after setting this value,
+      # you will need to pass the :compress option in the constructor e.g.
+      # <tt>SitemapGenerator::SimpleNamer.new(filename, :compress => false)</tt>
+      def compress=(value)
+        @compress = value
       end
 
-      # Return a boolean indicating whether or not to gzip the first sitemap file produced (usually the index)
-      def gzip_initial?
-        if @gzip_initial.nil?
-          @gzip_initial = SitemapGenerator.gzip_initial.nil? ? true : SitemapGenerator.gzip_initial
-        end
-        @gzip_initial
+      # Return the current compression setting.  Its value determines which files will be gzip'ed.
+      # See the setter for documentation of its values.
+      def compress
+        @compress
       end
 
       protected
@@ -640,48 +658,5 @@ module SitemapGenerator
       end
     end
     include LocationHelpers
-
-    module Deprecated
-      # *Deprecated*
-      #
-      # Set the namer to use when generating SitemapFiles (does not apply to the
-      # SitemapIndexFile)
-      #
-      # As of version 4, use the <tt>namer<tt> option.
-      def sitemaps_namer=(value)
-        @sitemaps_namer = value
-        @sitemap.location[:namer] = value if @sitemap && !@sitemap.finalized?
-      end
-
-      # *Deprecated*
-      #
-      # Return the current sitemaps namer object.  If it not set, looks for it on
-      # the current sitemap and if there is no sitemap, creates a new one using
-      # the current filename.
-      #
-      # As of version 4, use the <tt>namer<tt> option.
-      def sitemaps_namer
-        @sitemaps_namer ||= @sitemap && @sitemap.location.namer
-      end
-
-      # *Deprecated*
-      #
-      # Set the namer to use when generating the index file.
-      # The namer should be a <tt>SitemapGenerator::SitemapIndexNamer</tt> instance.
-      #
-      # As of version 4, use the <tt>namer<tt> option.
-      def sitemap_index_namer=(value)
-        @sitemap_index_namer = value
-        @sitemap_index.location[:namer] = value if @sitemap_index && !@sitemap_index.finalized? && !@protect_index
-      end
-
-      # *Deprecated*
-      #
-      # As of version 4, use the <tt>namer<tt> option.
-      def sitemap_index_namer
-        @sitemap_index_namer ||= @sitemap_index && @sitemap_index.location.namer
-      end
-    end
-    include Deprecated
   end
 end

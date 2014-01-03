@@ -1,74 +1,6 @@
 module SitemapGenerator
-  # A class for generating sitemap names given the base for the filename.
-  # Deprecated.  Rather use the <tt>SitemapGenerator::SimpleNamer</tt> class and the
-  # +namer+ option on your sitemap object.
+  # A class for generating sitemap filenames.
   #
-  # === Example
-  # namer = SitemapNamer.new(:sitemap)
-  # namer.to_s => 'sitemap1.xml.gz'
-  # namer.next.to_s => 'sitemap2.xml.gz'
-  class SitemapNamer
-    NameError = Class.new(StandardError)
-
-    # Params:
-    #   base - string or symbol that forms the base of the generated filename
-    #
-    # Options include:
-    #   :extension - Default: '.xml.gz'. File extension to append.
-    #   :start     - Default: 1. Numerical index at which to start counting.
-    #   :gzip_zero - Default: true. If false, strip out any .gz in the file
-    #                extension for the first file
-    def initialize(base, options={});
-      @options = SitemapGenerator::Utilities.reverse_merge(options,
-        :extension => '.xml.gz',
-        :start => 1,
-        :gzip_zero => true
-      )
-      @base = base
-      reset
-    end
-
-    def to_s
-      extension = @options[:extension]
-      if start? && !@options[:gzip_zero]
-        extension.gsub(/\.gz/, '')
-      end
-
-      "#{@base}#{@count}#{extension}"
-    end
-
-    # Increment count and return self
-    def next
-      @count += 1
-      self
-    end
-
-    # Decrement count and return self
-    def previous
-      raise NameError, "Already at the start of the series" if start?
-      @count -= 1
-      self
-    end
-
-    # Reset count to the starting index
-    def reset
-      @count = @options[:start]
-    end
-
-    def start?
-      @count <= @options[:start]
-    end
-  end
-
-  # A Namer for Sitemap Indexes.
-  # Deprecated.  Rather use the <tt>SitemapGenerator::SimpleNamer</tt> class and the
-  # +namer+ option on your sitemap object.
-  class SitemapIndexNamer < SitemapNamer
-    def to_s
-      "#{@base}#{@options[:extension]}"
-    end
-  end
-
   # The SimpleNamer uses the same namer instance for the sitemap index and the sitemaps.
   # If no index is needed, the first sitemap gets the first name.  However, if
   # an index is needed, the index gets the first name.
@@ -87,14 +19,15 @@ module SitemapGenerator
   # Options:
   #   :extension - Default: '.xml.gz'. File extension to append.
   #   :start     - Default: 1. Numerical index at which to start counting.
-  #   :gzip_zero - Default: true. If false, strip out any .gz in the file
-  #                extension for the first file
   #   :zero      - Default: nil.  A string or number that is appended to +base+
   #                to create the first name in the sequence.  So setting this
   #                to '_index' would produce 'sitemap_index.xml.gz' as
   #                the first name.  Thereafter, the numerical index defined by +start+
   #                is used, and subsequent names would be 'sitemap1.xml.gz', 'sitemap2.xml.gz', etc.
   #                In these examples the `base` string is assumed to be 'sitemap'.
+  #   :compress  - Default: true.  The LinkSet compress setting.  If `false` any `.gz` extension is
+  #                stripped from the filename.  If `:all_but_first`, only the `.gz` extension of the first
+  #                filename is stripped off.  If `true` the extensions are left unchanged.
   class SimpleNamer < SitemapNamer
     def initialize(base, options={})
       super_options = SitemapGenerator::Utilities.reverse_merge(options,
@@ -105,8 +38,11 @@ module SitemapGenerator
 
     def to_s
       extension = @options[:extension]
-      if start? && !@options[:gzip_zero]
-        extension = extension.gsub(/\.gz/, '')
+
+      # Strip the `.gz` from the extension if we aren't compressing this file.
+      if (start? && @options[:compress] == :all_but_first) ||
+         (@options[:compress] == false)
+        extension.gsub(/\.gz/, '')
       end
 
       "#{@base}#{@count}#{extension}"
