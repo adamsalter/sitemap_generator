@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe SitemapGenerator::SitemapLocation, :focus => true do
+describe SitemapGenerator::SitemapLocation do
   let(:default_host) { 'http://example.com' }
   let(:location)     { SitemapGenerator::SitemapLocation.new }
 
@@ -141,6 +141,48 @@ describe SitemapGenerator::SitemapLocation, :focus => true do
           :public_path => 'public/google', :filename => 'xxx',
           :host => default_host, :sitemaps_path => 'sub/dir')
       location.url.should == default_host + '/sub/dir/xxx'
+    end
+  end
+
+  describe "write" do
+    it "should output summary line when verbose" do
+      location = SitemapGenerator::SitemapLocation.new(:public_path => 'public/', :verbose => true)
+      location.adapter.stubs(:write)
+      location.expects(:summary)
+      location.write('data')
+    end
+
+    it "should not output summary line when not verbose" do
+      location = SitemapGenerator::SitemapLocation.new(:public_path => 'public/', :verbose => false)
+      location.adapter.stubs(:write)
+      location.expects(:summary).never
+      location.write('data')
+    end
+  end
+
+  describe "filename" do
+    it "should strip gz extension if not compressing" do
+      location = SitemapGenerator::SitemapLocation.new(:namer => SitemapGenerator::SimpleNamer.new(:sitemap), :compress => false)
+      location.filename.should == 'sitemap.xml'
+    end
+
+    it "should not strip gz extension if compressing" do
+      location = SitemapGenerator::SitemapLocation.new(:namer => SitemapGenerator::SimpleNamer.new(:sitemap), :compress => true)
+      location.filename.should == 'sitemap.xml.gz'
+    end
+
+    it "should strip gz extension if :all_but_first and first file" do
+      namer = SitemapGenerator::SimpleNamer.new(:sitemap)
+      namer.stubs(:start?).returns(true)
+      location = SitemapGenerator::SitemapLocation.new(:namer => namer, :compress => :all_but_first)
+      location.filename.should == 'sitemap.xml'
+    end
+
+    it "should strip gz extension if :all_but_first and first file" do
+      namer = SitemapGenerator::SimpleNamer.new(:sitemap)
+      namer.stubs(:start?).returns(false)
+      location = SitemapGenerator::SitemapLocation.new(:namer => namer, :compress => :all_but_first)
+      location.filename.should == 'sitemap.xml.gz'
     end
   end
 end

@@ -5,6 +5,8 @@ module SitemapGenerator
   # Handles reserving filenames from namers, constructing paths and sending
   # data to the adapter to be written out.
   class SitemapLocation < Hash
+    include SitemapGenerator::Helpers::NumberHelper
+
     PATH_OUTPUT_WIDTH = 47 # Character width of the path in the summary lines
 
     [:host, :adapter].each do |method|
@@ -103,7 +105,7 @@ module SitemapGenerator
         # Changing the filename here will affect how the FileAdapter writes out the file.
         if self[:compress] == false ||
            (self[:namer] && self[:namer].start? && self[:compress] == :all_but_first)
-          self[:filename].gsub(/\.gz$/, '')
+          self[:filename].gsub!(/\.gz$/, '')
         end
       end
       self[:filename]
