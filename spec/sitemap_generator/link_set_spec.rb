@@ -542,7 +542,7 @@ describe SitemapGenerator::LinkSet do
       ls.sitemap_index.location.filename.should =~ /^sitemap2/
     end
 
-    it "should support both sitemaps_namer and filename options no matter the order" do
+    it "should support both namer and filename options no matter the order" do
       options = {
         :namer => SitemapGenerator::SimpleNamer.new('sitemap1'),
         :filename => 'sitemap2'
