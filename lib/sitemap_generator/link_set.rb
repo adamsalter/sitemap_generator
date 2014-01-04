@@ -43,14 +43,6 @@ module SitemapGenerator
       self
     end
 
-    # Dreprecated.  Use create.
-    def add_links(&block)
-      original_value = @yield_sitemap
-      @yield_sitemap = true
-      create(&block)
-      @yield_sitemap = original_value
-    end
-
     # Constructor
     #
     # == Options:

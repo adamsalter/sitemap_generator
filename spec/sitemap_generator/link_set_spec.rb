@@ -41,7 +41,7 @@ describe SitemapGenerator::LinkSet do
       ls = SitemapGenerator::LinkSet.new(:default_host => default_host, :include_root => true, :include_index => true)
       ls.include_root.should be_true
       ls.include_index.should be_true
-      ls.add_links { |sitemap| }
+      ls.create { |sitemap| }
       ls.sitemap.link_count.should == 2
     end
 
@@ -49,7 +49,7 @@ describe SitemapGenerator::LinkSet do
       ls = SitemapGenerator::LinkSet.new(:default_host => default_host, :include_root => false)
       ls.include_root.should be_false
       ls.include_index.should be_false
-      ls.add_links { |sitemap| }
+      ls.create { |sitemap| }
       ls.sitemap.link_count.should == 0
     end
 
@@ -57,7 +57,7 @@ describe SitemapGenerator::LinkSet do
       ls = SitemapGenerator::LinkSet.new(:default_host => default_host, :include_index => false)
       ls.include_root.should be_true
       ls.include_index.should be_false
-      ls.add_links { |sitemap| }
+      ls.create { |sitemap| }
       ls.sitemap.link_count.should == 1
     end
 
@@ -65,7 +65,7 @@ describe SitemapGenerator::LinkSet do
       ls = SitemapGenerator::LinkSet.new(:default_host => default_host, :include_root => false, :include_index => false)
       ls.include_root.should be_false
       ls.include_index.should be_false
-      ls.add_links { |sitemap| }
+      ls.create { |sitemap| }
       ls.sitemap.link_count.should == 0
     end
   end
@@ -659,26 +659,6 @@ describe SitemapGenerator::LinkSet do
       ls.send(:interpreter).expects(:eval).with(:yield_sitemap => false)
       ls.yield_sitemap = false
       ls.create
-    end
-  end
-
-  describe "add_links" do
-    it "should not change the value of yield_sitemap" do
-      ls.stubs(:create)
-      ls.yield_sitemap = false
-      ls.add_links
-      ls.yield_sitemap.should be_false
-      ls.yield_sitemap = true
-      ls.add_links
-      ls.yield_sitemap.should be_true
-    end
-
-    it "should always yield the sitemap instance" do
-      ls.send(:interpreter).expects(:eval).with(:yield_sitemap => true).twice
-      ls.yield_sitemap = false
-      ls.add_links
-      ls.yield_sitemap = true
-      ls.add_links
     end
   end
 
