@@ -19,7 +19,7 @@ module SitemapGenerator
       end
 
       stream = open(location.path, 'wb')
-      if location.path.ends_with? '.gz'
+      if location.path.to_s =~ /.gz$/
         gzip(stream, raw_data)
       else
         plain(stream, raw_data)
