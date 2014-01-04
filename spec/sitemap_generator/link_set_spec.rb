@@ -208,8 +208,8 @@ describe SitemapGenerator::LinkSet do
     let(:ls) { SitemapGenerator::LinkSet.new(:default_host => default_host, :verbose => true, :create_index => true) }
 
     it "should output summary lines" do
-      ls.sitemap.expects(:summary)
-      ls.sitemap_index.expects(:summary)
+      ls.sitemap.location.expects(:summary)
+      ls.sitemap_index.location.expects(:summary)
       ls.finalize!
     end
   end
@@ -525,30 +525,30 @@ describe SitemapGenerator::LinkSet do
       ls.sitemap.location.host.should == host
     end
 
-    it "should set the sitemaps_namer" do
+    it "should set the namer" do
       namer = SitemapGenerator::SimpleNamer.new(:xxx)
-      ls.create(:sitemaps_namer => namer)
-      ls.sitemaps_namer.should == namer
+      ls.create(:namer => namer)
+      ls.namer.should == namer
       ls.sitemap.location.namer.should == namer
       ls.sitemap.location.filename.should =~ /xxx/
     end
 
-    it "should support both sitemaps_namer and filename options" do
-      namer = SitemapGenerator::SimpleNamer.new("sitemap1_")
-      ls.create(:sitemaps_namer => namer, :filename => "sitemap1")
-      ls.sitemaps_namer.should == namer
+    it "should support both namer and filename options" do
+      namer = SitemapGenerator::SimpleNamer.new("sitemap2")
+      ls.create(:namer => namer, :filename => "sitemap1")
+      ls.namer.should == namer
       ls.sitemap.location.namer.should == namer
-      ls.sitemap.location.filename.should =~ /sitemap1_1/
-      ls.sitemap_index.location.filename.should =~ /^sitemap1/
+      ls.sitemap.location.filename.should =~ /^sitemap2/
+      ls.sitemap_index.location.filename.should =~ /^sitemap2/
     end
 
     it "should support both sitemaps_namer and filename options no matter the order" do
-      namer = SitemapGenerator::SimpleNamer.new("sitemap1_")
-      options = {} #ActiveSupport::OrderedHash.new
-      options[:sitemaps_namer] = namer
-      options[:filename] = "sitemap1"
+      options = {
+        :namer => SitemapGenerator::SimpleNamer.new('sitemap1'),
+        :filename => 'sitemap2'
+      }
       ls.create(options)
-      ls.sitemap.location.filename.should =~ /sitemap1_1/
+      ls.sitemap.location.filename.should =~ /^sitemap1/
       ls.sitemap_index.location.filename.should =~ /^sitemap1/
     end
 
@@ -575,13 +575,6 @@ describe SitemapGenerator::LinkSet do
       SitemapGenerator::Sitemap.create(:default_host => 'http://cnn.com')
       SitemapGenerator::Sitemap.instance_variable_set(:@added_default_links, false)
     end
-
-    it "should reset the deprecated sitemaps_namer, if set" do
-      ls.sitemaps_namer = stub(:reset => nil)
-      ls.sitemaps_namer.expects(:reset)
-      ls.send(:reset!)
-    end
-
   end
 
   describe "include_root?" do
