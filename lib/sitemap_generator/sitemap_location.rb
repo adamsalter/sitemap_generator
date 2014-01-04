@@ -1,6 +1,9 @@
 require 'sitemap_generator/helpers/number_helper'
 
 module SitemapGenerator
+  # A class for determining the exact location at which to write sitemap data.
+  # Handles reserving filenames from namers, constructing paths and sending
+  # data to the adapter to be written out.
   class SitemapLocation < Hash
     PATH_OUTPUT_WIDTH = 47 # Character width of the path in the summary lines
 
@@ -25,7 +28,8 @@ module SitemapGenerator
     # * <tt>:filename</tt> - full name of the file e.g. <tt>'sitemap1.xml.gz'<tt>
     # * <tt>:host</tt> - host name for URLs.  The full URL to the file is then constructed from
     #   the <tt>host</tt>, <tt>sitemaps_path</tt> and <tt>filename</tt>
-    # * <tt>:namer</tt> - a SitemapGenerator::SimpleNamer instance.  Can be passed instead of +filename+.
+    # * <tt>:namer</tt> - a SitemapGenerator::SimpleNamer instance for generating file names.
+    #   Should be passed if no +filename+ is provided.
     # * <tt>:public_path</tt> - path to the "public" directory, or the directory you want to
     #   write sitemaps in.  Default is a directory <tt>public/</tt>
     #   in the current working directory, or relative to the Rails root
@@ -42,7 +46,14 @@ module SitemapGenerator
       SitemapGenerator::Utilities.assert_valid_keys(opts, [:adapter, :public_path, :sitemaps_path, :host, :filename, :namer, :verbose, :create_index, :compress])
       opts[:adapter] ||= SitemapGenerator::FileAdapter.new
       opts[:public_path] ||= SitemapGenerator.app.root + 'public/'
-      opts[:namer] = SitemapGenerator::SitemapNamer.new(:sitemap) if !opts[:filename] && !opts[:namer]
+      # This is a bit of a hack to make the SimpleNamer act like the old SitemapNamer.
+      # It doesn't really make sense to create a default namer like this because the
+      # namer instance should be shared by the location objects of the sitemaps and
+      # sitemap index files.  However, this greatly eases testing, so I'm leaving it in
+      # for now.
+      if !opts[:filename] && !opts[:namer]
+        opts[:namer] = SitemapGenerator::SimpleNamer.new(:sitemap, :start => 2, :zero => 1)
+      end
       opts[:verbose] = !!opts[:verbose]
       self.merge!(opts)
     end
@@ -90,8 +101,8 @@ module SitemapGenerator
         # If you're setting the filename manually, :all_but_first won't work as
         # expected.  Ultimately I should force using a namer in all circumstances.
         # Changing the filename here will affect how the FileAdapter writes out the file.
-        if @options[:compress] == false ||
-           (self[:namer] && self[:namer].start? && @options[:compress] == :all_but_first)
+        if self[:compress] == false ||
+           (self[:namer] && self[:namer].start? && self[:compress] == :all_but_first)
           self[:filename].gsub(/\.gz$/, '')
         end
       end
@@ -153,7 +164,7 @@ module SitemapGenerator
   class SitemapIndexLocation < SitemapLocation
     def initialize(opts={})
       if !opts[:filename] && !opts[:namer]
-        opts[:namer] = SitemapGenerator::SitemapIndexNamer.new(:sitemap)
+        opts[:namer] = SitemapGenerator::SimpleNamer.new(:sitemap)
       end
       super(opts)
     end

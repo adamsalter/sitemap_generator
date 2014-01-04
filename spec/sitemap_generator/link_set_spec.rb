@@ -365,22 +365,22 @@ describe SitemapGenerator::LinkSet do
         ls.group(:sitemaps_host => 'http://test.com') {}
       end
 
-      it "should use the same sitemaps_namer" do
+      it "should use the same namer" do
         @group = ls.group(:sitemaps_host => 'http://test.com') {}
         @group.sitemap.location.namer.should == ls.sitemap.location.namer
       end
     end
 
-    describe "sitemaps_namer" do
+    describe "namer" do
       it "should inherit the value" do
-        ls.group.sitemaps_namer.should == ls.sitemaps_namer
-        ls.group.sitemap.location.namer.should == ls.sitemaps_namer
+        ls.group.namer.should == ls.namer
+        ls.group.sitemap.location.namer.should == ls.namer
       end
 
       it "should set the value" do
-        namer = SitemapGenerator::SitemapNamer.new(:xxx)
-        group = ls.group(:sitemaps_namer => namer)
-        group.sitemaps_namer.should == namer
+        namer = SitemapGenerator::SimpleNamer.new(:xxx)
+        group = ls.group(:namer => namer)
+        group.namer.should == namer
         group.sitemap.location.namer.should == namer
         group.sitemap.location.filename.should =~ /xxx/
       end
@@ -412,7 +412,7 @@ describe SitemapGenerator::LinkSet do
         :filename => :xxx,
         :sitemaps_path => 'en/',
         :filename => :example,
-        :sitemaps_namer => SitemapGenerator::SitemapNamer.new(:sitemap)
+        :namer => SitemapGenerator::SimpleNamer.new(:sitemap)
       }.each do |key, value|
         it "if #{key} is present" do
           ls.group(key => value).sitemap.should_not == ls.sitemap
@@ -434,7 +434,8 @@ describe SitemapGenerator::LinkSet do
 
       {:sitemaps_path => 'en/',
         :filename => :example,
-        :sitemaps_namer => SitemapGenerator::SitemapNamer.new(:sitemap)}.each do |k, v|
+        :namer => SitemapGenerator::SimpleNamer.new(:sitemap)
+      }.each do |k, v|
 
         it "should not finalize the sitemap if #{k} is present" do
           ls.expects(:finalize_sitemap!).never
@@ -525,7 +526,7 @@ describe SitemapGenerator::LinkSet do
     end
 
     it "should set the sitemaps_namer" do
-      namer = SitemapGenerator::SitemapNamer.new(:xxx)
+      namer = SitemapGenerator::SimpleNamer.new(:xxx)
       ls.create(:sitemaps_namer => namer)
       ls.sitemaps_namer.should == namer
       ls.sitemap.location.namer.should == namer
@@ -533,7 +534,7 @@ describe SitemapGenerator::LinkSet do
     end
 
     it "should support both sitemaps_namer and filename options" do
-      namer = SitemapGenerator::SitemapNamer.new("sitemap1_")
+      namer = SitemapGenerator::SimpleNamer.new("sitemap1_")
       ls.create(:sitemaps_namer => namer, :filename => "sitemap1")
       ls.sitemaps_namer.should == namer
       ls.sitemap.location.namer.should == namer
@@ -542,7 +543,7 @@ describe SitemapGenerator::LinkSet do
     end
 
     it "should support both sitemaps_namer and filename options no matter the order" do
-      namer = SitemapGenerator::SitemapNamer.new("sitemap1_")
+      namer = SitemapGenerator::SimpleNamer.new("sitemap1_")
       options = {} #ActiveSupport::OrderedHash.new
       options[:sitemaps_namer] = namer
       options[:filename] = "sitemap1"
@@ -745,7 +746,7 @@ describe SitemapGenerator::LinkSet do
   end
 
   describe "create_index" do
-    let(:location) { SitemapGenerator::SitemapLocation.new(:namer => SitemapGenerator::SitemapNamer.new(:sitemap), :public_path => 'tmp/', :sitemaps_path => 'test/', :host => 'http://example.com/') }
+    let(:location) { SitemapGenerator::SitemapLocation.new(:namer => SitemapGenerator::SimpleNamer.new(:sitemap), :public_path => 'tmp/', :sitemaps_path => 'test/', :host => 'http://example.com/') }
     let(:sitemap)  { SitemapGenerator::Builder::SitemapFile.new(location) }
 
     describe "when false" do

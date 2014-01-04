@@ -25,12 +25,15 @@ module SitemapGenerator
   #                the first name.  Thereafter, the numerical index defined by +start+
   #                is used, and subsequent names would be 'sitemap1.xml.gz', 'sitemap2.xml.gz', etc.
   #                In these examples the `base` string is assumed to be 'sitemap'.
-  class SimpleNamer < SitemapNamer
+  class SimpleNamer
     def initialize(base, options={})
-      super_options = SitemapGenerator::Utilities.reverse_merge(options,
-        :zero => nil # identifies the marker for the start of the series
+      @options = SitemapGenerator::Utilities.reverse_merge(options,
+        :zero => nil,  # identifies the marker for the start of the series
+        :extension => '.xml.gz',
+        :start => 1
       )
-      super(base, super_options)
+      @base = base
+      reset
     end
 
     def to_s

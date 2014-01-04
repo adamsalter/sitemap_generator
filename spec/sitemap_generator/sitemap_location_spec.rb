@@ -1,9 +1,9 @@
 require 'spec_helper'
 
-describe SitemapGenerator::SitemapLocation do
+describe SitemapGenerator::SitemapLocation, :focus => true do
   let(:default_host) { 'http://example.com' }
   let(:location)     { SitemapGenerator::SitemapLocation.new }
-  
+
   it "public_path should default to the public directory in the application root" do
     location.public_path.should == SitemapGenerator.app.root + 'public/'
   end
@@ -36,13 +36,13 @@ describe SitemapGenerator::SitemapLocation do
   end
 
   it "should accept a Namer option" do
-    @namer = SitemapGenerator::SitemapNamer.new(:xxx)
+    @namer = SitemapGenerator::SimpleNamer.new(:xxx)
     location = SitemapGenerator::SitemapLocation.new(:namer => @namer)
     location.filename.should == @namer.to_s
   end
 
   it "should protect the filename from further changes in the Namer" do
-    @namer = SitemapGenerator::SitemapNamer.new(:xxx)
+    @namer = SitemapGenerator::SimpleNamer.new(:xxx)
     location = SitemapGenerator::SitemapLocation.new(:namer => @namer)
     location.filename.should == @namer.to_s
     @namer.next
@@ -50,10 +50,10 @@ describe SitemapGenerator::SitemapLocation do
   end
 
   it "should allow changing the namer" do
-    @namer1 = SitemapGenerator::SitemapNamer.new(:xxx)
+    @namer1 = SitemapGenerator::SimpleNamer.new(:xxx)
     location = SitemapGenerator::SitemapLocation.new(:namer => @namer1)
     location.filename.should == @namer1.to_s
-    @namer2 = SitemapGenerator::SitemapNamer.new(:yyy)
+    @namer2 = SitemapGenerator::SimpleNamer.new(:yyy)
     location[:namer] = @namer2
     location.filename.should == @namer2.to_s
   end
@@ -65,22 +65,22 @@ describe SitemapGenerator::SitemapLocation do
       [{
         :sitemaps_path => nil,
         :public_path => '/public',
-        :filename => 'sitemap1.xml.gz',
+        :filename => 'sitemap.xml.gz',
         :host => 'http://test.com' },
-      { :url => 'http://test.com/sitemap1.xml.gz',
+      { :url => 'http://test.com/sitemap.xml.gz',
         :directory => '/public',
-        :path => '/public/sitemap1.xml.gz',
-        :path_in_public => 'sitemap1.xml.gz'
+        :path => '/public/sitemap.xml.gz',
+        :path_in_public => 'sitemap.xml.gz'
       }],
       [{
         :sitemaps_path => 'sitemaps/en/',
         :public_path => '/public/system/',
-        :filename => 'sitemap1.xml.gz',
+        :filename => 'sitemap.xml.gz',
         :host => 'http://test.com/plus/extra/' },
-      { :url => 'http://test.com/plus/extra/sitemaps/en/sitemap1.xml.gz',
+      { :url => 'http://test.com/plus/extra/sitemaps/en/sitemap.xml.gz',
         :directory => '/public/system/sitemaps/en',
-        :path => '/public/system/sitemaps/en/sitemap1.xml.gz',
-        :path_in_public => 'sitemaps/en/sitemap1.xml.gz'
+        :path => '/public/system/sitemaps/en/sitemap.xml.gz',
+        :path_in_public => 'sitemaps/en/sitemap.xml.gz'
       }]
     ]
     tests.each do |opts, returns|
@@ -112,7 +112,7 @@ describe SitemapGenerator::SitemapLocation do
       location.filesize
     end
   end
-  
+
   describe "public_path" do
     it "should append a trailing slash" do
       location = SitemapGenerator::SitemapLocation.new(:public_path => 'public/google')
@@ -123,7 +123,7 @@ describe SitemapGenerator::SitemapLocation do
       location.public_path.to_s.should == 'already/slashed/'
     end
   end
-  
+
   describe "sitemaps_path" do
     it "should append a trailing slash" do
       location = SitemapGenerator::SitemapLocation.new(:sitemaps_path => 'public/google')
@@ -134,11 +134,11 @@ describe SitemapGenerator::SitemapLocation do
       location.sitemaps_path.to_s.should == 'already/slashed/'
     end
   end
-  
+
   describe "url" do
     it "should handle paths not ending in slash" do
       location = SitemapGenerator::SitemapLocation.new(
-          :public_path => 'public/google', :filename => 'xxx', 
+          :public_path => 'public/google', :filename => 'xxx',
           :host => default_host, :sitemaps_path => 'sub/dir')
       location.url.should == default_host + '/sub/dir/xxx'
     end
