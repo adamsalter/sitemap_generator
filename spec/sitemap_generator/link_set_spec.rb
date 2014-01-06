@@ -825,4 +825,40 @@ describe SitemapGenerator::LinkSet do
       ls.send(:finalize_sitemap!)
     end
   end
+
+  describe "compress" do
+    it "should be true by default" do
+      ls.compress.should be_true
+    end
+
+    it "should be set on the location objects" do
+      ls.sitemap.location[:compress].should be_true
+      ls.sitemap_index.location[:compress].should be_true
+    end
+
+    it "should be settable and gettable" do
+      ls.compress = false
+      ls.compress.should be_false
+      ls.compress = :all_but_first
+      ls.compress.should == :all_but_first
+    end
+
+    it "should update the location objects when set" do
+      ls.compress = false
+      ls.sitemap.location[:compress].should be_false
+      ls.sitemap_index.location[:compress].should be_false
+    end
+
+    describe "in groups" do
+      it "should inherit the current compress setting" do
+        ls.compress = false
+        ls.group.compress.should be_false
+      end
+
+      it "should set the compress value" do
+        group = ls.group(:compress => false)
+        group.compress.should be_false
+      end
+    end
+  end
 end

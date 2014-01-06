@@ -456,6 +456,99 @@ describe "SitemapGenerator" do
     end
   end
 
+  describe "compress" do
+    let(:ls) { SitemapGenerator::LinkSet.new(:default_host => 'http://test.local', :include_root => false) }
+
+    before :each do
+      clean_sitemap_files_from_rails_app
+    end
+
+    describe "when false" do
+      before :each do
+        ls.compress = false
+      end
+
+      it "should not compress files" do
+        with_max_links(1) do
+          ls.create do
+            add('/one')
+            add('/two')
+            group(:filename => :group) {
+              add('/group1')
+              add('/group2')
+            }
+          end
+        end
+        file_should_exist(rails_path('public/sitemap.xml'))
+        file_should_exist(rails_path('public/sitemap1.xml'))
+        file_should_exist(rails_path('public/group.xml'))
+        file_should_exist(rails_path('public/group1.xml'))
+      end
+    end
+
+    describe "when :all_but_first" do
+      before :each do
+        ls.compress = :all_but_first
+      end
+
+      it "should not compress first file" do
+        with_max_links(1) do
+          ls.create do
+            add('/one')
+            add('/two')
+            add('/three')
+            group(:filename => :group) {
+              add('/group1')
+              add('/group2')
+            }
+            group(:filename => :group2, :compress => true) {
+              add('/group1')
+              add('/group2')
+            }
+            group(:filename => :group2, :compress => false) {
+              add('/group1')
+              add('/group2')
+            }
+          end
+        end
+        file_should_exist(rails_path('public/sitemap.xml'))
+        file_should_exist(rails_path('public/sitemap1.xml.gz'))
+        file_should_exist(rails_path('public/sitemap2.xml.gz'))
+        file_should_exist(rails_path('public/group.xml'))
+        file_should_exist(rails_path('public/group1.xml.gz'))
+        file_should_exist(rails_path('public/group2.xml.gz'))
+        file_should_exist(rails_path('public/group21.xml.gz'))
+      end
+    end
+
+    describe "in groups" do
+      it "should respect passed in compress option" do
+        with_max_links(1) do
+          ls.create do
+            group(:filename => :group1, :compress => :all_but_first) {
+              add('/group1')
+              add('/group2')
+            }
+            group(:filename => :group2, :compress => true) {
+              add('/group1')
+              add('/group2')
+            }
+            group(:filename => :group3, :compress => false) {
+              add('/group1')
+              add('/group2')
+            }
+          end
+        end
+        file_should_exist(rails_path('public/group1.xml'))
+        file_should_exist(rails_path('public/group11.xml.gz'))
+        file_should_exist(rails_path('public/group2.xml.gz'))
+        file_should_exist(rails_path('public/group21.xml.gz'))
+        file_should_exist(rails_path('public/group3.xml'))
+        file_should_exist(rails_path('public/group31.xml'))
+      end
+    end
+  end
+
   protected
 
   #

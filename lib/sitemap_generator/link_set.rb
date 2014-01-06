@@ -107,6 +107,10 @@ module SitemapGenerator
     #     * `false` - Boolean; write out only uncompressed files.
     #     * `:all_but_first` - Symbol; leave the first file uncompressed but compress any remaining files.
     #
+    #   The compression setting applies to groups too.  So :all_but_first will have the same effect (the first
+    #   file in the group will not be compressed, the rest will).  So if you require different behaviour for your
+    #   groups, pass in a `:compress` option e.g. <tt>group(:compress => false) { add('/link') }</tt>
+    #
     # KJV: When adding a new option be sure to include it in `options_for_group()` if
     # the option should be inherited by groups.
     def initialize(options={})
@@ -408,7 +412,7 @@ module SitemapGenerator
         :create_index,
         :compress
       ].inject({}) do |hash, key|
-        if value = instance_variable_get(:"@#{key}")
+        if !(value = instance_variable_get(:"@#{key}")).nil?
           hash[key] = value
         end
         hash
@@ -621,12 +625,13 @@ module SitemapGenerator
       #   * `false` - Boolean; write out only uncompressed files
       #   * `:all_but_first` - Symbol; leave the first file uncompressed but compress any remaining files.
       #
-      # Any custom `namer` instances you use depend on this value, so if you set your namer before setting
-      # this value, the namer will be updated for you.  However, if you set your namer after setting this value,
-      # you will need to pass the :compress option in the constructor e.g.
-      # <tt>SitemapGenerator::SimpleNamer.new(filename, :compress => false)</tt>
+      # The compression setting applies to groups too.  So :all_but_first will have the same effect (the first
+      # file in the group will not be compressed, the rest will).  So if you require different behaviour for your
+      # groups, pass in a `:compress` option e.g. <tt>group(:compress => false) { add('/link') }</tt>
       def compress=(value)
         @compress = value
+        @sitemap_index.location[:compress] = @compress if @sitemap_index
+        @sitemap.location[:compress] = @compress if @sitemap
       end
 
       # Return the current compression setting.  Its value determines which files will be gzip'ed.
