@@ -149,14 +149,14 @@ describe SitemapGenerator::SitemapLocation do
       location = SitemapGenerator::SitemapLocation.new(:public_path => 'public/', :verbose => true)
       location.adapter.stubs(:write)
       location.expects(:summary)
-      location.write('data')
+      location.write('data', 1)
     end
 
     it "should not output summary line when not verbose" do
       location = SitemapGenerator::SitemapLocation.new(:public_path => 'public/', :verbose => false)
       location.adapter.stubs(:write)
       location.expects(:summary).never
-      location.write('data')
+      location.write('data', 1)
     end
   end
 
@@ -183,6 +183,17 @@ describe SitemapGenerator::SitemapLocation do
       namer.stubs(:start?).returns(false)
       location = SitemapGenerator::SitemapLocation.new(:namer => namer, :compress => :all_but_first)
       location.filename.should == 'sitemap.xml.gz'
+    end
+  end
+
+  describe "when not compressing" do
+    it "the URL should point to the uncompressed file" do
+      location = SitemapGenerator::SitemapLocation.new(
+        :namer => SitemapGenerator::SimpleNamer.new(:sitemap),
+        :host => 'http://example.com',
+        :compress => false
+      )
+      location.url.should == 'http://example.com/sitemap.xml'
     end
   end
 end

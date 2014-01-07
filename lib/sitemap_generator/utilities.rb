@@ -60,7 +60,7 @@ module SitemapGenerator
         [value]
       end
     end
-    
+
     # Rounds the float with the specified precision.
     #
     #   x = 1.337
@@ -151,7 +151,7 @@ module SitemapGenerator
     def falsy?(value)
       ['0', 0, 'f', 'false', false].include?(value)
     end
-    
+
     # Append a slash to `path` if it does not already end in a slash.
     # Returns a string.  Expects a string or Pathname object.
     def append_slash(path)
@@ -159,8 +159,23 @@ module SitemapGenerator
       if strpath[-1] != nil && strpath[-1].chr != '/'
         strpath + '/'
       else
-        strpath 
+        strpath
       end
+    end
+
+    # Replace the last 3 characters of string with ... if the string is as big
+    # or bigger than max.
+    def ellipsis(string, max)
+      if string.size > max
+        (string[0, max - 3] || '') + '...'
+      else
+        string
+      end
+    end
+
+    # Return the bytesize length of the string.  Ruby 1.8.6 compatible.
+    def bytesize(string)
+      string.respond_to?(:bytesize) ? string.bytesize : string.length
     end
   end
 end

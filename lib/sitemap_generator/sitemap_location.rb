@@ -150,16 +150,17 @@ module SitemapGenerator
 
     # Write `data` out to a file.
     # Output a summary line if verbose is true.
-    def write(data)
+    def write(data, link_count)
       adapter.write(self, data)
-      puts summary if verbose?
+      puts summary(link_count) if verbose?
     end
 
     # Return a summary string
-    def summary
+    def summary(link_count)
       filesize = number_to_human_size(self.filesize)
-      path = ellipsis(self.path_in_public, self::PATH_OUTPUT_WIDTH)
-      "+ #{'%-'+self::PATH_OUTPUT_WIDTH+'s' % path} #{'%10s' % @link_count} links / #{'%10s' % filesize}"
+      width = self.class::PATH_OUTPUT_WIDTH
+      path = SitemapGenerator::Utilities.ellipsis(self.path_in_public, width)
+      "+ #{('%-'+width.to_s+'s') % path} #{'%10s' % link_count} links / #{'%10s' % filesize}"
     end
   end
 
@@ -181,10 +182,11 @@ module SitemapGenerator
     end
 
     # Return a summary string
-    def summary
+    def summary(link_count)
       filesize = number_to_human_size(self.filesize)
-      path = ellipsis(self.path_in_public, self::PATH_OUTPUT_WIDTH - 3)
-      "+ #{'%-'+self::PATH_OUTPUT_WIDTH+'s' % path} #{'%10s' % @link_count} sitemaps / #{'%10s' % filesize}"
+      width = self.class::PATH_OUTPUT_WIDTH - 3
+      path = SitemapGenerator::Utilities.ellipsis(self.path_in_public, width)
+      "+ #{('%-'+width.to_s+'s') % path} #{'%10s' % link_count} sitemaps / #{'%10s' % filesize}"
     end
   end
 end

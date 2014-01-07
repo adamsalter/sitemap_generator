@@ -107,26 +107,4 @@ describe 'SitemapGenerator::Builder::SitemapFile' do
       sitemap.add '/one'
     end
   end
-
-  describe "ellipsis" do
-    it "should not modify when less than or equal to max" do
-      (1..10).each do |i|
-        string = 'a'*i
-        sitemap.send(:ellipsis, string, 10).should == string
-      end
-    end
-
-    it "should replace last 3 characters with ellipsis when greater than max" do
-      (1..5).each do |i|
-        string = 'aaaaa' + 'a'*i
-        sitemap.send(:ellipsis, string, 5).should == 'aa...'
-      end
-    end
-
-    it "should not freak out when string too small" do
-      sitemap.send(:ellipsis, 'a', 1).should == 'a'
-      sitemap.send(:ellipsis, 'aa', 1).should == '...'
-      sitemap.send(:ellipsis, 'aaa', 1).should == '...'
-    end
-  end
 end
