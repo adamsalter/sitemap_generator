@@ -13,7 +13,7 @@ module SitemapGenerator
       @fog_provider = opts[:fog_provider] || ENV['FOG_PROVIDER']
       @fog_directory = opts[:fog_directory] || ENV['FOG_DIRECTORY']
       @fog_region = opts[:fog_region] || ENV['FOG_REGION']
-      @fog_path_style = opts[:fog_path_style]
+      @fog_path_style = opts[:fog_path_style] || ENV['FOG_PATH_STYLE']
     end
 
     # Call with a SitemapLocation and string data

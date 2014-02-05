@@ -117,7 +117,7 @@ That's it!  Welcome to the future!
 
 ## Changelog
 
-* v5.0.0: Support new `:compress` option for customizing which files get compressed.  Remove old deprecated methods (see deprecation notices above).
+* v5.0.0: Support new `:compress` option for customizing which files get compressed.  Remove old deprecated methods (see deprecation notices above).  Support `fog_path_style` option in the `SitemapGenerator::S3Adapter` so buckets with dots in the name work over HTTPS without SSL certificate problems.
 * v4.3.1: Support integer timestamps.  Update README for new features added in last release.
 * v4.3.0: Support `media` attibute on alternate links ([#125](https://github.com/kjvarga/sitemap_generator/issues/125)).  Changed `SitemapGenerator::S3Adapter` to write files in a single operation, avoiding potential permissions errors when listing a directory prior to writing ([#130](https://github.com/kjvarga/sitemap_generator/issues/130)).  Remove Sitemap Writer from ping task ([#129](https://github.com/kjvarga/sitemap_generator/issues/129)).  Support `url:expires` element ([#126](https://github.com/kjvarga/sitemap_generator/issues/126)).
 * v4.2.0: Update Google ping URL.  Quote the ping URL in the output.  Support Video `video:price` element ([#117](https://github.com/kjvarga/sitemap_generator/issues/117)).  Support symbols as well as strings for most arguments to `add()` ([#113](https://github.com/kjvarga/sitemap_generator/issues/113)).  Ensure that `public_path` and `sitemaps_path` end with a slash (`/`) ([#113](https://github.com/kjvarga/sitemap_generator/issues/118)).
@@ -373,16 +373,16 @@ Sitemap Generator uses CarrierWave to support uploading to Amazon S3 store, Rack
      ```ruby
      # Your website's host name
      SitemapGenerator::Sitemap.default_host = "http://www.example.com"
-     
+
      # The remote host where your sitemaps will be hosted
      SitemapGenerator::Sitemap.sitemaps_host = "http://s3.amazonaws.com/sitemap-generator/"
-     
+
      # The directory to write sitemaps to locally
      SitemapGenerator::Sitemap.public_path = 'tmp/'
-     
+
      # Set this to a directory/path if you don't want to upload to the root of your `sitemaps_host`
      SitemapGenerator::Sitemap.sitemaps_path = 'sitemaps/'
-     
+
      # Instance of `SitemapGenerator::WaveAdapter`
      SitemapGenerator::Sitemap.adapter = SitemapGenerator::WaveAdapter.new
      ```
