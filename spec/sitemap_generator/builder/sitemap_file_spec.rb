@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe 'SitemapGenerator::Builder::SitemapFile' do
-  let(:location) { SitemapGenerator::SitemapLocation.new(:namer => SitemapGenerator::SitemapNamer.new(:sitemap), :public_path => 'tmp/', :sitemaps_path => 'test/', :host => 'http://example.com/') }
+  let(:location) { SitemapGenerator::SitemapLocation.new(:namer => SitemapGenerator::SimpleNamer.new(:sitemap, :start => 2, :zero => 1), :public_path => 'tmp/', :sitemaps_path => 'test/', :host => 'http://example.com/') }
   let(:sitemap)  { SitemapGenerator::Builder::SitemapFile.new(location) }
 
   it "should have a default namer" do
@@ -105,28 +105,6 @@ describe 'SitemapGenerator::Builder::SitemapFile' do
       url = SitemapGenerator::Builder::SitemapUrl.new('/one', :host => 'http://example.com/')
       SitemapGenerator::Builder::SitemapUrl.expects(:new).with('/one', :host => 'http://example.com/').returns(url)
       sitemap.add '/one'
-    end
-  end
-
-  describe "ellipsis" do
-    it "should not modify when less than or equal to max" do
-      (1..10).each do |i|
-        string = 'a'*i
-        sitemap.send(:ellipsis, string, 10).should == string
-      end
-    end
-
-    it "should replace last 3 characters with ellipsis when greater than max" do
-      (1..5).each do |i|
-        string = 'aaaaa' + 'a'*i
-        sitemap.send(:ellipsis, string, 5).should == 'aa...'
-      end
-    end
-
-    it "should not freak out when string too small" do
-      sitemap.send(:ellipsis, 'a', 1).should == 'a'
-      sitemap.send(:ellipsis, 'aa', 1).should == '...'
-      sitemap.send(:ellipsis, 'aaa', 1).should == '...'
     end
   end
 end

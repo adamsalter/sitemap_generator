@@ -31,7 +31,7 @@ module SitemapGenerator
               xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
                 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd"
               xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-              xmlns:image="#{SitemapGenerator::SCHEMAS['image']}"              
+              xmlns:image="#{SitemapGenerator::SCHEMAS['image']}"
               xmlns:video="#{SitemapGenerator::SCHEMAS['video']}"
               xmlns:geo="#{SitemapGenerator::SCHEMAS['geo']}"
               xmlns:news="#{SitemapGenerator::SCHEMAS['news']}"
@@ -42,7 +42,7 @@ module SitemapGenerator
         HTML
         @xml_wrapper_start.gsub!(/\s+/, ' ').gsub!(/ *> */, '>').strip!
         @xml_wrapper_end   = %q[</urlset>]
-        @filesize = bytesize(@xml_wrapper_start) + bytesize(@xml_wrapper_end)
+        @filesize = SitemapGenerator::Utilities.bytesize(@xml_wrapper_start) + SitemapGenerator::Utilities.bytesize(@xml_wrapper_end)
         @written = false
         @reserved_name = nil # holds the name reserved from the namer
         @frozen = false      # rather than actually freeze, use this boolean
@@ -66,7 +66,7 @@ module SitemapGenerator
       # of <tt>bytes</tt> bytes in size.  You can also pass a string and the
       # bytesize will be calculated for you.
       def file_can_fit?(bytes)
-        bytes = bytes.is_a?(String) ? bytesize(bytes) : bytes
+        bytes = bytes.is_a?(String) ? SitemapGenerator::Utilities.bytesize(bytes) : bytes
         (@filesize + bytes) < SitemapGenerator::MAX_SITEMAP_FILESIZE && @link_count < SitemapGenerator::MAX_SITEMAP_LINKS && @news_count < SitemapGenerator::MAX_SITEMAP_NEWS
       end
 
@@ -108,7 +108,7 @@ module SitemapGenerator
 
         # Add the XML to the sitemap
         @xml_content << xml
-        @filesize += bytesize(xml)
+        @filesize += SitemapGenerator::Utilities.bytesize(xml)
         @link_count += 1
       end
 
@@ -136,9 +136,8 @@ module SitemapGenerator
         raise SitemapGenerator::SitemapError.new("Sitemap already written!") if written?
         finalize! unless finalized?
         reserve_name
-        @location.write(@xml_wrapper_start + @xml_content + @xml_wrapper_end)
+        @location.write(@xml_wrapper_start + @xml_content + @xml_wrapper_end, link_count)
         @xml_content = @xml_wrapper_start = @xml_wrapper_end = ''
-        puts summary if @location.verbose?
         @written = true
       end
 
@@ -164,31 +163,6 @@ module SitemapGenerator
         location = @location.dup
         location.delete(:filename) if location.namer
         self.class.new(location)
-      end
-
-      # Return a summary string
-      def summary(opts={})
-        uncompressed_size = number_to_human_size(@filesize)
-        compressed_size   = number_to_human_size(@location.filesize)
-        path = ellipsis(@location.path_in_public, 47)
-        "+ #{'%-47s' % path} #{'%10s' % @link_count} links / #{'%10s' % compressed_size}"
-      end
-
-      protected
-
-      # Replace the last 3 characters of string with ... if the string is as big
-      # or bigger than max.
-      def ellipsis(string, max)
-        if string.size > max
-          (string[0, max - 3] || '') + '...'
-        else
-          string
-        end
-      end
-
-      # Return the bytesize length of the string.  Ruby 1.8.6 compatible.
-      def bytesize(string)
-        string.respond_to?(:bytesize) ? string.bytesize : string.length
       end
     end
   end

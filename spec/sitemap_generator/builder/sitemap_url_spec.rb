@@ -6,7 +6,7 @@ describe SitemapGenerator::Builder::SitemapUrl do
       :sitemaps_path => 'sitemaps/',
       :public_path => '/public',
       :host => 'http://test.com',
-      :namer => SitemapGenerator::SitemapNamer.new(:sitemap)
+      :namer => SitemapGenerator::SimpleNamer.new(:sitemap)
     )}
   let(:sitemap_file) { SitemapGenerator::Builder::SitemapFile.new(loc) }
 
@@ -19,7 +19,7 @@ describe SitemapGenerator::Builder::SitemapUrl do
 
   it "should build urls for sitemap files" do
     url = SitemapGenerator::Builder::SitemapUrl.new(sitemap_file)
-    url[:loc].should == 'http://test.com/sitemaps/sitemap1.xml.gz'
+    url[:loc].should == 'http://test.com/sitemaps/sitemap.xml.gz'
   end
 
   it "lastmod should default to the last modified date for sitemap files" do

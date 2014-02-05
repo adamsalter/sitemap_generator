@@ -14,15 +14,15 @@ SitemapGenerator::Sitemap.create(
     add '/three'
   end
 
-  # Test a deprecated namer
-  group(:sitemaps_namer => SitemapGenerator::SitemapNamer.new(:abc, :start => 3)) do
+  # Test a simple namer.
+  group(:namer => SitemapGenerator::SimpleNamer.new(:abc, :start => 4, :zero => 3)) do
     add '/four'
     add '/five'
     add '/six'
   end
 
   # Test a simple namer
-  group(:sitemaps_namer => SitemapGenerator::SimpleNamer.new(:def)) do
+  group(:namer => SitemapGenerator::SimpleNamer.new(:def)) do
     add '/four'
     add '/five'
     add '/six'

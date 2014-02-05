@@ -22,7 +22,7 @@ module SitemapGenerator
         HTML
         @xml_wrapper_start.gsub!(/\s+/, ' ').gsub!(/ *> */, '>').strip!
         @xml_wrapper_end   = %q[</sitemapindex>]
-        @filesize = bytesize(@xml_wrapper_start) + bytesize(@xml_wrapper_end)
+        @filesize = SitemapGenerator::Utilities.bytesize(@xml_wrapper_start) + SitemapGenerator::Utilities.bytesize(@xml_wrapper_end)
         @written = false
         @reserved_name = nil # holds the name reserved from the namer
         @frozen = false      # rather than actually freeze, use this boolean
@@ -84,21 +84,13 @@ module SitemapGenerator
       # of <tt>bytes</tt> bytes in size.  You can also pass a string and the
       # bytesize will be calculated for you.
       def file_can_fit?(bytes)
-        bytes = bytes.is_a?(String) ? bytesize(bytes) : bytes
+        bytes = bytes.is_a?(String) ? SitemapGenerator::Utilities.bytesize(bytes) : bytes
         (@filesize + bytes) < SitemapGenerator::MAX_SITEMAP_FILESIZE && @link_count < SitemapGenerator::MAX_SITEMAP_FILES
       end
 
       # Return the total number of links in all sitemaps reference by this index file
       def total_link_count
         @sitemaps_link_count
-      end
-
-      # Return a summary string
-      def summary(opts={})
-        uncompressed_size = number_to_human_size(@filesize)
-        compressed_size =   number_to_human_size(@location.filesize)
-        path = ellipsis(@location.path_in_public, 44) # 47 - 3
-        "+ #{'%-44s' % path} #{'%10s' % @link_count} sitemaps / #{'%10s' % compressed_size}"
       end
 
       def stats_summary(opts={})

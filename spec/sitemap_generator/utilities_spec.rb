@@ -66,7 +66,7 @@ describe SitemapGenerator::Utilities do
       SitemapGenerator::Utilities.as_array({}).should == [{}]
     end
   end
-  
+
   describe "append_slash" do
     SitemapGenerator::Utilities.append_slash('').should == ''
     SitemapGenerator::Utilities.append_slash(nil).should == ''
@@ -75,5 +75,27 @@ describe SitemapGenerator::Utilities do
     SitemapGenerator::Utilities.append_slash(Pathname.new('tmp')).should == 'tmp/'
     SitemapGenerator::Utilities.append_slash('tmp/').should == 'tmp/'
     SitemapGenerator::Utilities.append_slash(Pathname.new('tmp/')).should == 'tmp/'
+  end
+
+  describe "ellipsis" do
+    it "should not modify when less than or equal to max" do
+      (1..10).each do |i|
+        string = 'a'*i
+        SitemapGenerator::Utilities.ellipsis(string, 10).should == string
+      end
+    end
+
+    it "should replace last 3 characters with ellipsis when greater than max" do
+      (1..5).each do |i|
+        string = 'aaaaa' + 'a'*i
+        SitemapGenerator::Utilities.ellipsis(string, 5).should == 'aa...'
+      end
+    end
+
+    it "should not freak out when string too small" do
+      SitemapGenerator::Utilities.ellipsis('a', 1).should == 'a'
+      SitemapGenerator::Utilities.ellipsis('aa', 1).should == '...'
+      SitemapGenerator::Utilities.ellipsis('aaa', 1).should == '...'
+    end
   end
 end

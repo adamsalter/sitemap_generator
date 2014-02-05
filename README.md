@@ -12,7 +12,7 @@ Sitemaps adhere to the [Sitemap 0.9 protocol][sitemap_protocol] specification.
 * Compatible with Rails 2, 3 & 4 and tested with Ruby REE, 1.9.2 & 1.9.3
 * Adheres to the [Sitemap 0.9 protocol][sitemap_protocol]
 * Handles millions of links
-* Automatically compresses your sitemaps
+* Customizable sitemap compression
 * Notifies search engines (Google, Bing) of new sitemaps
 * Ensures your old sitemaps stay in place if the new sitemap fails to generate
 * Gives you complete control over your sitemap contents and naming scheme
@@ -66,11 +66,24 @@ Does your website use SitemapGenerator to generate Sitemaps?  Where would you be
 
 <a href='http://www.pledgie.com/campaigns/15267'><img alt='Click here to lend your support to: SitemapGenerator and make a donation at www.pledgie.com !' src='http://pledgie.com/campaigns/15267.png?skin_name=chrome' border='0' /></a>
 
-## Important changes in version 4!
+## Deprecation Notices and Non-Backwards Compatible Changes
+
+### Version 5.0.0
+
+In version 5.0.0 I've removed a few deprecated methods that have been deprecated for a long time.  The reason being that they would have made some new features more difficult and complex to implement.  I never actually ouput deprecation notices from these methods, so I understand it you're a little annoyed that your config has suddenly broken.  Apologies.
+
+Here's a list of the methods that have been removed:
+* Removed options to `LinkSet::add()`: `:sitemaps_namer` and `:sitemap_index_namer` (use `:namer` option)
+* Removed `LinkSet::sitemaps_namer=`, `LinkSet::sitemaps_namer` (use `LinkSet::namer=` and `LinkSet::namer`)
+* Removed `LinkSet::sitemaps_index_namer=`, `LinkSet::sitemaps_index_namer` (use `LinkSet::namer=` and `LinkSet::namer`)
+* Removed the `SitemapGenerator::SitemapNamer` class (use `SitemapGenerator::SimpleNamer`)
+* Removed `LinkSet::add_links()` (use `LinkSet::create()`)
+
+### Version 4.0.0
 
 Version 4.0 introduces a new **non-backwards compatible** naming scheme.  **If you are running version 3 or earlier and you upgrade to version 4, you need to make a couple small changes to ensure that search engines can still find your sitemaps!**  Your sitemaps will still work fine, but the name of the index file has changed.
 
-### So what has changed?
+#### So what has changed?
 
 * **The index is generated intelligently**.  SitemapGenerator now detects whether you need an index or not, and only generates one if you need it or have requested it.  So small sites (less than 50,000 links) won't have one, large sites will.  You don't have to worry about anything.  And with the `create_index` option, it's easier than ever to control index creation to suit your needs.
 
@@ -82,7 +95,7 @@ Version 4.0 introduces a new **non-backwards compatible** naming scheme.  **If y
 
 * **Groups share the new naming convention**.  So the files in your `geo` group will be named `geo.xml.gz`, `geo1.xml.gz`, `geo2.xml.gz` etc.  Pre-version 4 these files would have been named `geo1.xml.gz`, `geo2.xml.gz`, `geo3.xml.gz` etc.
 
-### I don't want it!  How can I keep everything as it was?
+#### I don't want it!  How can I keep everything as it was?
 
 You don't care, you just want to get on with your day.  To resort to pre-version 4 behaviour add the following to your sitemap config:
 
@@ -93,7 +106,7 @@ SitemapGenerator::Sitemap.namer = SitemapGenerator::SimpleNamer.new(:sitemap, :z
 
 This tells SitemapGenerator to always create an index file and to name it `sitemap_index.xml.gz`.  If you are already using custom namers, you don't need to set `namer`; your old namers should still work as before.  If you are using named groups, setting the sitemap namer in this way won't affect your groups, which will still be using the new naming scheme.  If this is an issue for you, you may have to create namers for your groups.
 
-### I want it!  What do I need to do?
+#### I want it!  What do I need to do?
 
 1. Update your `robots.txt` file and make sure it points to `sitemap.xml.gz`.
 2. Generate your sitemaps to create the new `sitemap.xml.gz` file.
@@ -104,6 +117,7 @@ That's it!  Welcome to the future!
 
 ## Changelog
 
+* v5.0.0: Support new `:compress` option for customizing which files get compressed.  Remove old deprecated methods (see deprecation notices above).
 * v4.3.1: Support integer timestamps.  Update README for new features added in last release.
 * v4.3.0: Support `media` attibute on alternate links ([#125](https://github.com/kjvarga/sitemap_generator/issues/125)).  Changed `SitemapGenerator::S3Adapter` to write files in a single operation, avoiding potential permissions errors when listing a directory prior to writing ([#130](https://github.com/kjvarga/sitemap_generator/issues/130)).  Remove Sitemap Writer from ping task ([#129](https://github.com/kjvarga/sitemap_generator/issues/129)).  Support `url:expires` element ([#126](https://github.com/kjvarga/sitemap_generator/issues/126)).
 * v4.2.0: Update Google ping URL.  Quote the ping URL in the output.  Support Video `video:price` element ([#117](https://github.com/kjvarga/sitemap_generator/issues/117)).  Support symbols as well as strings for most arguments to `add()` ([#113](https://github.com/kjvarga/sitemap_generator/issues/113)).  Ensure that `public_path` and `sitemaps_path` end with a slash (`/`) ([#113](https://github.com/kjvarga/sitemap_generator/issues/118)).
@@ -740,36 +754,38 @@ The options passed to `group` only apply to the links and sitemaps generated in 
 
 ### Sitemap Options
 
-The following options are supported:
+The following options are supported.
 
-* `create_index` - Supported values: `true`, `false`, `:auto`.  Default: `true`. Whether to create a sitemap index file.  If `true` an index file is always created regardless of how many sitemap files are generated.  If `false` an index file is never created.  If `:auto` an index file is created only when you have more than one sitemap file (i.e. you have added more than 50,000 - `SitemapGenerator::MAX_SITEMAP_LINKS` - links).
+* `:create_index` - Supported values: `true`, `false`, `:auto`.  Default: `true`. Whether to create a sitemap index file.  If `true` an index file is always created regardless of how many sitemap files are generated.  If `false` an index file is never created.  If `:auto` an index file is created only when you have more than one sitemap file (i.e. you have added more than 50,000 - `SitemapGenerator::MAX_SITEMAP_LINKS` - links).
 
-* `default_host` - String.  Required.  **Host including protocol** to use when building a link to add to your sitemap.  For example `http://example.com`.  Calling `add '/home'` would then generate the URL `http://example.com/home` and add that to the sitemap.  You can pass a `:host` option in your call to `add` to override this value on a per-link basis.  For example calling `add '/home', :host => 'https://example.com'` would generate the URL `https://example.com/home`, for that link only.
+* `:default_host` - String.  Required.  **Host including protocol** to use when building a link to add to your sitemap.  For example `http://example.com`.  Calling `add '/home'` would then generate the URL `http://example.com/home` and add that to the sitemap.  You can pass a `:host` option in your call to `add` to override this value on a per-link basis.  For example calling `add '/home', :host => 'https://example.com'` would generate the URL `https://example.com/home`, for that link only.
 
-* `filename` - Symbol.  The **base name for the files** that will be generated.  The default value is `:sitemap`.  This yields files with names like `sitemap.xml.gz`, `sitemap1.xml.gz`, `sitemap2.xml.gz`, `sitemap3.xml.gz` etc.  If we now set the value to `:geo` the files would be named `geo.xml.gz`, `geo1.xml.gz`, `geo2.xml.gz`, `geo3.xml.gz` etc.
+* `:filename` - Symbol.  The **base name for the files** that will be generated.  The default value is `:sitemap`.  This yields files with names like `sitemap.xml.gz`, `sitemap1.xml.gz`, `sitemap2.xml.gz`, `sitemap3.xml.gz` etc.  If we now set the value to `:geo` the files would be named `geo.xml.gz`, `geo1.xml.gz`, `geo2.xml.gz`, `geo3.xml.gz` etc.
 
-* `include_index` - Boolean.  Whether to **add a link pointing to the sitemap index** to the current sitemap.  This points search engines to your Sitemap Index to include it in the indexing of your site.  2012-07: This is now turned off by default because Google may complain about there being 'Nested Sitemap indexes'.  Default is `false`.  Turned off when `sitemaps_host` is set or within a `group()` block.
+* `:include_index` - Boolean.  Whether to **add a link pointing to the sitemap index** to the current sitemap.  This points search engines to your Sitemap Index to include it in the indexing of your site.  2012-07: This is now turned off by default because Google may complain about there being 'Nested Sitemap indexes'.  Default is `false`.  Turned off when `sitemaps_host` is set or within a `group()` block.
 
-* `include_root` - Boolean.  Whether to **add the root** url i.e. '/' to the current sitemap.  Default is `true`.  Turned off within a `group()` block.
+* `:include_root` - Boolean.  Whether to **add the root** url i.e. '/' to the current sitemap.  Default is `true`.  Turned off within a `group()` block.
 
-* `public_path` - String.  A **full or relative path** to the `public` directory or the directory you want to write sitemaps into.  Defaults to `public/` under your application root or relative to the current working directory.
+* `:public_path` - String.  A **full or relative path** to the `public` directory or the directory you want to write sitemaps into.  Defaults to `public/` under your application root or relative to the current working directory.
 
-* `sitemaps_host` - String.  **Host including protocol** to use when generating a link to a sitemap file i.e. the hostname of the server where the sitemaps are hosted.  The value will differ from the hostname in your sitemap links.  For example: `'http://amazon.aws.com/'`.  Note that `include_index` is
+* `:sitemaps_host` - String.  **Host including protocol** to use when generating a link to a sitemap file i.e. the hostname of the server where the sitemaps are hosted.  The value will differ from the hostname in your sitemap links.  For example: `'http://amazon.aws.com/'`.  Note that `include_index` is
 automatically turned off when the `sitemaps_host` does not match `default_host`.
 Because the link to the sitemap index file that would otherwise be added would point to a different host than the rest of the links in the sitemap.  Something that the sitemap rules forbid.
 
-* `namer` - A `SitemapGenerator::SimpleNamer` instance **for generating sitemap names**.  You can read about Sitemap Namers by reading the API docs.  Allows you to set the name, extension and number sequence for sitemap files, as well as modify the name of the first file in the sequence, which is often the index file.  A simple example if we want to generate files like 'newname.xml.gz', 'newname1.xml.gz', etc is `SitemapGenerator::SimpleNamer.new(:newname)`.  I've deprecated the old namer options `sitemaps_namer` and `sitemap_index_namer` in favour of this integrated approach, however those should still work.
+* `:namer` - A `SitemapGenerator::SimpleNamer` instance **for generating sitemap names**.  You can read about Sitemap Namers by reading the API docs.  Allows you to set the name, extension and number sequence for sitemap files, as well as modify the name of the first file in the sequence, which is often the index file.  A simple example if we want to generate files like 'newname.xml.gz', 'newname1.xml.gz', etc is `SitemapGenerator::SimpleNamer.new(:newname)`.
 
-* `sitemaps_path` - String. A **relative path** giving a directory under your `public_path` at which to write sitemaps.  The difference between the two options is that the `sitemaps_path` is used when generating a link to a sitemap file.  For example, if we set `SitemapGenerator::Sitemap.sitemaps_path = 'en/'` and use the default `public_path` sitemaps will be written to `public/en/`.  The URL to the sitemap index would then be `http://example.com/en/sitemap.xml.gz`.
+* `:sitemaps_path` - String. A **relative path** giving a directory under your `public_path` at which to write sitemaps.  The difference between the two options is that the `sitemaps_path` is used when generating a link to a sitemap file.  For example, if we set `SitemapGenerator::Sitemap.sitemaps_path = 'en/'` and use the default `public_path` sitemaps will be written to `public/en/`.  The URL to the sitemap index would then be `http://example.com/en/sitemap.xml.gz`.
 
-* `verbose` - Boolean.  Whether to **output a sitemap summary** describing the sitemap files and giving statistics about your sitemap.  Default is `false`.  When using the Rake tasks `verbose` will be `true` unless you pass the `-s` option.
+* `:verbose` - Boolean.  Whether to **output a sitemap summary** describing the sitemap files and giving statistics about your sitemap.  Default is `false`.  When using the Rake tasks `verbose` will be `true` unless you pass the `-s` option.
 
-* `adapter` - Instance.  The default adapter is a `SitemapGenerator::FileAdapter`
-  which simply writes files to the filesystem.  You can use a `SitemapGenerator::WaveAdapter`
-  for uploading sitemaps to remote servers - useful for read-only hosts such as Heroku.  Or
-  you can provide an instance of your own class to provide custom behavior.  Your class must
-  define a write method which takes a `SitemapGenerator::Location` and raw XML data.
+* `:adapter` - Instance.  The default adapter is a `SitemapGenerator::FileAdapter` which simply writes files to the filesystem.  You can use a `SitemapGenerator::WaveAdapter` for uploading sitemaps to remote servers - useful for read-only hosts such as Heroku.  Or you can provide an instance of your own class to provide custom behavior.  Your class must define a write method which takes a `SitemapGenerator::Location` and raw XML data.
 
+* `:compress` - Specifies which files to compress with gzip.  Default is `true`. Accepted values:
+    * `true` - Boolean; compress all files.
+    * `false` - Boolean; Do not compress any files.
+    * `:all_but_first` - Symbol; leave the first file uncompressed but compress all remaining files.
+
+  The compression setting applies to groups too.  So `:all_but_first` will have the same effect (the first file in the group will not be compressed, the rest will).  So if you require different behaviour for your groups, pass in a `:compress` option e.g. `group(:compress => false) { add('/link') }`
 
 ## Sitemap Groups
 
