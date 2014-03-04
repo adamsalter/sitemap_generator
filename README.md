@@ -117,6 +117,7 @@ That's it!  Welcome to the future!
 
 ## Changelog
 
+* v5.0.1: Include new `SitemapGenerator::FogAdapter` ([#138](https://github.com/kjvarga/sitemap_generator/pull/138)).  Fix usage of attr_* methods in LinkSet; don't override custom getters/setters ([#144](https://github.com/kjvarga/sitemap_generator/pull/144)). Fix breaking spec in Ruby 2 ([#142](https://github.com/kjvarga/sitemap_generator/pull/142)).  Include Capistrano 3.x tasks ([#141](https://github.com/kjvarga/sitemap_generator/pull/141)).
 * v5.0.0: Support new `:compress` option for customizing which files get compressed.  Remove old deprecated methods (see deprecation notices above).  Support `fog_path_style` option in the `SitemapGenerator::S3Adapter` so buckets with dots in the name work over HTTPS without SSL certificate problems.
 * v4.3.1: Support integer timestamps.  Update README for new features added in last release.
 * v4.3.0: Support `media` attibute on alternate links ([#125](https://github.com/kjvarga/sitemap_generator/issues/125)).  Changed `SitemapGenerator::S3Adapter` to write files in a single operation, avoiding potential permissions errors when listing a directory prior to writing ([#130](https://github.com/kjvarga/sitemap_generator/issues/130)).  Remove Sitemap Writer from ping task ([#129](https://github.com/kjvarga/sitemap_generator/issues/129)).  Support `url:expires` element ([#126](https://github.com/kjvarga/sitemap_generator/issues/126)).
@@ -344,11 +345,28 @@ And the default "intelligent" behaviour:
 SitemapGenerator::Sitemap.create_index = :auto
 ```
 
-### Upload Sitemaps to a Remote Host
+### Upload Sitemaps to a Remote Host using Adapters
 
-> SitemapGenerator::S3Adapter is a simple S3 adapter which was added in v3.2 which
-> uses Fog and doesn't require CarrierWave.  You can find a bit more information
-> about it [on the wiki page][remote_hosts].
+_This section needs better documentation.  Please consider contributing._
+
+#### Supported Adapters
+* `SitemapGenerator::FileAdapter`
+
+  Standard adapter, writes out to a file
+
+* `SitemapGenerator::FogAdapter`
+
+  Uses `fog` to upload to any service supported by Fog.
+
+* `SitemapGenerator::S3Adapter`
+
+  Uses `fog` to upload to Amazon S3 storage.
+
+* `SitemapGenerator::WaveAdapter`
+
+  Uses `carrierwave` to upload to any service supported by CarrierWave.
+
+Some documentation exists [on the wiki page][remote_hosts].
 
 Sometimes it is desirable to host your sitemap files on a remote server and point robots
 and search engines to the remote files.  For example if you are using a host like Heroku

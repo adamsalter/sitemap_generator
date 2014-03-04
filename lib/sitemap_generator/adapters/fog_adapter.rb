@@ -23,9 +23,6 @@ module SitemapGenerator
         :body   => File.open(location.path),
         :public => true
       )
-
-      File.delete(location.path)
     end
-
   end
 end
