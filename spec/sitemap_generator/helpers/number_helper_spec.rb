@@ -55,7 +55,7 @@ describe SitemapGenerator::Helpers::NumberHelper do
     number_with_precision(0.001, :precision => 5).should == "0.00100"
     number_with_precision(0.00111, :precision => 3).should == "0.001"
     # Odd difference between Ruby versions
-    if RUBY_VERSION < '2.0.0'
+    if RUBY_VERSION < '1.9.3'
       number_with_precision(9.995, :precision => 2).should == "9.99"
     else
       number_with_precision(9.995, :precision => 2).should == "10.00"
