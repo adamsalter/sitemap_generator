@@ -117,6 +117,7 @@ That's it!  Welcome to the future!
 
 ## Changelog
 
+* v5.0.2: Set maximum filesize to 10,000,000 bytes rather than 10,485,760 bytes.
 * v5.0.1: Include new `SitemapGenerator::FogAdapter` ([#138](https://github.com/kjvarga/sitemap_generator/pull/138)).  Fix usage of attr_* methods in LinkSet; don't override custom getters/setters ([#144](https://github.com/kjvarga/sitemap_generator/pull/144)). Fix breaking spec in Ruby 2 ([#142](https://github.com/kjvarga/sitemap_generator/pull/142)).  Include Capistrano 3.x tasks ([#141](https://github.com/kjvarga/sitemap_generator/pull/141)).
 * v5.0.0: Support new `:compress` option for customizing which files get compressed.  Remove old deprecated methods (see deprecation notices above).  Support `fog_path_style` option in the `SitemapGenerator::S3Adapter` so buckets with dots in the name work over HTTPS without SSL certificate problems.
 * v4.3.1: Support integer timestamps.  Update README for new features added in last release.
