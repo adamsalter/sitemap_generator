@@ -1117,7 +1117,7 @@ Copyright (c) 2009 Karl Varga released under the MIT license
 [sitemap_images]:http://www.google.com/support/webmasters/bin/answer.py?answer=178636
 [sitemap_video]:https://support.google.com/webmasters/answer/80471?hl=en&ref_topic=4581190
 [sitemap_news]:https://support.google.com/news/publisher/topic/2527688?hl=en&ref_topic=4359874
-[sitemap_geo]:http://www.google.com/support/webmasters/bin/topic.py?hl=en&topic=14688
+[sitemap_geo]:#
 [sitemap_mobile]:http://support.google.com/webmasters/bin/answer.py?hl=en&answer=34648
 [sitemap_pagemap]:https://developers.google.com/custom-search/docs/structured_data#addtositemap
 [sitemap_protocol]:http://sitemaps.org/protocol.php
