@@ -1115,8 +1115,8 @@ Copyright (c) 2009 Karl Varga released under the MIT license
 [sitemaps_xml]:http://www.sitemaps.org/protocol.php#xmlTagDefinitions "XML Tag Definitions"
 [sitemap_generator_usage]:http://wiki.github.com/adamsalter/sitemap_generator/sitemapgenerator-usage "http://wiki.github.com/adamsalter/sitemap_generator/sitemapgenerator-usage"
 [sitemap_images]:http://www.google.com/support/webmasters/bin/answer.py?answer=178636
-[sitemap_video]:http://www.google.com/support/webmasters/bin/topic.py?topic=10079
-[sitemap_news]:http://www.google.com/support/webmasters/bin/topic.py?hl=en&topic=10078
+[sitemap_video]:https://support.google.com/webmasters/answer/80471?hl=en&ref_topic=4581190
+[sitemap_news]:https://support.google.com/news/publisher/topic/2527688?hl=en&ref_topic=4359874
 [sitemap_geo]:http://www.google.com/support/webmasters/bin/topic.py?hl=en&topic=14688
 [sitemap_mobile]:http://support.google.com/webmasters/bin/answer.py?hl=en&answer=34648
 [sitemap_pagemap]:https://developers.google.com/custom-search/docs/structured_data#addtositemap
