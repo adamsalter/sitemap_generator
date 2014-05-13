@@ -129,6 +129,7 @@ module SitemapGenerator
               if video[:uploader]
                 builder.video :uploader, video[:uploader].to_s, video[:uploader_info] ? { :info => video[:uploader_info].to_s } : {}
               end
+              builder.video :live, yes_or_no_with_default(video[:live], true) if video.has_key?(:live)
             end
           end
 
