@@ -963,6 +963,8 @@ end
         * `:price_currency` - Required.  In [ISO_4217][iso_4217] format.
         * `:price_type` - Optional. `rent` or `own`
         * `:price_resolution` - Optional. `HD` or `SD`
+    * ':live' - Boolean. Its a "yes" or a "no".
+    * ':requires_subscription' - Boolean. Its a "yes" or "no".
 
 ### Geo Sitemaps
 
