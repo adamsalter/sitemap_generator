@@ -938,33 +938,33 @@ end
 
 #### Supported options
 
-* `:video`/`:videos` - Hash or array of hashes, respectively
-    * `:thumbnail_loc` - String, URL of the thumbnail image.
-    * `:title` - String, title of the video.
-    * `:description` - String, description of the video.
-    * `:content_loc` - String, URL.  One of content_loc or player_loc must be present.
-    * `:player_loc` - String, URL.  One of content_loc or player_loc must be present.
+* `:video` or `:videos` - Hash or array of hashes, respectively
+    * `:thumbnail_loc` - Required.  String, URL of the thumbnail image.
+    * `:title` - Required.  String, title of the video.
+    * `:description` - Required.  String, description of the video.
+    * `:content_loc` - Depends. String, URL.  One of content_loc or player_loc must be present.
+    * `:player_loc` - Depends. String, URL.  One of content_loc or player_loc must be present.
     * `:allow_embed` - Boolean, attribute of player_loc.
     * `:autoplay` - Boolean, default true.  Attribute of player_loc.
-    * `:duration` - Integer or string.  Duration in seconds.
-    * `:expiration_date`
-    * `:rating`
-    * `:view_count` - Integer or string.
-    * `:publication_date`
-    * `:tags` - Array of string tags.
-    * `:tag` - String, single tag.
-    * `:category`
-    * `:family_friendly`- Boolean
-    * `:gallery_loc` - String, URL.
-    * `:gallery_title` - Title attribute of the gallery location element
-    * `:uploader`
-    * `:uploader_info` - Info attribute of uploader element
-    * `:price` - Only one price supported at this time
+    * `:duration` - Recommended. Integer or string.  Duration in seconds.
+    * `:expiration_date` - Recommended when applicable.  The date after which the video will no longer be available.
+    * `:rating` - Optional
+    * `:view_count` - Optional. Integer or string.
+    * `:publication_date` - Optional
+    * `:tags` - Optional. Array of string tags.
+    * `:tag` - Optional. String, single tag.
+    * `:category` - Optional
+    * `:family_friendly`- Optional. Boolean
+    * `:gallery_loc` - Optional. String, URL.
+    * `:gallery_title` - Optional. Title attribute of the gallery location element
+    * `:uploader` - Optional.
+    * `:uploader_info` - Optional. Info attribute of uploader element
+    * `:price` - Optional. Only one price supported at this time
         * `:price_currency` - Required.  In [ISO_4217][iso_4217] format.
         * `:price_type` - Optional. `rent` or `own`
         * `:price_resolution` - Optional. `HD` or `SD`
-    * ':live' - Boolean. Its a "yes" or a "no".
-    * ':requires_subscription' - Boolean. Its a "yes" or "no".
+    * `:live` - Optional. Boolean.
+    * `:requires_subscription` - Optional. Boolean.
 
 ### Geo Sitemaps
 
