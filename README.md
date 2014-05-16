@@ -117,6 +117,7 @@ That's it!  Welcome to the future!
 
 ## Changelog
 
+* v5.0.4: Don't include the `media` attribute on alternate links unless it's given
 * v5.0.3: Add support for Video sitemaps options `:live` and ':requires_subscription'
 * v5.0.2: Set maximum filesize to 10,000,000 bytes rather than 10,485,760 bytes.
 * v5.0.1: Include new `SitemapGenerator::FogAdapter` ([#138](https://github.com/kjvarga/sitemap_generator/pull/138)).  Fix usage of attr_* methods in LinkSet; don't override custom getters/setters ([#144](https://github.com/kjvarga/sitemap_generator/pull/144)). Fix breaking spec in Ruby 2 ([#142](https://github.com/kjvarga/sitemap_generator/pull/142)).  Include Capistrano 3.x tasks ([#141](https://github.com/kjvarga/sitemap_generator/pull/141)).
@@ -1044,7 +1045,7 @@ end
     * `:href` - Required, string.
     * `:lang`  - Required, string.
     * `:nofollow` - Optional, boolean. Used to mark link as "nofollow".
-    * `:media` - Optional, string.  Specify [media][media targets for responsive design pages].
+    * `:media` - Optional, string.  Specify [media targets for responsive design pages][media].
 
 ## Raison d'être
 

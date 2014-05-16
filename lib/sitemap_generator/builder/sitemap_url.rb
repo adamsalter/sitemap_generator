@@ -136,7 +136,9 @@ module SitemapGenerator
 
           self[:alternates].each do |alternate|
             rel = alternate[:nofollow] ? 'alternate nofollow' : 'alternate'
-            builder.xhtml :link, :rel => rel, :hreflang => alternate[:lang].to_s, :href => alternate[:href].to_s, :media => alternate[:media].to_s
+            attributes = { :rel => rel, :hreflang => alternate[:lang].to_s, :href => alternate[:href].to_s }
+            attributes[:media] = alternate[:media].to_s if SitemapGenerator::Utilities.present?(alternate[:media])
+            builder.xhtml :link, attributes
           end
 
           unless SitemapGenerator::Utilities.blank?(self[:geo])
