@@ -9,6 +9,7 @@ Gem::Specification.new do |s|
   s.homepage    = %q{http://github.com/kjvarga/sitemap_generator}
   s.summary     = %q{Easily generate XML Sitemaps}
   s.description = %q{SitemapGenerator is a framework-agnostic XML Sitemap generator written in Ruby with automatic Rails integration.  It supports Video, News, Image, Geo, Mobile, PageMap and Alternate Links sitemap extensions and includes Rake tasks for managing your sitemaps, as well as many other great features.}
+  s.license     = 'MIT'
   s.add_development_dependency 'mocha'
   s.add_development_dependency 'nokogiri'
   s.add_development_dependency 'rspec'
