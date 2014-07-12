@@ -4,7 +4,7 @@ namespace :deploy do
     task :refresh do
       on roles :web do
         within release_path do
-          with rails_env: fetch(:rails_env) do
+          with rails_env: (fetch(:rails_env) || fetch(:stage)) do
            execute :rake, "sitemap:refresh"
           end
         end
@@ -15,7 +15,7 @@ namespace :deploy do
     task :create do
       on roles :web do
         within release_path do
-          with rails_env: fetch(:rails_env) do
+          with rails_env: (fetch(:rails_env) || fetch(:stage)) do
            execute :rake, "sitemap:create"
           end
         end
@@ -26,7 +26,7 @@ namespace :deploy do
     task :clean do
       on roles :web do
         within release_path do
-          with rails_env: fetch(:rails_env) do
+          with rails_env: (fetch(:rails_env) || fetch(:stage)) do
            execute :rake, "sitemap:clean"
           end
         end
