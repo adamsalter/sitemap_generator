@@ -117,6 +117,7 @@ That's it!  Welcome to the future!
 
 ## Changelog
 
+* v5.0.5: Use MIT licence.  Fix deploys with Capistrano 3 ([#163](https://github.com/kjvarga/sitemap_generator/issues/163)).  Allow any Fog storage options for S3 adapter ([#167](https://github.com/kjvarga/sitemap_generator/pull/167)).
 * v5.0.4: Don't include the `media` attribute on alternate links unless it's given
 * v5.0.3: Add support for Video sitemaps options `:live` and ':requires_subscription'
 * v5.0.2: Set maximum filesize to 10,000,000 bytes rather than 10,485,760 bytes.
