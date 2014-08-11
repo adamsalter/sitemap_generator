@@ -619,7 +619,7 @@ From this example we can see that:
 * The Rails URL/path helper methods are made available to us, and
 * The basic syntax for adding paths to the sitemap using `add`
 
-You can read more about `add` in the [XML Specification](http://sitemaps.org/protocol.php#xmlTagDefinitions).
+You can read more about `add` in the [XML Specification](http://www.sitemaps.org/protocol.html#xmlTagDefinitions).
 
 ### Supported Options to `add`
 
@@ -1125,7 +1125,7 @@ Copyright (c) 2009 Karl Varga released under the MIT license
 [sitemap_geo]:#
 [sitemap_mobile]:http://support.google.com/webmasters/bin/answer.py?hl=en&answer=34648
 [sitemap_pagemap]:https://developers.google.com/custom-search/docs/structured_data#addtositemap
-[sitemap_protocol]:http://sitemaps.org/protocol.php
+[sitemap_protocol]:http://www.sitemaps.org/protocol.html
 [video_tags]:http://www.google.com/support/webmasters/bin/answer.py?hl=en&answer=80472#4
 [image_tags]:http://www.google.com/support/webmasters/bin/answer.py?hl=en&answer=178636
 [geo_tags]:http://www.google.com/support/webmasters/bin/answer.py?hl=en&answer=94555
