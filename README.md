@@ -1116,8 +1116,8 @@ Copyright (c) 2009 Karl Varga released under the MIT license
 
 [canonical_repo]:http://github.com/kjvarga/sitemap_generator
 [enterprise_class]:https://twitter.com/dhh/status/1631034662 "I use enterprise in the same sense the Phusion guys do - i.e. Enterprise Ruby. Please don't look down on my use of the word 'enterprise' to represent being a cut above. It doesn't mean you ever have to work for a company the size of IBM. Or constantly fight inertia, writing crappy software, adhering to change management practices and spending hours in meetings... Not that there's anything wrong with that - Wait, what?"
-[sitemaps_org]:http://www.sitemaps.org/protocol.php "http://www.sitemaps.org/protocol.php"
-[sitemaps_xml]:http://www.sitemaps.org/protocol.php#xmlTagDefinitions "XML Tag Definitions"
+[sitemaps_org]:http://www.sitemaps.org/protocol.html "http://www.sitemaps.org/protocol.html"
+[sitemaps_xml]:http://www.sitemaps.org/protocol.html#xmlTagDefinitions "XML Tag Definitions"
 [sitemap_generator_usage]:http://wiki.github.com/adamsalter/sitemap_generator/sitemapgenerator-usage "http://wiki.github.com/adamsalter/sitemap_generator/sitemapgenerator-usage"
 [sitemap_images]:http://www.google.com/support/webmasters/bin/answer.py?answer=178636
 [sitemap_video]:https://support.google.com/webmasters/answer/80471?hl=en&ref_topic=4581190
