@@ -619,7 +619,7 @@ From this example we can see that:
 * The Rails URL/path helper methods are made available to us, and
 * The basic syntax for adding paths to the sitemap using `add`
 
-You can read more about `add` in the [XML Specification](http://sitemaps.org/protocol.php#xmlTagDefinitions).
+You can read more about `add` in the [XML Specification](http://www.sitemaps.org/protocol.html#xmlTagDefinitions).
 
 ### Supported Options to `add`
 
@@ -1116,8 +1116,8 @@ Copyright (c) 2009 Karl Varga released under the MIT license
 
 [canonical_repo]:http://github.com/kjvarga/sitemap_generator
 [enterprise_class]:https://twitter.com/dhh/status/1631034662 "I use enterprise in the same sense the Phusion guys do - i.e. Enterprise Ruby. Please don't look down on my use of the word 'enterprise' to represent being a cut above. It doesn't mean you ever have to work for a company the size of IBM. Or constantly fight inertia, writing crappy software, adhering to change management practices and spending hours in meetings... Not that there's anything wrong with that - Wait, what?"
-[sitemaps_org]:http://www.sitemaps.org/protocol.php "http://www.sitemaps.org/protocol.php"
-[sitemaps_xml]:http://www.sitemaps.org/protocol.php#xmlTagDefinitions "XML Tag Definitions"
+[sitemaps_org]:http://www.sitemaps.org/protocol.html "http://www.sitemaps.org/protocol.html"
+[sitemaps_xml]:http://www.sitemaps.org/protocol.html#xmlTagDefinitions "XML Tag Definitions"
 [sitemap_generator_usage]:http://wiki.github.com/adamsalter/sitemap_generator/sitemapgenerator-usage "http://wiki.github.com/adamsalter/sitemap_generator/sitemapgenerator-usage"
 [sitemap_images]:http://www.google.com/support/webmasters/bin/answer.py?answer=178636
 [sitemap_video]:https://support.google.com/webmasters/answer/80471?hl=en&ref_topic=4581190
@@ -1125,7 +1125,7 @@ Copyright (c) 2009 Karl Varga released under the MIT license
 [sitemap_geo]:#
 [sitemap_mobile]:http://support.google.com/webmasters/bin/answer.py?hl=en&answer=34648
 [sitemap_pagemap]:https://developers.google.com/custom-search/docs/structured_data#addtositemap
-[sitemap_protocol]:http://sitemaps.org/protocol.php
+[sitemap_protocol]:http://www.sitemaps.org/protocol.html
 [video_tags]:http://www.google.com/support/webmasters/bin/answer.py?hl=en&answer=80472#4
 [image_tags]:http://www.google.com/support/webmasters/bin/answer.py?hl=en&answer=178636
 [geo_tags]:http://www.google.com/support/webmasters/bin/answer.py?hl=en&answer=94555
