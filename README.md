@@ -274,7 +274,7 @@ SitemapGenerator::Sitemap.ping_search_engines('http://example.com/sitemap.xml.gz
 
 To keep your sitemaps up-to-date, setup a cron job.  Make sure to pass the `-s` option to silence rake.  That way you will only get email if the sitemap build fails.
 
-If you're using Whenever, your schedule would look something like this:
+If you're using [Whenever](https://github.com/javan/whenever), your schedule would look something like this:
 
 ```ruby
 # config/schedule.rb
