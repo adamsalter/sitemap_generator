@@ -663,7 +663,7 @@ add '/about', :priority => 0.75
 
 ```ruby
 add '/about', :expires => Time.now + 2.weeks
-
+```
 
 ### Adding Links to the Sitemap Index
 
