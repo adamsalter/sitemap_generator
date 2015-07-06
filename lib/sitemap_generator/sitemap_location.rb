@@ -41,7 +41,7 @@ module SitemapGenerator
     # * <tt>:verbose</tt> - whether to output summary into to STDOUT.  Default +false+.
     # * <tt>:create_index</tt> - whether to create a sitemap index.  Default `:auto`.  See <tt>LinkSet::create_index=</tt>
     #   for possible values. Only applies to the SitemapIndexLocation object.
-    # * <tt>compress</tt> - The LinkSet compress setting.  Default: true.  If `false` any `.gz` extension is
+    # * <tt>compress</tt> - The LinkSet compress setting.  Default: +true+.  If `false` any `.gz` extension is
     #   stripped from the filename.  If `:all_but_first`, only the `.gz` extension of the first
     #   filename is stripped off.  If `true` the extensions are left unchanged.
     def initialize(opts={})
