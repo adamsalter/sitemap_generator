@@ -1044,7 +1044,7 @@ end
 
 * `:alternate`/`:alternates` - Hash or array of hashes, respectively
     * `:href` - Required, string.
-    * `:lang`  - Required, string.
+    * `:lang`  - Optional, string.
     * `:nofollow` - Optional, boolean. Used to mark link as "nofollow".
     * `:media` - Optional, string.  Specify [media targets for responsive design pages][media].
 
