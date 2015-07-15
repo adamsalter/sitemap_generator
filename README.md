@@ -117,6 +117,7 @@ That's it!  Welcome to the future!
 
 ## Changelog
 
+* v5.1.0: Require only `fog-aws` instead of `fog` for the `S3Adapter` and support using IAM profile instead of setting access key & secret directly.  Implement `respond_to?` on the `SitemapGenerator::Sitemap` pseudo class.
 * v5.0.5: Use MIT licence.  Fix deploys with Capistrano 3 ([#163](https://github.com/kjvarga/sitemap_generator/issues/163)).  Allow any Fog storage options for S3 adapter ([#167](https://github.com/kjvarga/sitemap_generator/pull/167)).
 * v5.0.4: Don't include the `media` attribute on alternate links unless it's given
 * v5.0.3: Add support for Video sitemaps options `:live` and ':requires_subscription'
@@ -364,7 +365,7 @@ _This section needs better documentation.  Please consider contributing._
 
 * `SitemapGenerator::S3Adapter`
 
-  Uses `fog` to upload to Amazon S3 storage.
+  Uses `fog-aws` to upload to Amazon S3 storage.
 
 * `SitemapGenerator::WaveAdapter`
 

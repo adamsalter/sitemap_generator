@@ -549,6 +549,15 @@ describe "SitemapGenerator" do
     end
   end
 
+  describe "respond_to?" do
+    it "should correctly identify the methods that it responds to" do
+      SitemapGenerator::Sitemap.respond_to?(:create).should be_true
+      SitemapGenerator::Sitemap.respond_to?(:adapter).should be_true
+      SitemapGenerator::Sitemap.respond_to?(:default_host).should be_true
+      SitemapGenerator::Sitemap.respond_to?(:invalid_func).should be_false
+    end
+  end
+
   protected
 
   #
