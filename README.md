@@ -117,7 +117,7 @@ That's it!  Welcome to the future!
 
 ## Changelog
 
-* v5.1.0: Require only `fog-aws` instead of `fog` for the `S3Adapter` and support using IAM profile instead of setting access key & secret directly.  Implement `respond_to?` on the `SitemapGenerator::Sitemap` pseudo class.
+* v5.1.0: Require only `fog-aws` instead of `fog` for the `S3Adapter` and support using IAM profile instead of setting access key & secret directly.  Implement `respond_to?` on the `SitemapGenerator::Sitemap` pseudo class.  Make `:lang` optional on alternate links so they can be used for [AppIndexing](https://developers.google.com/app-indexing/reference/deeplinks).  Documented [Mobile Sitemaps](#internal_mobile) `:mobile` option.
 * v5.0.5: Use MIT licence.  Fix deploys with Capistrano 3 ([#163](https://github.com/kjvarga/sitemap_generator/issues/163)).  Allow any Fog storage options for S3 adapter ([#167](https://github.com/kjvarga/sitemap_generator/pull/167)).
 * v5.0.4: Don't include the `media` attribute on alternate links unless it's given
 * v5.0.3: Add support for Video sitemaps options `:live` and ':requires_subscription'
@@ -660,7 +660,7 @@ add '/about', :priority => 0.75
 
 * `expires` - Optional (Integer, Time, Date, DateTime, String)
 
-  [expires][Request removal of this URL from search engines' indexes].   Example (uses ActiveSupport):
+  [Request removal of this URL from search engines' indexes][expires].   Example (uses ActiveSupport):
 
 ```ruby
 add '/about', :expires => Time.now + 2.weeks
@@ -1049,6 +1049,25 @@ end
     * `:nofollow` - Optional, boolean. Used to mark link as "nofollow".
     * `:media` - Optional, string.  Specify [media targets for responsive design pages][media].
 
+### <a name="internal_mobile"></a> Mobile Sitemaps
+
+Mobile sitemaps include a specific `<mobile:mobile/>` tag.
+
+Check out the Google specification [here][sitemap_mobile].
+
+#### Example
+
+```ruby
+SitemapGenerator::Sitemap.default_host = "http://www.example.com"
+SitemapGenerator::Sitemap.create do
+  add('/index.html', :mobile => true)
+end
+```
+
+#### Supported options
+
+* `:mobile` - Presence of this option will turn on the mobile flag regardless of value.
+
 ## Raison d'être
 
 Most of the Sitemap plugins out there seem to try to recreate the Sitemap links by iterating the Rails routes. In some cases this is possible, but for a great deal of cases it isn't.
@@ -1081,9 +1100,9 @@ Easy hey?
 
 Tested and working on:
 
-* **Rails** 3.0.0, 3.0.7
+* **Rails** 3.0.0, 3.0.7, 4.2.3
 * **Rails** 1.x - 2.3.8
-* **Ruby** 1.8.6, 1.8.7, 1.8.7 Enterprise Edition, 1.9.1, 1.9.2
+* **Ruby** 1.8.6, 1.8.7, 1.8.7 Enterprise Edition, 1.9.1, 1.9.2, 2.1.3
 
 
 ## Known Bugs

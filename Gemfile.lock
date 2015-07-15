@@ -1,7 +1,7 @@
 PATH
   remote: ./
   specs:
-    sitemap_generator (5.0.5)
+    sitemap_generator (5.1.0)
       builder
 
 GEM
