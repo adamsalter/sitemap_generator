@@ -221,9 +221,7 @@ _If you would prefer to install as a plugin (deprecated) don't do any of the abo
 
 ### Preventing Output
 
-To disable all non-essential output set the environment variable `VERBOSE=false` when calling Rake or running your Ruby script.
-
-Alternatively you can pass the `-s` option to Rake, for example `rake -s sitemap:refresh`.
+To disable all non-essential output you can pass the `-s` option to Rake, for example `rake -s sitemap:refresh`, or set the environment variable `VERBOSE=false` when calling as a Ruby script.
 
 To disable output in-code use the following:
 
