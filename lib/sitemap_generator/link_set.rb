@@ -121,7 +121,7 @@ module SitemapGenerator
         :filename => :sitemap,
         :search_engines => {
           :google         => "http://www.google.com/webmasters/tools/ping?sitemap=%s",
-          :bing           => "http://www.bing.com/webmaster/ping.aspx?siteMap=%s"
+          :bing           => "http://www.bing.com/ping?sitemap=%s"
         },
         :create_index => :auto,
         :compress => true
