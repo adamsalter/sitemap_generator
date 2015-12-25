@@ -20,7 +20,7 @@ Sitemaps adhere to the [Sitemap 0.9 protocol][sitemap_protocol] specification.
 
 ### Show Me
 
-This is a simple standalone example.  For Rails installation see the Install section.
+This is a simple standalone example.  For Rails installation see the [Rails instructions](#rails) in the [Install](#install) section.
 
 Install:
 
