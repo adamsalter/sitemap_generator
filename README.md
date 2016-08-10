@@ -365,6 +365,10 @@ _This section needs better documentation.  Please consider contributing._
 
   Uses `fog-aws` to upload to Amazon S3 storage.
 
+* `SitemapGenerator::AwsSdkAdapter`
+
+  Uses `aws-sdk` to upload to Amazon S3 storage.
+
 * `SitemapGenerator::WaveAdapter`
 
   Uses `carrierwave` to upload to any service supported by CarrierWave.
