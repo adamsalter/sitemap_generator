@@ -29,6 +29,12 @@ describe SitemapGenerator::Builder::SitemapUrl do
     url[:lastmod].should == lastmod
   end
 
+  it "should support string option keys" do
+    url = new_url('/home', 'host' => 'http://string.com', 'priority' => 1)
+    url[:priority].should == 1
+    url[:host].should == 'http://string.com'
+  end
+
   it "should support subdirectory routing" do
     url = SitemapGenerator::Builder::SitemapUrl.new('/profile', :host => 'http://example.com/subdir/')
     url[:loc].should == 'http://example.com/subdir/profile'
