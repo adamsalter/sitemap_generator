@@ -774,7 +774,7 @@ The options passed to `group` only apply to the links and sitemaps generated in 
 
 The following options are supported.
 
-* `:create_index` - Supported values: `true`, `false`, `:auto`.  Default: `true`. Whether to create a sitemap index file.  If `true` an index file is always created regardless of how many sitemap files are generated.  If `false` an index file is never created.  If `:auto` an index file is created only when you have more than one sitemap file (i.e. you have added more than 50,000 - `SitemapGenerator::MAX_SITEMAP_LINKS` - links).
+* `:create_index` - Supported values: `true`, `false`, `:auto`.  Default: `:auto`. Whether to create a sitemap index file.  If `true` an index file is always created regardless of how many sitemap files are generated.  If `false` an index file is never created.  If `:auto` an index file is created only when you have more than one sitemap file (i.e. you have added more than 50,000 - `SitemapGenerator::MAX_SITEMAP_LINKS` - links).
 
 * `:default_host` - String.  Required.  **Host including protocol** to use when building a link to add to your sitemap.  For example `http://example.com`.  Calling `add '/home'` would then generate the URL `http://example.com/home` and add that to the sitemap.  You can pass a `:host` option in your call to `add` to override this value on a per-link basis.  For example calling `add '/home', :host => 'https://example.com'` would generate the URL `https://example.com/home`, for that link only.
 
