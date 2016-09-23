@@ -117,6 +117,7 @@ That's it!  Welcome to the future!
 
 ## Changelog
 
+* v5.2.0: New `SitemapGenerator::AwsSdkAdapter` adapter using the bare aws-sdk gem.  Fix Bing ping url.  Support string option keys passed to `add`.  In Railtie, Load the rake task instead of requiring them.
 * v5.1.0: Require only `fog-aws` instead of `fog` for the `S3Adapter` and support using IAM profile instead of setting access key & secret directly.  Implement `respond_to?` on the `SitemapGenerator::Sitemap` pseudo class.  Make `:lang` optional on alternate links so they can be used for [AppIndexing](https://developers.google.com/app-indexing/reference/deeplinks).  Documented [Mobile Sitemaps](#internal_mobile) `:mobile` option.
 * v5.0.5: Use MIT licence.  Fix deploys with Capistrano 3 ([#163](https://github.com/kjvarga/sitemap_generator/issues/163)).  Allow any Fog storage options for S3 adapter ([#167](https://github.com/kjvarga/sitemap_generator/pull/167)).
 * v5.0.4: Don't include the `media` attribute on alternate links unless it's given

@@ -10,10 +10,10 @@ Gem::Specification.new do |s|
   s.summary     = %q{Easily generate XML Sitemaps}
   s.description = %q{SitemapGenerator is a framework-agnostic XML Sitemap generator written in Ruby with automatic Rails integration.  It supports Video, News, Image, Geo, Mobile, PageMap and Alternate Links sitemap extensions and includes Rake tasks for managing your sitemaps, as well as many other great features.}
   s.license     = 'MIT'
-  s.add_development_dependency 'mocha'
-  s.add_development_dependency 'nokogiri'
-  s.add_development_dependency 'rspec'
-  s.add_dependency 'builder'
+  s.add_development_dependency 'mocha', '~> 0.10.0'
+  s.add_development_dependency 'nokogiri', '=1.15.10'
+  s.add_development_dependency 'rspec', '~>2.8'
+  s.add_dependency 'builder', '~> 3.0'
   s.test_files  = Dir.glob(['spec/**/*']) - Dir.glob(['spec/mock_*', 'spec/mock_*/**/*'])
   s.files       = Dir.glob(["[A-Z]*", "{lib,rails,templates}/**/*"]) - Dir.glob('*.orig')
 
