@@ -18,7 +18,8 @@ module SitemapGenerator
       # === Options
       #
       # * <tt>location</tt> - a SitemapGenerator::SitemapLocation instance or a Hash of options
-      #   from which a SitemapLocation will be created for you.
+      #   from which a SitemapLocation will be created for you.  See `SitemapGenerator::SitemapLocation` for
+      #   the supported list of options.
       def initialize(opts={})
         @location = opts.is_a?(Hash) ? SitemapGenerator::SitemapLocation.new(opts) : opts
         @link_count = 0
@@ -67,7 +68,7 @@ module SitemapGenerator
       # bytesize will be calculated for you.
       def file_can_fit?(bytes)
         bytes = bytes.is_a?(String) ? SitemapGenerator::Utilities.bytesize(bytes) : bytes
-        (@filesize + bytes) < SitemapGenerator::MAX_SITEMAP_FILESIZE && @link_count < SitemapGenerator::MAX_SITEMAP_LINKS && @news_count < SitemapGenerator::MAX_SITEMAP_NEWS
+        (@filesize + bytes) < SitemapGenerator::MAX_SITEMAP_FILESIZE && @link_count < max_sitemaps_links && @news_count < SitemapGenerator::MAX_SITEMAP_NEWS
       end
 
       # Add a link to the sitemap file.
@@ -163,6 +164,12 @@ module SitemapGenerator
         location = @location.dup
         location.delete(:filename) if location.namer
         self.class.new(location)
+      end
+
+      protected
+
+      def max_sitemaps_links
+        @max_sitemaps_links ||= @location[:max_sitemap_links] || SitemapGenerator::MAX_SITEMAP_LINKS
       end
     end
   end

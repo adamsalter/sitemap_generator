@@ -44,8 +44,20 @@ module SitemapGenerator
     # * <tt>compress</tt> - The LinkSet compress setting.  Default: +true+.  If `false` any `.gz` extension is
     #   stripped from the filename.  If `:all_but_first`, only the `.gz` extension of the first
     #   filename is stripped off.  If `true` the extensions are left unchanged.
+    # * <tt>max_sitemap_links</tt> - The maximum number of links to put in each sitemap.
     def initialize(opts={})
-      SitemapGenerator::Utilities.assert_valid_keys(opts, [:adapter, :public_path, :sitemaps_path, :host, :filename, :namer, :verbose, :create_index, :compress])
+      SitemapGenerator::Utilities.assert_valid_keys(opts, [
+        :adapter,
+        :public_path,
+        :sitemaps_path,
+        :host,
+        :filename,
+        :namer,
+        :verbose,
+        :create_index,
+        :compress,
+        :max_sitemap_links
+      ])
       opts[:adapter] ||= SitemapGenerator::FileAdapter.new
       opts[:public_path] ||= SitemapGenerator.app.root + 'public/'
       # This is a bit of a hack to make the SimpleNamer act like the old SitemapNamer.
