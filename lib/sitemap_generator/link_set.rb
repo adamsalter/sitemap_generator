@@ -127,7 +127,8 @@ module SitemapGenerator
           :bing           => "http://www.bing.com/ping?sitemap=%s"
         },
         :create_index => :auto,
-        :compress => true
+        :compress => true,
+        :max_sitemap_links => SitemapGenerator::MAX_SITEMAP_LINKS
       )
       options.each_pair { |k, v| instance_variable_set("@#{k}".to_sym, v) }
 
@@ -418,9 +419,8 @@ module SitemapGenerator
         :compress,
         :max_sitemap_links
       ].inject({}) do |hash, key|
-        if !(value = instance_variable_get(:"@#{key}")).nil?
-          hash[key] = value
-        end
+        value = instance_variable_get(:"@#{key}")
+        hash[key] = value unless value.nil?
         hash
       end
       SitemapGenerator::Utilities.reverse_merge!(opts, current_settings)
@@ -576,7 +576,7 @@ module SitemapGenerator
           :adapter => @adapter,
           :verbose => verbose,
           :compress => @compress,
-          :max_sitemap_links => @max_sitemap_links
+          :max_sitemap_links => max_sitemap_links
         )
       end
 
