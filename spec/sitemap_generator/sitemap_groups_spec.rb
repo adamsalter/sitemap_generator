@@ -1,18 +1,9 @@
 require "spec_helper"
 
-def with_max_links(num)
-  SitemapGenerator::Utilities.with_warnings(nil) do
-    original = SitemapGenerator::MAX_SITEMAP_LINKS
-    SitemapGenerator.const_set(:MAX_SITEMAP_LINKS, num)
-    yield
-    SitemapGenerator.const_set(:MAX_SITEMAP_LINKS, original)
-  end
-end
-
 describe "Sitemap Groups" do
   let(:linkset) { ::SitemapGenerator::LinkSet.new(:default_host => 'http://test.com') }
 
-  before :each do
+  before do
     FileUtils.rm_rf(SitemapGenerator.app.root + 'public/')
   end
 
@@ -57,18 +48,17 @@ describe "Sitemap Groups" do
   end
 
   it "should rollover when sitemaps are full" do
-    with_max_links(1) {
-      linkset.include_index = false
-      linkset.include_root = false
-      linkset.create do
-        add '/before'
-        group(:filename => :sitemap_en, :sitemaps_path => 'en/') do
-          add '/one'
-          add '/two'
-        end
-        add '/after'
+    linkset.max_sitemap_links = 1
+    linkset.include_index = false
+    linkset.include_root = false
+    linkset.create do
+      add '/before'
+      group(:filename => :sitemap_en, :sitemaps_path => 'en/') do
+        add '/one'
+        add '/two'
       end
-    }
+      add '/after'
+    end
     linkset.link_count.should == 4
     file_should_exist(SitemapGenerator.app.root + 'public/sitemap.xml.gz')
     file_should_exist(SitemapGenerator.app.root + 'public/sitemap1.xml.gz')

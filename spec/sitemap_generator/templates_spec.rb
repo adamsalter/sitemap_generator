@@ -10,7 +10,7 @@ describe "Templates class" do
   end
 
   describe "templates" do
-    before :each do
+    before do
       SitemapGenerator.templates.sitemap_sample = nil
       File.expects(:read).returns('read file')
     end

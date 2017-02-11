@@ -8,20 +8,16 @@ class Holder
 end
 
 def with_max_links(num)
-  original = SitemapGenerator::MAX_SITEMAP_LINKS
-  SitemapGenerator::Utilities.with_warnings(nil) do
-    SitemapGenerator.const_set(:MAX_SITEMAP_LINKS, num)
-  end
+  original = SitemapGenerator::Sitemap.max_sitemap_links
+  SitemapGenerator::Sitemap.max_sitemap_links = num
   yield
-  SitemapGenerator::Utilities.with_warnings(nil) do
-    SitemapGenerator.const_set(:MAX_SITEMAP_LINKS, original)
-  end
+ensure
+  SitemapGenerator::Sitemap.max_sitemap_links = original
 end
 
 describe "SitemapGenerator" do
-
   describe "reset!" do
-    before :each do
+    before do
       SitemapGenerator::Sitemap.default_host # Force initialization of the LinkSet
     end
 
@@ -126,7 +122,7 @@ describe "SitemapGenerator" do
   end
 
   describe "should handle links added manually" do
-    before :each do
+    before do
       clean_sitemap_files_from_rails_app
       ::SitemapGenerator::Sitemap.reset!
       ::SitemapGenerator::Sitemap.default_host = "http://www.example.com"
@@ -148,7 +144,7 @@ describe "SitemapGenerator" do
   end
 
   describe "should handle links added manually" do
-    before :each do
+    before do
       clean_sitemap_files_from_rails_app
       ::SitemapGenerator::Sitemap.reset!
       ::SitemapGenerator::Sitemap.default_host = "http://www.example.com"
@@ -232,7 +228,7 @@ describe "SitemapGenerator" do
   end
 
   describe "sitemap path" do
-    before :each do
+    before do
       clean_sitemap_files_from_rails_app
       ::SitemapGenerator::Sitemap.reset!
       ::SitemapGenerator::Sitemap.default_host = 'http://test.local'
@@ -310,22 +306,24 @@ describe "SitemapGenerator" do
   end
 
   describe "create_index" do
-    before :each do
+    let(:ls) {
+      SitemapGenerator::LinkSet.new(
+        :include_root => false,
+        :default_host => 'http://example.com',
+        :create_index => create_index,
+        :max_sitemap_links => 1
+      )
+    }
+
+    before do
       clean_sitemap_files_from_rails_app
     end
 
     describe "when true" do
-      let(:ls) {
-        SitemapGenerator::LinkSet.new(
-          :include_root => false,
-          :default_host => 'http://example.com',
-          :create_index => true)
-      }
+      let(:create_index) { true }
 
       it "should always create index" do
-        with_max_links(1) do
-          ls.create { add('/one') }
-        end
+        ls.create { add('/one') }
         ls.sitemap_index.link_count.should == 1 # one sitemap
         file_should_exist(rails_path('public/sitemap.xml.gz'))
         file_should_exist(rails_path('public/sitemap1.xml.gz'))
@@ -340,9 +338,7 @@ describe "SitemapGenerator" do
       end
 
       it "should always create index" do
-        with_max_links(1) do
-          ls.create { add('/one'); add('/two') }
-        end
+        ls.create { add('/one'); add('/two') }
         ls.sitemap_index.link_count.should == 2 # two sitemaps
         file_should_exist(rails_path('public/sitemap.xml.gz'))
         file_should_exist(rails_path('public/sitemap1.xml.gz'))
@@ -361,12 +357,10 @@ describe "SitemapGenerator" do
     # Technically when there's no index, the first sitemap is the "index"
     # regardless of how many sitemaps were created, or if create_index is false.
     describe "when false" do
-      let(:ls) { SitemapGenerator::LinkSet.new(:include_root => false, :default_host => 'http://example.com', :create_index => false) }
+      let(:create_index) { false }
 
       it "should never create index" do
-        with_max_links(1) do
-          ls.create { add('/one') }
-        end
+        ls.create { add('/one') }
         ls.sitemap_index.link_count.should == 1 # one sitemap
         file_should_exist(rails_path('public/sitemap.xml.gz'))
         file_should_not_exist(rails_path('public/sitemap1.xml.gz'))
@@ -379,9 +373,7 @@ describe "SitemapGenerator" do
       end
 
       it "should never create index" do
-        with_max_links(1) do
-          ls.create { add('/one'); add('/two') }
-        end
+        ls.create { add('/one'); add('/two') }
         ls.sitemap_index.link_count.should == 2 # two sitemaps
         file_should_exist(rails_path('public/sitemap.xml.gz'))
         file_should_exist(rails_path('public/sitemap1.xml.gz'))
@@ -397,12 +389,10 @@ describe "SitemapGenerator" do
     end
 
     describe "when :auto" do
-      let(:ls) { SitemapGenerator::LinkSet.new(:include_root => false, :default_host => 'http://example.com', :create_index => :auto) }
+      let(:create_index) { :auto }
 
       it "should not create index if only one sitemap file" do
-        with_max_links(1) do
-          ls.create { add('/one') }
-        end
+        ls.create { add('/one') }
         ls.sitemap_index.link_count.should == 1 # one sitemap
         file_should_exist(rails_path('public/sitemap.xml.gz'))
         file_should_not_exist(rails_path('public/sitemap1.xml.gz'))
@@ -415,9 +405,7 @@ describe "SitemapGenerator" do
       end
 
       it "should create index if more than one sitemap file" do
-        with_max_links(1) do
-          ls.create { add('/one'); add('/two') }
-        end
+        ls.create { add('/one'); add('/two') }
         ls.sitemap_index.link_count.should == 2 # two sitemaps
         file_should_exist(rails_path('public/sitemap.xml.gz'))
         file_should_exist(rails_path('public/sitemap1.xml.gz'))
@@ -434,11 +422,9 @@ describe "SitemapGenerator" do
       end
 
       it "should create index if more than one group" do
-        with_max_links(1) do
-          ls.create do
-            group(:filename => :group1) { add('/one') };
-            group(:filename => :group2) { add('/two') };
-          end
+        ls.create do
+          group(:filename => :group1) { add('/one') };
+          group(:filename => :group2) { add('/two') };
         end
         ls.sitemap_index.link_count.should == 2 # two sitemaps
         file_should_exist(rails_path('public/sitemap.xml.gz'))
@@ -457,27 +443,30 @@ describe "SitemapGenerator" do
   end
 
   describe "compress" do
-    let(:ls) { SitemapGenerator::LinkSet.new(:default_host => 'http://test.local', :include_root => false) }
+    let(:ls) {
+      SitemapGenerator::LinkSet.new(
+        :default_host => 'http://test.local',
+        :include_root => false,
+        :compress => compress,
+        :max_sitemap_links => 1
+      )
+    }
 
-    before :each do
+    before do
       clean_sitemap_files_from_rails_app
     end
 
     describe "when false" do
-      before :each do
-        ls.compress = false
-      end
+      let(:compress) { false }
 
       it "should not compress files" do
-        with_max_links(1) do
-          ls.create do
-            add('/one')
-            add('/two')
-            group(:filename => :group) {
-              add('/group1')
-              add('/group2')
-            }
-          end
+        ls.create do
+          add('/one')
+          add('/two')
+          group(:filename => :group) {
+            add('/group1')
+            add('/group2')
+          }
         end
         file_should_exist(rails_path('public/sitemap.xml'))
         file_should_exist(rails_path('public/sitemap1.xml'))
@@ -487,29 +476,25 @@ describe "SitemapGenerator" do
     end
 
     describe "when :all_but_first" do
-      before :each do
-        ls.compress = :all_but_first
-      end
+      let(:compress) { :all_but_first }
 
       it "should not compress first file" do
-        with_max_links(1) do
-          ls.create do
-            add('/one')
-            add('/two')
-            add('/three')
-            group(:filename => :group) {
-              add('/group1')
-              add('/group2')
-            }
-            group(:filename => :group2, :compress => true) {
-              add('/group1')
-              add('/group2')
-            }
-            group(:filename => :group2, :compress => false) {
-              add('/group1')
-              add('/group2')
-            }
-          end
+        ls.create do
+          add('/one')
+          add('/two')
+          add('/three')
+          group(:filename => :group) {
+            add('/group1')
+            add('/group2')
+          }
+          group(:filename => :group2, :compress => true) {
+            add('/group1')
+            add('/group2')
+          }
+          group(:filename => :group2, :compress => false) {
+            add('/group1')
+            add('/group2')
+          }
         end
         file_should_exist(rails_path('public/sitemap.xml'))
         file_should_exist(rails_path('public/sitemap1.xml.gz'))
@@ -522,22 +507,22 @@ describe "SitemapGenerator" do
     end
 
     describe "in groups" do
+      let(:compress) { nil }
+
       it "should respect passed in compress option" do
-        with_max_links(1) do
-          ls.create do
-            group(:filename => :group1, :compress => :all_but_first) {
-              add('/group1')
-              add('/group2')
-            }
-            group(:filename => :group2, :compress => true) {
-              add('/group1')
-              add('/group2')
-            }
-            group(:filename => :group3, :compress => false) {
-              add('/group1')
-              add('/group2')
-            }
-          end
+        ls.create do
+          group(:filename => :group1, :compress => :all_but_first) {
+            add('/group1')
+            add('/group2')
+          }
+          group(:filename => :group2, :compress => true) {
+            add('/group1')
+            add('/group2')
+          }
+          group(:filename => :group3, :compress => false) {
+            add('/group1')
+            add('/group2')
+          }
         end
         file_should_exist(rails_path('public/group1.xml'))
         file_should_exist(rails_path('public/group11.xml.gz'))

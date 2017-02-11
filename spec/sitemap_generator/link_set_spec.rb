@@ -5,8 +5,8 @@ describe SitemapGenerator::LinkSet do
   let(:ls)           { SitemapGenerator::LinkSet.new(:default_host => default_host) }
 
   describe "initializer options" do
-    options = [:public_path, :sitemaps_path, :default_host, :filename, :search_engines]
-    values = [File.expand_path(SitemapGenerator.app.root + 'tmp/'), 'mobile/', 'http://myhost.com', :xxx, { :abc => '123' }]
+    options = [:public_path, :sitemaps_path, :default_host, :filename, :search_engines, :max_sitemap_links]
+    values = [File.expand_path(SitemapGenerator.app.root + 'tmp/'), 'mobile/', 'http://myhost.com', :xxx, { :abc => '123' }, 10]
 
     options.zip(values).each do |option, value|
       it "should set #{option} to #{value}" do
@@ -26,7 +26,8 @@ describe SitemapGenerator::LinkSet do
       :default_host  => nil,
       :include_index => false,
       :include_root  => true,
-      :create_index  => :auto
+      :create_index  => :auto,
+      :max_sitemap_links => SitemapGenerator::MAX_SITEMAP_LINKS
     }
 
     default_options.each do |option, value|
@@ -240,7 +241,7 @@ describe SitemapGenerator::LinkSet do
   end
 
   describe "with a sitemap index specified" do
-    before :each do
+    before do
       @index = SitemapGenerator::Builder::SitemapIndexFile.new(:host => default_host)
       @ls = SitemapGenerator::LinkSet.new(:sitemap_index => @index, :sitemaps_host => 'http://newhost.com')
     end
@@ -479,7 +480,7 @@ describe SitemapGenerator::LinkSet do
   end
 
   describe "options to create" do
-    before :each do
+    before do
       ls.stubs(:finalize!)
     end
 
@@ -808,7 +809,7 @@ describe SitemapGenerator::LinkSet do
   end
 
   describe "when sitemap empty" do
-    before :each do
+    before do
       ls.include_root = false
     end
 
@@ -859,6 +860,59 @@ describe SitemapGenerator::LinkSet do
         group = ls.group(:compress => false)
         group.compress.should be_false
       end
+    end
+  end
+
+  describe 'max_sitemap_links' do
+    it 'can be set via initializer' do
+      ls = SitemapGenerator::LinkSet.new(:max_sitemap_links => 10)
+      ls.max_sitemap_links.should == 10
+    end
+
+    it 'can be set via accessor' do
+      ls.max_sitemap_links = 10
+      ls.max_sitemap_links.should == 10
+    end
+  end
+
+  describe 'options_for_group' do
+    context 'max_sitemap_links' do
+      it 'inherits the current value' do
+        ls.max_sitemap_links = 10
+        options = ls.send(:options_for_group, {})
+        options[:max_sitemap_links].should == 10
+      end
+
+      it 'returns the value when set' do
+        options = ls.send(:options_for_group, :max_sitemap_links => 10)
+        options[:max_sitemap_links].should == 10
+      end
+    end
+  end
+
+  describe 'sitemap_location' do
+    it 'returns an instance initialized with values from the link set' do
+      ls.expects(:sitemaps_host).returns(:host)
+      ls.expects(:namer).returns(:namer)
+      ls.expects(:public_path).returns(:public_path)
+      ls.expects(:verbose).returns(:verbose)
+      ls.expects(:max_sitemap_links).returns(:max_sitemap_links)
+
+      ls.instance_variable_set(:@sitemaps_path, :sitemaps_path)
+      ls.instance_variable_set(:@adapter, :adapter)
+      ls.instance_variable_set(:@compress, :compress)
+
+      SitemapGenerator::SitemapLocation.expects(:new).with(
+        :host => :host,
+        :namer => :namer,
+        :public_path => :public_path,
+        :sitemaps_path => :sitemaps_path,
+        :adapter => :adapter,
+        :verbose => :verbose,
+        :compress => :compress,
+        :max_sitemap_links => :max_sitemap_links
+      )
+      ls.sitemap_location
     end
   end
 end

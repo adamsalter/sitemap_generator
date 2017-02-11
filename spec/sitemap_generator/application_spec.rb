@@ -13,7 +13,7 @@ describe SitemapGenerator::Application do
     end
   end
 
-  before :each do
+  before do
     @app = SitemapGenerator::Application.new
   end
 
@@ -34,7 +34,7 @@ describe SitemapGenerator::Application do
   end
 
   describe "with Rails" do
-    before :each do
+    before do
       @root = '/test'
       Rails.expects(:root).returns(@root).at_least_once
     end
@@ -47,7 +47,7 @@ describe SitemapGenerator::Application do
   end
 
   describe "with no Rails" do
-    before :each do
+    before do
       @rails = Rails
       Object.send(:remove_const, :Rails)
     end

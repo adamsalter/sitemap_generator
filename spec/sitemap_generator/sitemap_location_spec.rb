@@ -186,6 +186,13 @@ describe SitemapGenerator::SitemapLocation do
     end
   end
 
+  describe 'max_sitemap_links' do
+    it 'returns the value set on the object' do
+      location = SitemapGenerator::SitemapLocation.new(:max_sitemap_links => 10)
+      location[:max_sitemap_links] = 10
+    end
+  end
+
   describe "when not compressing" do
     it "the URL should point to the uncompressed file" do
       location = SitemapGenerator::SitemapLocation.new(

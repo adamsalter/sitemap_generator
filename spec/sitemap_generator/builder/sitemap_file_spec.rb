@@ -58,7 +58,7 @@ describe 'SitemapGenerator::Builder::SitemapFile' do
     let(:original_sitemap) { sitemap }
     let(:new_sitemap)      { sitemap.new }
 
-    before :each do
+    before do
       original_sitemap
       new_sitemap
     end
@@ -105,6 +105,49 @@ describe 'SitemapGenerator::Builder::SitemapFile' do
       url = SitemapGenerator::Builder::SitemapUrl.new('/one', :host => 'http://example.com/')
       SitemapGenerator::Builder::SitemapUrl.expects(:new).with('/one', :host => 'http://example.com/').returns(url)
       sitemap.add '/one'
+    end
+  end
+
+  describe 'file_can_fit?' do
+    let(:link_count) { 10 }
+
+    before do
+      sitemap.expects(:max_sitemap_links).returns(max_sitemap_links)
+      sitemap.instance_variable_set(:@link_count, link_count)
+    end
+
+    context 'when link count is less than max' do
+      let(:max_sitemap_links) { link_count + 1 }
+
+      it 'returns true' do
+        sitemap.file_can_fit?(1).should be_true
+      end
+    end
+
+    context 'when link count is at max' do
+      let(:max_sitemap_links) { link_count }
+
+      it 'returns true' do
+        sitemap.file_can_fit?(1).should be_false
+      end
+    end
+  end
+
+  describe 'max_sitemap_links' do
+    context 'when not present in the location' do
+      it 'returns SitemapGenerator::MAX_SITEMAP_LINKS' do
+        sitemap.max_sitemap_links.should == SitemapGenerator::MAX_SITEMAP_LINKS
+      end
+    end
+
+    context 'when present in the location' do
+      before do
+        sitemap.location.expects(:[]).with(:max_sitemap_links).returns(10)
+      end
+
+      it 'returns the value from the location' do
+        sitemap.max_sitemap_links.should == 10
+      end
     end
   end
 end

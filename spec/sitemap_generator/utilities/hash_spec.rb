@@ -20,7 +20,7 @@ describe SitemapGenerator::Utilities do
   end
 
   describe "keys" do
-    before :each do
+    before do
       @strings = { 'a' => 1, 'b' => 2 }
       @symbols = { :a  => 1, :b  => 2 }
       @mixed   = { :a  => 1, 'b' => 2 }
