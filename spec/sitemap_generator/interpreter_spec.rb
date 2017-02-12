@@ -71,18 +71,18 @@ describe SitemapGenerator::Interpreter do
     end
 
     it "should not yield the LinkSet to the block" do
-      local = interpreter         # prevent undefined method
-      local_be = self.method(:be) # prevent undefined method
-      local.eval(:yield_sitemap => false) do
-        self.should local_be.call(local)
+      # Assign self to a local variable so it is captured by the block
+      this = self
+      interpreter.eval(:yield_sitemap => false) do
+        this.expect(self).to this.be(this.interpreter)
       end
     end
 
     it "should not yield the LinkSet to the block by default" do
-      local = interpreter         # prevent undefined method
-      local_be = self.method(:be) # prevent undefined method
-      local.eval do
-        self.should local_be.call(local)
+      # Assign self to a local variable so it is captured by the block
+      this = self
+      interpreter.eval do
+        this.expect(self).to this.be(this.interpreter)
       end
     end
   end

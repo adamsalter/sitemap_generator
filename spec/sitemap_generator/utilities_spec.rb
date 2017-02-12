@@ -68,13 +68,15 @@ describe SitemapGenerator::Utilities do
   end
 
   describe "append_slash" do
-    SitemapGenerator::Utilities.append_slash('').should == ''
-    SitemapGenerator::Utilities.append_slash(nil).should == ''
-    SitemapGenerator::Utilities.append_slash(Pathname.new('')).should == ''
-    SitemapGenerator::Utilities.append_slash('tmp').should == 'tmp/'
-    SitemapGenerator::Utilities.append_slash(Pathname.new('tmp')).should == 'tmp/'
-    SitemapGenerator::Utilities.append_slash('tmp/').should == 'tmp/'
-    SitemapGenerator::Utilities.append_slash(Pathname.new('tmp/')).should == 'tmp/'
+    it 'should yield the expect result' do
+      expect(SitemapGenerator::Utilities.append_slash('')).to eq('')
+      expect(SitemapGenerator::Utilities.append_slash(nil)).to eq('')
+      expect(SitemapGenerator::Utilities.append_slash(Pathname.new(''))).to eq('')
+      expect(SitemapGenerator::Utilities.append_slash('tmp')).to eq('tmp/')
+      expect(SitemapGenerator::Utilities.append_slash(Pathname.new('tmp'))).to eq('tmp/')
+      expect(SitemapGenerator::Utilities.append_slash('tmp/')).to eq('tmp/')
+      expect(SitemapGenerator::Utilities.append_slash(Pathname.new('tmp/'))).to eq('tmp/')
+    end
   end
 
   describe "ellipsis" do
