@@ -1,13 +1,14 @@
 # encoding: UTF-8
 require 'spec_helper'
 
-# Don't run this test as part of the unit testing suite as we don't want
-# Fog to be a dependency of SitemapGenerator core.  This is an integration
-# test.  Unfortunately it doesn't really test much, so its usefullness is
-# questionable.
-describe 'SitemapGenerator::S3Adapter', :integration => true do
-
-  let(:location) { SitemapGenerator::SitemapLocation.new(:namer => SitemapGenerator::SitemapNamer.new(:sitemap), :public_path => 'tmp/', :sitemaps_path => 'test/', :host => 'http://example.com/') }
+describe SitemapGenerator::S3Adapter do
+  let(:location) do
+    SitemapGenerator::SitemapLocation.new(
+      :namer => SitemapGenerator::SimpleNamer.new(:sitemap),
+      :public_path => 'tmp/',
+      :sitemaps_path => 'test/',
+      :host => 'http://example.com/')
+  end
   let(:directory) { stub(:files => stub(:create)) }
   let(:directories) { stub(:directories => stub(:new => directory)) }
 
