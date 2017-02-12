@@ -5,17 +5,17 @@ describe SitemapGenerator::Utilities do
 
   describe "assert_valid_keys" do
     it "should raise" do
-      lambda do
+      expect do
         utils.assert_valid_keys({ :failore => "stuff", :funny => "business" }, [ :failure, :funny])
         utils.assert_valid_keys({ :failore => "stuff", :funny => "business" }, :failure, :funny)
-      end.should raise_error(ArgumentError, "Unknown key(s): failore")
+      end.to raise_error(ArgumentError, "Unknown key(s): failore")
     end
 
     it "should not raise" do
-      lambda do
+      expect do
         utils.assert_valid_keys({ :failure => "stuff", :funny => "business" }, [ :failure, :funny ])
         utils.assert_valid_keys({ :failure => "stuff", :funny => "business" }, :failure, :funny)
-      end.should_not raise_error
+      end.not_to raise_error
     end
   end
 
@@ -33,25 +33,25 @@ describe SitemapGenerator::Utilities do
     end
 
     it "should symbolize_keys" do
-      utils.symbolize_keys(@symbols).should == @symbols
-      utils.symbolize_keys(@strings).should == @symbols
-      utils.symbolize_keys(@mixed).should == @symbols
+      expect(utils.symbolize_keys(@symbols)).to eq(@symbols)
+      expect(utils.symbolize_keys(@strings)).to eq(@symbols)
+      expect(utils.symbolize_keys(@mixed)).to eq(@symbols)
     end
 
     it "should symbolize_keys!" do
-      utils.symbolize_keys!(@symbols.dup).should == @symbols
-      utils.symbolize_keys!(@strings.dup).should == @symbols
-      utils.symbolize_keys!(@mixed.dup).should == @symbols
+      expect(utils.symbolize_keys!(@symbols.dup)).to eq(@symbols)
+      expect(utils.symbolize_keys!(@strings.dup)).to eq(@symbols)
+      expect(utils.symbolize_keys!(@mixed.dup)).to eq(@symbols)
     end
 
     it "should symbolize_keys_preserves_keys_that_cant_be_symbolized" do
-      utils.symbolize_keys(@illegal_symbols).should == @illegal_symbols
-      utils.symbolize_keys!(@illegal_symbols.dup).should == @illegal_symbols
+      expect(utils.symbolize_keys(@illegal_symbols)).to eq(@illegal_symbols)
+      expect(utils.symbolize_keys!(@illegal_symbols.dup)).to eq(@illegal_symbols)
     end
 
     it "should symbolize_keys_preserves_fixnum_keys" do
-      utils.symbolize_keys(@fixnums).should == @fixnums
-      utils.symbolize_keys!(@fixnums.dup).should == @fixnums
+      expect(utils.symbolize_keys(@fixnums)).to eq(@fixnums)
+      expect(utils.symbolize_keys!(@fixnums.dup)).to eq(@fixnums)
     end
   end
 end

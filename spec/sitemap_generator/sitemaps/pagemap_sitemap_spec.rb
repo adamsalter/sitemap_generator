@@ -37,20 +37,20 @@ describe "SitemapGenerator" do
     
     url = doc.at_xpath("//url")
     loc = url.at_xpath("loc")
-    loc.text.should == 'http://www.example.com/my_page.html'
+    expect(loc.text).to eq('http://www.example.com/my_page.html')
     
     pagemap =  doc.at_xpath('//pagemap:PageMap', 'pagemap' => schema)
-    pagemap.element_children.count.should == 2
+    expect(pagemap.element_children.count).to eq(2)
     dataobject = pagemap.at_xpath('//pagemap:DataObject')
-    dataobject.attributes['type'].value.should == 'document'
-    dataobject.attributes['id'].value.should == 'hibachi'
-    dataobject.element_children.count.should == 2
+    expect(dataobject.attributes['type'].value).to eq('document')
+    expect(dataobject.attributes['id'].value).to eq('hibachi')
+    expect(dataobject.element_children.count).to eq(2)
     first_attribute = dataobject.element_children.first
     second_attribute = dataobject.element_children.last
-    first_attribute.text.should == 'Dragon'
-    first_attribute.attributes['name'].value.should == 'name'
-    second_attribute.text.should == '3.5'
-    second_attribute.attributes['name'].value.should == 'review'
+    expect(first_attribute.text).to eq('Dragon')
+    expect(first_attribute.attributes['name'].value).to eq('name')
+    expect(second_attribute.text).to eq('3.5')
+    expect(second_attribute.attributes['name'].value).to eq('review')
 
     xml_fragment_should_validate_against_schema(pagemap, 'sitemap-pagemap', 'xmlns:pagemap' => schema)
   end

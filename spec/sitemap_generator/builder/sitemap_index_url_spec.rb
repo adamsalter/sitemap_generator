@@ -11,18 +11,18 @@ describe SitemapGenerator::Builder::SitemapIndexUrl do
   let(:url)  { SitemapGenerator::Builder::SitemapUrl.new(index) }
 
   it "should return the correct url" do
-    url[:loc].should == 'http://test.com/sitemaps/sitemap_index.xml.gz'
+    expect(url[:loc]).to eq('http://test.com/sitemaps/sitemap_index.xml.gz')
   end
 
   it "should use the host from the index" do
     host = 'http://myexample.com'
     index.location.expects(:host).returns(host)
-    url[:host].should == host
+    expect(url[:host]).to eq(host)
   end
 
   it "should use the public path for the link" do
     path = '/path'
     index.location.expects(:path_in_public).returns(path)
-    url[:loc].should == 'http://test.com/path'
+    expect(url[:loc]).to eq('http://test.com/path')
   end
 end

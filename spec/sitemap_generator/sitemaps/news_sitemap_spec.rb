@@ -24,18 +24,18 @@ describe "SitemapGenerator" do
 
     url = doc.at_xpath("//url")
     loc = url.at_xpath("loc")
-    loc.text.should == 'http://www.example.com/my_article.html'
+    expect(loc.text).to eq('http://www.example.com/my_article.html')
 
     news = doc.at_xpath("//news:news")
 
-    news.at_xpath('//news:title').text.should == "My Article"
-    news.at_xpath("//news:keywords").text.should == "my article, articles about myself"
-    news.at_xpath("//news:stock_tickers").text.should == "SAO:PETR3"
-    news.at_xpath("//news:publication_date").text.should == "2011-08-22"
-    news.at_xpath("//news:access").text.should == "Subscription"
-    news.at_xpath("//news:genres").text.should == "PressRelease"
-    news.at_xpath("//news:name").text.should == "Example"
-    news.at_xpath("//news:language").text.should == "en"
+    expect(news.at_xpath('//news:title').text).to eq("My Article")
+    expect(news.at_xpath("//news:keywords").text).to eq("my article, articles about myself")
+    expect(news.at_xpath("//news:stock_tickers").text).to eq("SAO:PETR3")
+    expect(news.at_xpath("//news:publication_date").text).to eq("2011-08-22")
+    expect(news.at_xpath("//news:access").text).to eq("Subscription")
+    expect(news.at_xpath("//news:genres").text).to eq("PressRelease")
+    expect(news.at_xpath("//news:name").text).to eq("Example")
+    expect(news.at_xpath("//news:language").text).to eq("en")
 
     xml_fragment_should_validate_against_schema(news, 'sitemap-news', 'xmlns:news' => SitemapGenerator::SCHEMAS['news'])
   end

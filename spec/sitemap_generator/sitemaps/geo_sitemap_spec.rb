@@ -16,12 +16,12 @@ describe "SitemapGenerator" do
     # Check that the options were parsed correctly
     doc = Nokogiri::XML.parse("<root xmlns:geo='#{SitemapGenerator::SCHEMAS['geo']}'>#{geo_xml_fragment}</root>")
     url = doc.at_xpath("//url")
-    url.should_not be_nil
-    url.at_xpath("loc").text.should == loc
+    expect(url).not_to be_nil
+    expect(url.at_xpath("loc").text).to eq(loc)
 
     geo = url.at_xpath("geo:geo")
-    geo.should_not be_nil
-    geo.at_xpath("geo:format").text.should == format
+    expect(geo).not_to be_nil
+    expect(geo.at_xpath("geo:format").text).to eq(format)
 
     # Google's documentation and published schema don't match some valid elements may
     # not validate.

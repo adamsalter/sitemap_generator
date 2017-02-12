@@ -28,7 +28,7 @@ describe SitemapGenerator::Application do
     it "should identify the rails version correctly" do
       tests.each do |version, result|
         Rails.expects(:version).returns(version)
-        @app.rails3?.should == result
+        expect(@app.rails3?).to eq(result)
       end
     end
   end
@@ -40,9 +40,9 @@ describe SitemapGenerator::Application do
     end
 
     it "should use the Rails.root" do
-      @app.root.should be_a(Pathname)
-      @app.root.to_s.should == @root
-      (@app.root + 'public/').to_s.should == File.join(@root, 'public/')
+      expect(@app.root).to be_a(Pathname)
+      expect(@app.root.to_s).to eq(@root)
+      expect((@app.root + 'public/').to_s).to eq(File.join(@root, 'public/'))
     end
   end
 
@@ -57,13 +57,13 @@ describe SitemapGenerator::Application do
     end
 
     it "should not be Rails" do
-      @app.rails?.should be false
+      expect(@app.rails?).to be false
     end
 
     it "should use the current working directory" do
-      @app.root.should be_a(Pathname)
-      @app.root.to_s.should == Dir.getwd
-      (@app.root + 'public/').to_s.should == File.join(Dir.getwd, 'public/')
+      expect(@app.root).to be_a(Pathname)
+      expect(@app.root.to_s).to eq(Dir.getwd)
+      expect((@app.root + 'public/').to_s).to eq(File.join(Dir.getwd, 'public/'))
     end
   end
 end

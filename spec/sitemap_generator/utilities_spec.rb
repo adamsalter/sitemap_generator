@@ -4,66 +4,66 @@ describe SitemapGenerator::Utilities do
 
   describe "assert_valid_keys" do
     it "should raise error on invalid keys" do
-      lambda {
+      expect {
         SitemapGenerator::Utilities.assert_valid_keys({ :name => "Rob", :years => "28" }, :name, :age)
-      }.should raise_exception(ArgumentError)
-      lambda {
+      }.to raise_exception(ArgumentError)
+      expect {
         SitemapGenerator::Utilities.assert_valid_keys({ :name => "Rob", :age => "28" }, "name", "age")
-      }.should raise_exception(ArgumentError)
+      }.to raise_exception(ArgumentError)
     end
 
     it "should not raise error on valid keys" do
-      lambda {
+      expect {
         SitemapGenerator::Utilities.assert_valid_keys({ :name => "Rob", :age => "28" }, :name, :age)
-      }.should_not raise_exception
+      }.not_to raise_exception
 
-      lambda {
+      expect {
         SitemapGenerator::Utilities.assert_valid_keys({ :name => "Rob" }, :name, :age)
-      }.should_not raise_exception
+      }.not_to raise_exception
     end
   end
 
   describe "titleize" do
     it "should titleize words and replace underscores" do
-      SitemapGenerator::Utilities.titleize('google').should == 'Google'
-      SitemapGenerator::Utilities.titleize('amy_and_jon').should == 'Amy And Jon'
+      expect(SitemapGenerator::Utilities.titleize('google')).to eq('Google')
+      expect(SitemapGenerator::Utilities.titleize('amy_and_jon')).to eq('Amy And Jon')
     end
   end
 
   describe "truthy?" do
     it "should be truthy" do
       ['1', 1, 't', 'true', true].each do |value|
-        SitemapGenerator::Utilities.truthy?(value).should be true
+        expect(SitemapGenerator::Utilities.truthy?(value)).to be true
       end
-      SitemapGenerator::Utilities.truthy?(nil).should be false
+      expect(SitemapGenerator::Utilities.truthy?(nil)).to be false
     end
   end
 
   describe "falsy?" do
     it "should be falsy" do
       ['0', 0, 'f', 'false', false].each do |value|
-        SitemapGenerator::Utilities.falsy?(value).should be true
+        expect(SitemapGenerator::Utilities.falsy?(value)).to be true
       end
-      SitemapGenerator::Utilities.falsy?(nil).should be false
+      expect(SitemapGenerator::Utilities.falsy?(nil)).to be false
     end
   end
 
   describe "as_array" do
     it "should return an array unchanged" do
-      SitemapGenerator::Utilities.as_array([]).should == []
-      SitemapGenerator::Utilities.as_array([1]).should == [1]
-      SitemapGenerator::Utilities.as_array([1,2,3]).should == [1,2,3]
+      expect(SitemapGenerator::Utilities.as_array([])).to eq([])
+      expect(SitemapGenerator::Utilities.as_array([1])).to eq([1])
+      expect(SitemapGenerator::Utilities.as_array([1,2,3])).to eq([1,2,3])
     end
 
     it "should return empty array on nil" do
-      SitemapGenerator::Utilities.as_array(nil).should == []
+      expect(SitemapGenerator::Utilities.as_array(nil)).to eq([])
     end
 
     it "should make array of item otherwise" do
-      SitemapGenerator::Utilities.as_array('').should == ['']
-      SitemapGenerator::Utilities.as_array(1).should == [1]
-      SitemapGenerator::Utilities.as_array('hello').should == ['hello']
-      SitemapGenerator::Utilities.as_array({}).should == [{}]
+      expect(SitemapGenerator::Utilities.as_array('')).to eq([''])
+      expect(SitemapGenerator::Utilities.as_array(1)).to eq([1])
+      expect(SitemapGenerator::Utilities.as_array('hello')).to eq(['hello'])
+      expect(SitemapGenerator::Utilities.as_array({})).to eq([{}])
     end
   end
 
@@ -81,21 +81,21 @@ describe SitemapGenerator::Utilities do
     it "should not modify when less than or equal to max" do
       (1..10).each do |i|
         string = 'a'*i
-        SitemapGenerator::Utilities.ellipsis(string, 10).should == string
+        expect(SitemapGenerator::Utilities.ellipsis(string, 10)).to eq(string)
       end
     end
 
     it "should replace last 3 characters with ellipsis when greater than max" do
       (1..5).each do |i|
         string = 'aaaaa' + 'a'*i
-        SitemapGenerator::Utilities.ellipsis(string, 5).should == 'aa...'
+        expect(SitemapGenerator::Utilities.ellipsis(string, 5)).to eq('aa...')
       end
     end
 
     it "should not freak out when string too small" do
-      SitemapGenerator::Utilities.ellipsis('a', 1).should == 'a'
-      SitemapGenerator::Utilities.ellipsis('aa', 1).should == '...'
-      SitemapGenerator::Utilities.ellipsis('aaa', 1).should == '...'
+      expect(SitemapGenerator::Utilities.ellipsis('a', 1)).to eq('a')
+      expect(SitemapGenerator::Utilities.ellipsis('aa', 1)).to eq('...')
+      expect(SitemapGenerator::Utilities.ellipsis('aaa', 1)).to eq('...')
     end
   end
 end

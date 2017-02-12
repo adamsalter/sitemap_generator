@@ -15,22 +15,22 @@ describe SitemapGenerator::Interpreter do
     SitemapGenerator::Utilities.with_warnings(nil) do
       Rails = stub(:root => SitemapGenerator.app.root.to_s.sub(/\/$/, ''))
     end
-    lambda { SitemapGenerator::Interpreter.run }.should_not raise_error
+    expect { SitemapGenerator::Interpreter.run }.not_to raise_error
   end
 
   it "should set the verbose option" do
     SitemapGenerator::Interpreter.any_instance.expects(:instance_eval)
     interpreter = SitemapGenerator::Interpreter.run(:verbose => true)
-    interpreter.instance_variable_get(:@linkset).verbose.should be true
+    expect(interpreter.instance_variable_get(:@linkset).verbose).to be true
   end
 
   describe "link_set" do
     it "should default to the default LinkSet" do
-      SitemapGenerator::Interpreter.new.sitemap.should be(SitemapGenerator::Sitemap)
+      expect(SitemapGenerator::Interpreter.new.sitemap).to be(SitemapGenerator::Sitemap)
     end
 
     it "should allow setting the LinkSet as an option" do
-      interpreter.sitemap.should be(link_set)
+      expect(interpreter.sitemap).to be(link_set)
     end
   end
 
@@ -51,7 +51,7 @@ describe SitemapGenerator::Interpreter do
 
     describe "sitemap" do
       it "should return the LinkSet" do
-        interpreter.sitemap.should be(link_set)
+        expect(interpreter.sitemap).to be(link_set)
       end
     end
 
@@ -66,7 +66,7 @@ describe SitemapGenerator::Interpreter do
   describe "eval" do
     it "should yield the LinkSet to the block" do
       interpreter.eval(:yield_sitemap => true) do |sitemap|
-        sitemap.should be(link_set)
+        expect(sitemap).to be(link_set)
       end
     end
 

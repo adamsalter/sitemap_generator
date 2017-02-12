@@ -21,23 +21,23 @@ describe SitemapGenerator::Numeric do
       }
 
       relationships.each do |left, right|
-        left.should == right
+        expect(left).to eq(right)
       end
     end
 
     it "should represent units as bytes" do
-      numeric(3).megabytes.should == 3145728
-      numeric(3).megabyte .should == 3145728
-      numeric(3).kilobytes.should == 3072
-      numeric(3).kilobyte .should == 3072
-      numeric(3).gigabytes.should == 3221225472
-      numeric(3).gigabyte .should == 3221225472
-      numeric(3).terabytes.should == 3298534883328
-      numeric(3).terabyte .should == 3298534883328
-      numeric(3).petabytes.should == 3377699720527872
-      numeric(3).petabyte .should == 3377699720527872
-      numeric(3).exabytes .should == 3458764513820540928
-      numeric(3).exabyte  .should == 3458764513820540928
+      expect(numeric(3).megabytes).to eq(3145728)
+      expect(numeric(3).megabyte) .to eq(3145728)
+      expect(numeric(3).kilobytes).to eq(3072)
+      expect(numeric(3).kilobyte) .to eq(3072)
+      expect(numeric(3).gigabytes).to eq(3221225472)
+      expect(numeric(3).gigabyte) .to eq(3221225472)
+      expect(numeric(3).terabytes).to eq(3298534883328)
+      expect(numeric(3).terabyte) .to eq(3298534883328)
+      expect(numeric(3).petabytes).to eq(3377699720527872)
+      expect(numeric(3).petabyte) .to eq(3377699720527872)
+      expect(numeric(3).exabytes) .to eq(3458764513820540928)
+      expect(numeric(3).exabyte)  .to eq(3458764513820540928)
     end
   end
 end

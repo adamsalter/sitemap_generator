@@ -4,8 +4,8 @@ describe "Templates class" do
 
   it "should provide method access to each template" do
     SitemapGenerator::Templates::FILES.each do |name, file|
-      SitemapGenerator.templates.send(name).should_not be(nil)
-      SitemapGenerator.templates.send(name).should == File.read(File.join(SitemapGenerator.root, 'templates', file))
+      expect(SitemapGenerator.templates.send(name)).not_to be(nil)
+      expect(SitemapGenerator.templates.send(name)).to eq(File.read(File.join(SitemapGenerator.root, 'templates', file)))
     end
   end
 

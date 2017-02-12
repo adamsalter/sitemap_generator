@@ -14,11 +14,11 @@ describe "SitemapGenerator" do
     # Check that the options were parsed correctly
     doc = Nokogiri::XML.parse("<root xmlns:mobile='#{SitemapGenerator::SCHEMAS['mobile']}'>#{mobile_xml_fragment}</root>")
     url = doc.at_xpath("//url")
-    url.should_not be_nil
-    url.at_xpath("loc").text.should == loc
+    expect(url).not_to be_nil
+    expect(url.at_xpath("loc").text).to eq(loc)
 
     mobile = url.at_xpath("mobile:mobile")
-    mobile.should_not be_nil
+    expect(mobile).not_to be_nil
 
     # Google's documentation and published schema don't match some valid elements may
     # not validate.

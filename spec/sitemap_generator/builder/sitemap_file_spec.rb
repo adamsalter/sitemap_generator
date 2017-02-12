@@ -6,32 +6,32 @@ describe 'SitemapGenerator::Builder::SitemapFile' do
 
   it "should have a default namer" do
     sitemap = SitemapGenerator::Builder::SitemapFile.new
-    sitemap.location.filename.should == 'sitemap1.xml.gz'
+    expect(sitemap.location.filename).to eq('sitemap1.xml.gz')
   end
 
   it "should return the name of the sitemap file" do
-    sitemap.location.filename.should == 'sitemap1.xml.gz'
+    expect(sitemap.location.filename).to eq('sitemap1.xml.gz')
   end
 
   it "should return the URL" do
-    sitemap.location.url.should == 'http://example.com/test/sitemap1.xml.gz'
+    expect(sitemap.location.url).to eq('http://example.com/test/sitemap1.xml.gz')
   end
 
   it "should return the path" do
-    sitemap.location.path.should == File.expand_path('tmp/test/sitemap1.xml.gz')
+    expect(sitemap.location.path).to eq(File.expand_path('tmp/test/sitemap1.xml.gz'))
   end
 
   it "should be empty" do
-    sitemap.empty?.should be true
-    sitemap.link_count.should == 0
+    expect(sitemap.empty?).to be true
+    expect(sitemap.link_count).to eq(0)
   end
 
   it "should not be finalized" do
-    sitemap.finalized?.should be false
+    expect(sitemap.finalized?).to be false
   end
 
   it "should raise if no default host is set" do
-    lambda { SitemapGenerator::Builder::SitemapFile.new.location.url }.should raise_error(SitemapGenerator::SitemapError)
+    expect { SitemapGenerator::Builder::SitemapFile.new.location.url }.to raise_error(SitemapGenerator::SitemapError)
   end
 
   describe "lastmod" do
@@ -39,18 +39,18 @@ describe 'SitemapGenerator::Builder::SitemapFile' do
       lastmod = (Time.now - 1209600)
       sitemap.location.reserve_name
       File.expects(:mtime).with(sitemap.location.path).returns(lastmod)
-      sitemap.lastmod.should == lastmod
+      expect(sitemap.lastmod).to eq(lastmod)
     end
 
     it "should be nil if the location has not reserved a name" do
       File.expects(:mtime).never
-      sitemap.lastmod.should be_nil
+      expect(sitemap.lastmod).to be_nil
     end
 
     it "should be nil if location has reserved a name and the file DNE" do
       sitemap.location.reserve_name
       File.expects(:mtime).raises(Errno::ENOENT)
-      sitemap.lastmod.should be_nil
+      expect(sitemap.lastmod).to be_nil
     end
   end
 
@@ -65,26 +65,26 @@ describe 'SitemapGenerator::Builder::SitemapFile' do
 
     it "should inherit the same options" do
       # The name is the same because the original sitemap was not finalized
-      new_sitemap.location.url.should == 'http://example.com/test/sitemap1.xml.gz'
-      new_sitemap.location.path.should == File.expand_path('tmp/test/sitemap1.xml.gz')
+      expect(new_sitemap.location.url).to eq('http://example.com/test/sitemap1.xml.gz')
+      expect(new_sitemap.location.path).to eq(File.expand_path('tmp/test/sitemap1.xml.gz'))
     end
 
     it "should not share the same location instance" do
-      new_sitemap.location.should_not be(original_sitemap.location)
+      expect(new_sitemap.location).not_to be(original_sitemap.location)
     end
 
     it "should inherit the same namer instance" do
-      new_sitemap.location.namer.should == original_sitemap.location.namer
+      expect(new_sitemap.location.namer).to eq(original_sitemap.location.namer)
     end
   end
 
   describe "reserve_name" do
     it "should reserve the name from the location" do
-      sitemap.reserved_name?.should be false
+      expect(sitemap.reserved_name?).to be false
       sitemap.location.expects(:reserve_name).returns('name')
       sitemap.reserve_name
-      sitemap.reserved_name?.should be true
-      sitemap.instance_variable_get(:@reserved_name).should == 'name'
+      expect(sitemap.reserved_name?).to be true
+      expect(sitemap.instance_variable_get(:@reserved_name)).to eq('name')
     end
 
     it "should be safe to call multiple times" do
@@ -120,7 +120,7 @@ describe 'SitemapGenerator::Builder::SitemapFile' do
       let(:max_sitemap_links) { link_count + 1 }
 
       it 'returns true' do
-        sitemap.file_can_fit?(1).should be true
+        expect(sitemap.file_can_fit?(1)).to be true
       end
     end
 
@@ -128,7 +128,7 @@ describe 'SitemapGenerator::Builder::SitemapFile' do
       let(:max_sitemap_links) { link_count }
 
       it 'returns true' do
-        sitemap.file_can_fit?(1).should be false
+        expect(sitemap.file_can_fit?(1)).to be false
       end
     end
   end
@@ -136,7 +136,7 @@ describe 'SitemapGenerator::Builder::SitemapFile' do
   describe 'max_sitemap_links' do
     context 'when not present in the location' do
       it 'returns SitemapGenerator::MAX_SITEMAP_LINKS' do
-        sitemap.max_sitemap_links.should == SitemapGenerator::MAX_SITEMAP_LINKS
+        expect(sitemap.max_sitemap_links).to eq(SitemapGenerator::MAX_SITEMAP_LINKS)
       end
     end
 
@@ -146,7 +146,7 @@ describe 'SitemapGenerator::Builder::SitemapFile' do
       end
 
       it 'returns the value from the location' do
-        sitemap.max_sitemap_links.should == 10
+        expect(sitemap.max_sitemap_links).to eq(10)
       end
     end
   end

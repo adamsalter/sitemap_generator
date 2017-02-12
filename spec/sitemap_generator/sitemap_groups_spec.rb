@@ -28,7 +28,7 @@ describe "Sitemap Groups" do
   it "should add default links if no groups are created" do
     linkset.create do
     end
-    linkset.link_count.should == 1
+    expect(linkset.link_count).to eq(1)
     file_should_exist(SitemapGenerator.app.root + 'public/sitemap.xml.gz')
     file_should_not_exist(SitemapGenerator.app.root + 'public/sitemap1.xml.gz')
   end
@@ -41,7 +41,7 @@ describe "Sitemap Groups" do
       end
       add '/after'
     end
-    linkset.link_count.should == 4
+    expect(linkset.link_count).to eq(4)
     file_should_exist(SitemapGenerator.app.root + 'public/sitemap.xml.gz')
     file_should_exist(SitemapGenerator.app.root + 'public/sitemap1.xml.gz')
     file_should_exist(SitemapGenerator.app.root + 'public/sitemap_en.xml.gz')
@@ -59,7 +59,7 @@ describe "Sitemap Groups" do
       end
       add '/after'
     end
-    linkset.link_count.should == 4
+    expect(linkset.link_count).to eq(4)
     file_should_exist(SitemapGenerator.app.root + 'public/sitemap.xml.gz')
     file_should_exist(SitemapGenerator.app.root + 'public/sitemap1.xml.gz')
     file_should_exist(SitemapGenerator.app.root + 'public/sitemap2.xml.gz')
@@ -78,7 +78,7 @@ describe "Sitemap Groups" do
         add '/one'
       end
     end
-    linkset.link_count.should == 2
+    expect(linkset.link_count).to eq(2)
     file_should_exist(SitemapGenerator.app.root + 'public/sitemap.xml.gz')
     file_should_exist(SitemapGenerator.app.root + 'public/en/sitemap_en.xml.gz')
     file_should_exist(SitemapGenerator.app.root + 'public/fr/sitemap_fr.xml.gz')
@@ -92,7 +92,7 @@ describe "Sitemap Groups" do
       group(:filename => :second) { add '/four' }
       add 'five'
     end
-    linkset.link_count.should == 6
+    expect(linkset.link_count).to eq(6)
     file_should_exist(SitemapGenerator.app.root + 'public/sitemap.xml.gz')
     file_should_exist(SitemapGenerator.app.root + 'public/sitemap1.xml.gz')
     file_should_exist(SitemapGenerator.app.root + 'public/first.xml.gz')
@@ -109,7 +109,7 @@ describe "Sitemap Groups" do
       group(:default_host => 'http://betterhost.com') { add '/four' }
       add 'five'
     end
-    linkset.link_count.should == 6
+    expect(linkset.link_count).to eq(6)
     file_should_exist(SitemapGenerator.app.root + 'public/sitemap.xml.gz')
     file_should_not_exist(SitemapGenerator.app.root + 'public/sitemap1.xml.gz')
     gzipped_xml_file_should_validate_against_schema(SitemapGenerator.app.root + 'public/sitemap.xml.gz', 'sitemap')
@@ -123,7 +123,7 @@ describe "Sitemap Groups" do
       group(:sitemaps_host => 'http://newhost.com') { add '/four' }
       add 'five'
     end
-    linkset.link_count.should == 6
+    expect(linkset.link_count).to eq(6)
     file_should_exist(SitemapGenerator.app.root + 'public/sitemap.xml.gz')
     file_should_exist(SitemapGenerator.app.root + 'public/sitemap1.xml.gz')
     file_should_exist(SitemapGenerator.app.root + 'public/sitemap2.xml.gz')
