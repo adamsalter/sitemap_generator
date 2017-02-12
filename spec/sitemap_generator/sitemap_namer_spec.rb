@@ -43,7 +43,7 @@ describe SitemapGenerator::SimpleNamer do
   it "should raise if already at the start" do
     namer = SitemapGenerator::SimpleNamer.new(:sitemap)
     namer.to_s.should == "sitemap.xml.gz"
-    lambda { namer.previous }.should raise_error
+    lambda { namer.previous }.should raise_error(NameError, 'Already at the start of the series')
   end
 
   it "should handle names with underscores" do

@@ -18,21 +18,21 @@ describe SitemapGenerator::SitemapLocation do
     location[:filename] = nil
     lambda {
       location.filename.should be_nil
-    }.should raise_error
+    }.should raise_error(SitemapGenerator::SitemapError, 'No filename or namer set')
   end
 
   it "should require a namer" do
     location[:namer] = nil
     lambda {
       location.filename.should be_nil
-    }.should raise_error
+    }.should raise_error(SitemapGenerator::SitemapError, 'No filename or namer set')
   end
 
   it "should require a host" do
     location = SitemapGenerator::SitemapLocation.new(:filename => nil, :namer => nil)
     lambda {
       location.host.should be_nil
-    }.should raise_error
+    }.should raise_error(SitemapGenerator::SitemapError, 'No value set for host')
   end
 
   it "should accept a Namer option" do

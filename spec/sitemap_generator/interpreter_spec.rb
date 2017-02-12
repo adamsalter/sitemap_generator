@@ -15,8 +15,7 @@ describe SitemapGenerator::Interpreter do
     SitemapGenerator::Utilities.with_warnings(nil) do
       Rails = stub(:root => SitemapGenerator.app.root.to_s.sub(/\/$/, ''))
     end
-    # Rails.expects(:root).returns(rails_root).at_least_once
-    lambda { SitemapGenerator::Interpreter.run }.should_not raise_exception(Errno::ENOENT)
+    lambda { SitemapGenerator::Interpreter.run }.should_not raise_error
   end
 
   it "should set the verbose option" do
