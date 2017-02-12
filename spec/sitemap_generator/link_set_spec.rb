@@ -40,32 +40,32 @@ describe SitemapGenerator::LinkSet do
   describe "include_root include_index option" do
     it "should include the root url and the sitemap index url" do
       ls = SitemapGenerator::LinkSet.new(:default_host => default_host, :include_root => true, :include_index => true)
-      ls.include_root.should be_true
-      ls.include_index.should be_true
+      ls.include_root.should be true
+      ls.include_index.should be true
       ls.create { |sitemap| }
       ls.sitemap.link_count.should == 2
     end
 
     it "should not include the root url" do
       ls = SitemapGenerator::LinkSet.new(:default_host => default_host, :include_root => false)
-      ls.include_root.should be_false
-      ls.include_index.should be_false
+      ls.include_root.should be false
+      ls.include_index.should be false
       ls.create { |sitemap| }
       ls.sitemap.link_count.should == 0
     end
 
     it "should not include the sitemap index url" do
       ls = SitemapGenerator::LinkSet.new(:default_host => default_host, :include_index => false)
-      ls.include_root.should be_true
-      ls.include_index.should be_false
+      ls.include_root.should be true
+      ls.include_index.should be false
       ls.create { |sitemap| }
       ls.sitemap.link_count.should == 1
     end
 
     it "should not include the root url or the sitemap index url" do
       ls = SitemapGenerator::LinkSet.new(:default_host => default_host, :include_root => false, :include_index => false)
-      ls.include_root.should be_false
-      ls.include_index.should be_false
+      ls.include_root.should be false
+      ls.include_index.should be false
       ls.create { |sitemap| }
       ls.sitemap.link_count.should == 0
     end
@@ -186,22 +186,22 @@ describe SitemapGenerator::LinkSet do
 
   describe "verbose" do
     it "should be set as an initialize option" do
-      SitemapGenerator::LinkSet.new(:default_host => default_host, :verbose => false).verbose.should be_false
-      SitemapGenerator::LinkSet.new(:default_host => default_host, :verbose => true).verbose.should be_true
+      SitemapGenerator::LinkSet.new(:default_host => default_host, :verbose => false).verbose.should be false
+      SitemapGenerator::LinkSet.new(:default_host => default_host, :verbose => true).verbose.should be true
     end
 
     it "should be set as an accessor" do
       ls.verbose = true
-      ls.verbose.should be_true
+      ls.verbose.should be true
       ls.verbose = false
-      ls.verbose.should be_false
+      ls.verbose.should be false
     end
 
     it "should use SitemapGenerator.verbose as a default" do
       SitemapGenerator.expects(:verbose).returns(true).at_least_once
-      SitemapGenerator::LinkSet.new.verbose.should be_true
+      SitemapGenerator::LinkSet.new.verbose.should be true
       SitemapGenerator.expects(:verbose).returns(false).at_least_once
-      SitemapGenerator::LinkSet.new.verbose.should be_false
+      SitemapGenerator::LinkSet.new.verbose.should be false
     end
   end
 
@@ -260,7 +260,7 @@ describe SitemapGenerator::LinkSet do
 
     it "should not finalize the index" do
       @ls.send(:finalize_sitemap_index!)
-      @ls.sitemap_index.finalized?.should be_false
+      @ls.sitemap_index.finalized?.should be false
     end
   end
 
@@ -275,7 +275,7 @@ describe SitemapGenerator::LinkSet do
       end
 
       it "should protect the sitemap_index" do
-        ls.group.instance_variable_get(:@protect_index).should be_true
+        ls.group.instance_variable_get(:@protect_index).should be true
       end
 
       it "should not allow chaning the public_path" do
@@ -289,7 +289,7 @@ describe SitemapGenerator::LinkSet do
       end
 
       it "should default to false" do
-        ls.group.include_index.should be_false
+        ls.group.include_index.should be false
       end
     end
 
@@ -299,7 +299,7 @@ describe SitemapGenerator::LinkSet do
       end
 
       it "should default to false" do
-        ls.group.include_root.should be_false
+        ls.group.include_root.should be false
       end
     end
 
@@ -424,13 +424,13 @@ describe SitemapGenerator::LinkSet do
     describe "finalizing" do
       it "should only finalize the sitemaps if a block is passed" do
         @group = ls.group
-        @group.sitemap.finalized?.should be_false
+        @group.sitemap.finalized?.should be false
       end
 
       it "should not finalize the sitemap if a group is created" do
         ls.create { group {} }
-        ls.sitemap.empty?.should be_true
-        ls.sitemap.finalized?.should be_false
+        ls.sitemap.empty?.should be true
+        ls.sitemap.finalized?.should be false
       end
 
       {:sitemaps_path => 'en/',
@@ -464,18 +464,18 @@ describe SitemapGenerator::LinkSet do
   describe "after create" do
     it "should finalize the sitemap index" do
       ls.create {}
-      ls.sitemap_index.finalized?.should be_true
+      ls.sitemap_index.finalized?.should be true
     end
 
     it "should finalize the sitemap" do
       ls.create {}
-      ls.sitemap.finalized?.should be_true
+      ls.sitemap.finalized?.should be true
     end
 
     it "should not finalize the sitemap if a group was created" do
       ls.instance_variable_set(:@created_group, true)
       ls.send(:finalize_sitemap!)
-      ls.sitemap.finalized?.should be_false
+      ls.sitemap.finalized?.should be false
     end
   end
 
@@ -581,12 +581,12 @@ describe SitemapGenerator::LinkSet do
   describe "include_root?" do
     it "should return false" do
       ls.include_root = false
-      ls.include_root.should be_false
+      ls.include_root.should be false
     end
 
     it "should return true" do
       ls.include_root = true
-      ls.include_root.should be_true
+      ls.include_root.should be true
     end
   end
 
@@ -596,25 +596,25 @@ describe SitemapGenerator::LinkSet do
     it "should be true if no sitemaps_host set, or it is the same" do
       ls.include_index = true
       ls.sitemaps_host = default_host
-      ls.include_index?.should be_true
+      ls.include_index?.should be true
 
       ls.sitemaps_host = nil
-      ls.include_index?.should be_true
+      ls.include_index?.should be true
     end
 
     it "should be false if include_index is false or sitemaps_host differs" do
       ls.include_index = false
       ls.sitemaps_host = default_host
-      ls.include_index?.should be_false
+      ls.include_index?.should be false
 
       ls.include_index = true
       ls.sitemaps_host = sitemaps_host
-      ls.include_index?.should be_false
+      ls.include_index?.should be false
     end
 
     it "should return false" do
       ls = SitemapGenerator::LinkSet.new(:default_host => default_host, :sitemaps_host => sitemaps_host)
-      ls.include_index?.should be_false
+      ls.include_index?.should be false
     end
   end
 
@@ -635,22 +635,22 @@ describe SitemapGenerator::LinkSet do
   describe "yield_sitemap" do
     it "should default to the value of SitemapGenerator.yield_sitemap?" do
       SitemapGenerator.expects(:yield_sitemap?).returns(true)
-      ls.yield_sitemap?.should be_true
+      ls.yield_sitemap?.should be true
       SitemapGenerator.expects(:yield_sitemap?).returns(false)
-      ls.yield_sitemap?.should be_false
+      ls.yield_sitemap?.should be false
     end
 
     it "should be settable as an option" do
       SitemapGenerator.expects(:yield_sitemap?).never
-      SitemapGenerator::LinkSet.new(:yield_sitemap => true).yield_sitemap?.should be_true
-      SitemapGenerator::LinkSet.new(:yield_sitemap => false).yield_sitemap?.should be_false
+      SitemapGenerator::LinkSet.new(:yield_sitemap => true).yield_sitemap?.should be true
+      SitemapGenerator::LinkSet.new(:yield_sitemap => false).yield_sitemap?.should be false
     end
 
     it "should be settable as an attribute" do
       ls.yield_sitemap = true
-      ls.yield_sitemap?.should be_true
+      ls.yield_sitemap?.should be true
       ls.yield_sitemap = false
-      ls.yield_sitemap?.should be_false
+      ls.yield_sitemap?.should be false
     end
 
     it "should yield the sitemap in the call to create" do
@@ -728,7 +728,7 @@ describe SitemapGenerator::LinkSet do
 
       it "should not write the index" do
         ls.send(:finalize_sitemap_index!)
-        ls.sitemap_index.written?.should be_false
+        ls.sitemap_index.written?.should be false
       end
 
       it "should still add finalized sitemaps to the index (but the index is never finalized)" do
@@ -742,7 +742,7 @@ describe SitemapGenerator::LinkSet do
 
       it "should always finalize the index" do
         ls.send(:finalize_sitemap_index!)
-        ls.sitemap_index.finalized?.should be_true
+        ls.sitemap_index.finalized?.should be true
       end
 
       it "should add finalized sitemaps to the index" do
@@ -755,9 +755,9 @@ describe SitemapGenerator::LinkSet do
       let(:ls)  { SitemapGenerator::LinkSet.new(:default_host => default_host, :create_index => :auto) }
 
       it "should not write the index when it is empty" do
-        ls.sitemap_index.empty?.should be_true
+        ls.sitemap_index.empty?.should be true
         ls.send(:finalize_sitemap_index!)
-        ls.sitemap_index.written?.should be_false
+        ls.sitemap_index.written?.should be false
       end
 
       it "should add finalized sitemaps to the index" do
@@ -767,9 +767,9 @@ describe SitemapGenerator::LinkSet do
 
       it "should write the index when a link is added manually" do
         ls.sitemap_index.add '/test'
-        ls.sitemap_index.empty?.should be_false
+        ls.sitemap_index.empty?.should be false
         ls.send(:finalize_sitemap_index!)
-        ls.sitemap_index.written?.should be_true
+        ls.sitemap_index.written?.should be true
 
         # Test that the index url is reported correctly
         ls.sitemap_index.index_url.should == 'http://example.com/sitemap.xml.gz'
@@ -777,9 +777,9 @@ describe SitemapGenerator::LinkSet do
 
       it "should not write the index when only one sitemap is added (considered internal usage)" do
         ls.sitemap_index.add sitemap
-        ls.sitemap_index.empty?.should be_false
+        ls.sitemap_index.empty?.should be false
         ls.send(:finalize_sitemap_index!)
-        ls.sitemap_index.written?.should be_false
+        ls.sitemap_index.written?.should be false
 
         # Test that the index url is reported correctly
         ls.sitemap_index.index_url.should == sitemap.location.url
@@ -789,7 +789,7 @@ describe SitemapGenerator::LinkSet do
         ls.sitemap_index.add sitemap
         ls.sitemap_index.add sitemap.new
         ls.send(:finalize_sitemap_index!)
-        ls.sitemap_index.written?.should be_true
+        ls.sitemap_index.written?.should be true
 
         # Test that the index url is reported correctly
         ls.sitemap_index.index_url.should == ls.sitemap_index.location.url
@@ -800,7 +800,7 @@ describe SitemapGenerator::LinkSet do
         ls.sitemap_index.add '/test1'
         ls.sitemap_index.add '/test2'
         ls.send(:finalize_sitemap_index!)
-        ls.sitemap_index.written?.should be_true
+        ls.sitemap_index.written?.should be true
 
         # Test that the index url is reported correctly
         ls.sitemap_index.index_url.should == 'http://example.com/sitemap.xml.gz'
@@ -814,14 +814,14 @@ describe SitemapGenerator::LinkSet do
     end
 
     it "should not be written" do
-      ls.sitemap.empty?.should be_true
+      ls.sitemap.empty?.should be true
       ls.expects(:add_to_index).never
       ls.send(:finalize_sitemap!)
     end
 
     it "should be written" do
       ls.sitemap.add '/test'
-      ls.sitemap.empty?.should be_false
+      ls.sitemap.empty?.should be false
       ls.expects(:add_to_index).with(ls.sitemap)
       ls.send(:finalize_sitemap!)
     end
@@ -829,36 +829,36 @@ describe SitemapGenerator::LinkSet do
 
   describe "compress" do
     it "should be true by default" do
-      ls.compress.should be_true
+      ls.compress.should be true
     end
 
     it "should be set on the location objects" do
-      ls.sitemap.location[:compress].should be_true
-      ls.sitemap_index.location[:compress].should be_true
+      ls.sitemap.location[:compress].should be true
+      ls.sitemap_index.location[:compress].should be true
     end
 
     it "should be settable and gettable" do
       ls.compress = false
-      ls.compress.should be_false
+      ls.compress.should be false
       ls.compress = :all_but_first
       ls.compress.should == :all_but_first
     end
 
     it "should update the location objects when set" do
       ls.compress = false
-      ls.sitemap.location[:compress].should be_false
-      ls.sitemap_index.location[:compress].should be_false
+      ls.sitemap.location[:compress].should be false
+      ls.sitemap_index.location[:compress].should be false
     end
 
     describe "in groups" do
       it "should inherit the current compress setting" do
         ls.compress = false
-        ls.group.compress.should be_false
+        ls.group.compress.should be false
       end
 
       it "should set the compress value" do
         group = ls.group(:compress => false)
-        group.compress.should be_false
+        group.compress.should be false
       end
     end
   end

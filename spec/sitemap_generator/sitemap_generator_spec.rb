@@ -287,10 +287,10 @@ describe "SitemapGenerator" do
       original = SitemapGenerator.verbose
       SitemapGenerator.verbose = nil
       ENV['VERBOSE'] = 'true'
-      SitemapGenerator.verbose.should be_true
+      SitemapGenerator.verbose.should be true
       SitemapGenerator.verbose = nil
       ENV['VERBOSE'] = 'false'
-      SitemapGenerator.verbose.should be_false
+      SitemapGenerator.verbose.should be false
       SitemapGenerator.verbose = original
     end
   end
@@ -298,9 +298,9 @@ describe "SitemapGenerator" do
   describe "yield_sitemap" do
     it "should set the yield_sitemap flag" do
       SitemapGenerator.yield_sitemap = false
-      SitemapGenerator.yield_sitemap?.should be_false
+      SitemapGenerator.yield_sitemap?.should be false
       SitemapGenerator.yield_sitemap = true
-      SitemapGenerator.yield_sitemap?.should be_true
+      SitemapGenerator.yield_sitemap?.should be true
       SitemapGenerator.yield_sitemap = false
     end
   end
@@ -536,10 +536,10 @@ describe "SitemapGenerator" do
 
   describe "respond_to?" do
     it "should correctly identify the methods that it responds to" do
-      SitemapGenerator::Sitemap.respond_to?(:create).should be_true
-      SitemapGenerator::Sitemap.respond_to?(:adapter).should be_true
-      SitemapGenerator::Sitemap.respond_to?(:default_host).should be_true
-      SitemapGenerator::Sitemap.respond_to?(:invalid_func).should be_false
+      SitemapGenerator::Sitemap.respond_to?(:create).should be true
+      SitemapGenerator::Sitemap.respond_to?(:adapter).should be true
+      SitemapGenerator::Sitemap.respond_to?(:default_host).should be true
+      SitemapGenerator::Sitemap.respond_to?(:invalid_func).should be false
     end
   end
 

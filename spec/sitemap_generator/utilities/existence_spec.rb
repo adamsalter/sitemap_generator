@@ -15,12 +15,12 @@ describe Object do
   let(:utils) { SitemapGenerator::Utilities }
 
   it "should define blankness" do
-    BLANK.each { |v| utils.blank?(v).should be_true }
-    NOT.each   { |v| utils.blank?(v).should be_false }
+    BLANK.each { |v| utils.blank?(v).should be true }
+    NOT.each   { |v| utils.blank?(v).should be false }
   end
 
   it "should define presence" do
-    BLANK.each { |v| utils.present?(v).should be_false }
-    NOT.each   { |v| utils.present?(v).should be_true }
+    BLANK.each { |v| utils.present?(v).should be false }
+    NOT.each   { |v| utils.present?(v).should be true }
   end
 end

@@ -33,18 +33,18 @@ describe SitemapGenerator::Utilities do
   describe "truthy?" do
     it "should be truthy" do
       ['1', 1, 't', 'true', true].each do |value|
-        SitemapGenerator::Utilities.truthy?(value).should be_true
+        SitemapGenerator::Utilities.truthy?(value).should be true
       end
-      SitemapGenerator::Utilities.truthy?(nil).should be_false
+      SitemapGenerator::Utilities.truthy?(nil).should be false
     end
   end
 
   describe "falsy?" do
     it "should be falsy" do
       ['0', 0, 'f', 'false', false].each do |value|
-        SitemapGenerator::Utilities.falsy?(value).should be_true
+        SitemapGenerator::Utilities.falsy?(value).should be true
       end
-      SitemapGenerator::Utilities.falsy?(nil).should be_false
+      SitemapGenerator::Utilities.falsy?(nil).should be false
     end
   end
 

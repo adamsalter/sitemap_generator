@@ -22,7 +22,7 @@ describe SitemapGenerator::Interpreter do
   it "should set the verbose option" do
     SitemapGenerator::Interpreter.any_instance.expects(:instance_eval)
     interpreter = SitemapGenerator::Interpreter.run(:verbose => true)
-    interpreter.instance_variable_get(:@linkset).verbose.should be_true
+    interpreter.instance_variable_get(:@linkset).verbose.should be true
   end
 
   describe "link_set" do
@@ -55,7 +55,7 @@ describe SitemapGenerator::Interpreter do
         interpreter.sitemap.should be(link_set)
       end
     end
-    
+
     describe "add_to_index" do
       it "should add a link to the sitemap index" do
         link_set.expects(:add_to_index).with('test', :option => 'value')

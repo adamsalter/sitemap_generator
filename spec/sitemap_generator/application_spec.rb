@@ -52,12 +52,12 @@ describe SitemapGenerator::Application do
       Object.send(:remove_const, :Rails)
     end
 
-    after :each do
+    after do
       Object::Rails = @rails
     end
 
     it "should not be Rails" do
-      @app.rails?.should be_false
+      @app.rails?.should be false
     end
 
     it "should use the current working directory" do

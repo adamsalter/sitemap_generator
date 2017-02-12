@@ -1,5 +1,4 @@
 # encoding: UTF-8
-
 require 'spec_helper'
 
 # Don't run this test as part of the unit testing suite as we don't want

@@ -22,12 +22,12 @@ describe 'SitemapGenerator::Builder::SitemapFile' do
   end
 
   it "should be empty" do
-    sitemap.empty?.should be_true
+    sitemap.empty?.should be true
     sitemap.link_count.should == 0
   end
 
   it "should not be finalized" do
-    sitemap.finalized?.should be_false
+    sitemap.finalized?.should be false
   end
 
   it "should raise if no default host is set" do
@@ -80,10 +80,10 @@ describe 'SitemapGenerator::Builder::SitemapFile' do
 
   describe "reserve_name" do
     it "should reserve the name from the location" do
-      sitemap.reserved_name?.should be_false
+      sitemap.reserved_name?.should be false
       sitemap.location.expects(:reserve_name).returns('name')
       sitemap.reserve_name
-      sitemap.reserved_name?.should be_true
+      sitemap.reserved_name?.should be true
       sitemap.instance_variable_get(:@reserved_name).should == 'name'
     end
 
@@ -120,7 +120,7 @@ describe 'SitemapGenerator::Builder::SitemapFile' do
       let(:max_sitemap_links) { link_count + 1 }
 
       it 'returns true' do
-        sitemap.file_can_fit?(1).should be_true
+        sitemap.file_can_fit?(1).should be true
       end
     end
 
@@ -128,7 +128,7 @@ describe 'SitemapGenerator::Builder::SitemapFile' do
       let(:max_sitemap_links) { link_count }
 
       it 'returns true' do
-        sitemap.file_can_fit?(1).should be_false
+        sitemap.file_can_fit?(1).should be false
       end
     end
   end

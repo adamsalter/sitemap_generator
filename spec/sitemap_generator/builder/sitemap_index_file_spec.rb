@@ -17,7 +17,7 @@ describe 'SitemapGenerator::Builder::SitemapIndexFile' do
   end
 
   it "should be empty" do
-    index.empty?.should be_true
+    index.empty?.should be true
     index.link_count.should == 0
   end
 
@@ -26,7 +26,7 @@ describe 'SitemapGenerator::Builder::SitemapIndexFile' do
   end
 
   it "should not be finalized" do
-    index.finalized?.should be_false
+    index.finalized?.should be false
   end
 
   it "filename should be set" do
@@ -48,27 +48,27 @@ describe 'SitemapGenerator::Builder::SitemapIndexFile' do
   describe "create_index?" do
     it "should return false" do
       index.location[:create_index] = false
-      index.create_index?.should be_false
+      index.create_index?.should be false
 
       index.instance_variable_set(:@link_count, 10)
-      index.create_index?.should be_false
+      index.create_index?.should be false
     end
 
     it "should return true" do
       index.location[:create_index] = true
-      index.create_index?.should be_true
+      index.create_index?.should be true
 
       index.instance_variable_set(:@link_count, 1)
-      index.create_index?.should be_true
+      index.create_index?.should be true
     end
 
     it "when :auto, should be true if more than one link" do
       index.instance_variable_set(:@link_count, 1)
       index.location[:create_index] = :auto
-      index.create_index?.should be_false
+      index.create_index?.should be false
 
       index.instance_variable_set(:@link_count, 2)
-      index.create_index?.should be_true
+      index.create_index?.should be true
     end
   end
 
@@ -92,9 +92,9 @@ describe 'SitemapGenerator::Builder::SitemapIndexFile' do
       end
 
       it "should create index" do
-        index.create_index?.should be_false
+        index.create_index?.should be false
         index.add '/one'
-        index.create_index?.should be_true
+        index.create_index?.should be true
       end
     end
   end
@@ -103,14 +103,14 @@ describe 'SitemapGenerator::Builder::SitemapIndexFile' do
     it "when not creating an index, should be the first sitemap url" do
       index.instance_variable_set(:@create_index, false)
       index.instance_variable_set(:@first_sitemap_url, 'http://test.com/index.xml')
-      index.create_index?.should be_false
+      index.create_index?.should be false
       index.index_url.should == 'http://test.com/index.xml'
     end
 
     it "if there's no first sitemap url, should default to the index location url" do
       index.instance_variable_set(:@create_index, false)
       index.instance_variable_set(:@first_sitemap_url, nil)
-      index.create_index?.should be_false
+      index.create_index?.should be false
       index.index_url.should == index.location.url
       index.index_url.should == 'http://example.com/test/sitemap.xml.gz'
     end
