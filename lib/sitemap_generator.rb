@@ -1,4 +1,4 @@
-require 'sitemap_generator/sitemap_namer'
+require 'sitemap_generator/simple_namer'
 require 'sitemap_generator/builder'
 require 'sitemap_generator/link_set'
 require 'sitemap_generator/templates'
