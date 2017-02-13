@@ -198,9 +198,12 @@ describe SitemapGenerator::LinkSet do
     end
 
     it "should use SitemapGenerator.verbose as a default" do
-      expect(SitemapGenerator).to receive(:verbose).and_return(true).at_least(1)
+      expect(SitemapGenerator).to receive(:verbose).and_return(true).twice
       expect(SitemapGenerator::LinkSet.new.verbose).to be(true)
-      expect(SitemapGenerator).to receive(:verbose).and_return(false).at_least(1)
+    end
+
+    it "should use SitemapGenerator.verbose as a default" do
+      expect(SitemapGenerator).to receive(:verbose).and_return(false).twice
       expect(SitemapGenerator::LinkSet.new.verbose).to be(false)
     end
   end

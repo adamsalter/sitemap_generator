@@ -12,16 +12,12 @@ describe SitemapGenerator::Interpreter do
   end
 
   it "should find the config file if Rails.root doesn't end in a slash" do
-    SitemapGenerator::Utilities.with_warnings(nil) do
-      Rails = double('Rails', :root => SitemapGenerator.app.root.to_s.sub(/\/$/, ''))
-    end
+    stub_const('Rails', double('Rails', :root => SitemapGenerator.app.root.to_s.sub(/\/$/, '')))
     expect { SitemapGenerator::Interpreter.run }.not_to raise_error
   end
 
   it "should set the verbose option" do
-    any_instance_of(SitemapGenerator::Interpreter) do |interpreter|
-      expect(interpreter).to receive(:instance_eval)
-    end
+    expect_any_instance_of(SitemapGenerator::Interpreter).to receive(:instance_eval)
     interpreter = SitemapGenerator::Interpreter.run(:verbose => true)
     expect(interpreter.instance_variable_get(:@linkset).verbose).to be(true)
   end

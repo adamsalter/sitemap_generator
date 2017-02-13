@@ -277,7 +277,7 @@ describe "SitemapGenerator" do
 
   describe "external dependencies" do
     it "should work outside of Rails" do
-      remove_constant(Rails) if defined?(Rails)
+      hide_const('Rails')
       expect { ::SitemapGenerator::LinkSet.new }.not_to raise_exception
     end
   end

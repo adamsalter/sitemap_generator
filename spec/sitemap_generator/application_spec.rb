@@ -1,19 +1,8 @@
 require 'spec_helper'
 
 describe SitemapGenerator::Application do
-  before :all do
-    SitemapGenerator::Utilities.with_warnings(nil) do
-      Object.const_set(:Rails, Object.new)
-    end
-  end
-
-  after :all do
-    SitemapGenerator::Utilities.with_warnings(nil) do
-      Object.const_set(:Rails, nil)
-    end
-  end
-
   before do
+    stub_const('Rails', Object.new)
     @app = SitemapGenerator::Application.new
   end
 
@@ -36,7 +25,7 @@ describe SitemapGenerator::Application do
   describe "with Rails" do
     before do
       @root = '/test'
-      expect(Rails).to receive(:root).and_return(@root).at_least_once
+      expect(Rails).to receive(:root).and_return(@root).at_least(:once)
     end
 
     it "should use the Rails.root" do
@@ -48,12 +37,7 @@ describe SitemapGenerator::Application do
 
   describe "with no Rails" do
     before do
-      @rails = Rails
-      Object.send(:remove_const, :Rails)
-    end
-
-    after do
-      Object::Rails = @rails
+      hide_const('Rails')
     end
 
     it "should not be Rails" do
