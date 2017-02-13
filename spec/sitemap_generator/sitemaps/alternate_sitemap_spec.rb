@@ -1,7 +1,7 @@
 require 'spec_helper'
 
-describe "SitemapGenerator" do
-  it "should not include media element unless provided" do
+describe 'SitemapGenerator' do
+  it 'should not include media element unless provided' do
     xml_fragment = SitemapGenerator::Builder::SitemapUrl.new('link_with_alternates.html',
       :host => 'http://www.example.com',
       :alternates => [
@@ -24,7 +24,7 @@ describe "SitemapGenerator" do
     expect(alternate.attribute('media')).to be_nil
   end
 
-  it "should not include hreflang element unless provided" do
+  it 'should not include hreflang element unless provided' do
     xml_fragment = SitemapGenerator::Builder::SitemapUrl.new('link_with_alternates.html',
                                                              :host => 'http://www.example.com',
                                                              :alternates => [
@@ -45,7 +45,7 @@ describe "SitemapGenerator" do
     expect(alternate.attribute('hreflang')).to be_nil
   end
 
-  it "should add alternate links to sitemap" do
+  it 'should add alternate links to sitemap' do
     xml_fragment = SitemapGenerator::Builder::SitemapUrl.new('link_with_alternates.html',
       :host => 'http://www.example.com',
       :alternates => [
@@ -70,7 +70,7 @@ describe "SitemapGenerator" do
     expect(alternate.attribute('media').value).to eq('only screen and (max-width: 640px)')
   end
 
-  it "should add alternate links to sitemap with rel nofollow" do
+  it 'should add alternate links to sitemap with rel nofollow' do
     xml_fragment = SitemapGenerator::Builder::SitemapUrl.new('link_with_alternates.html',
       :host => 'http://www.example.com',
       :alternates => [

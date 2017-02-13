@@ -5,8 +5,8 @@ describe SitemapGenerator::Numeric do
     SitemapGenerator::Numeric.new(size)
   end
 
-  describe "bytes" do
-    it "should define equality of different units" do
+  describe 'bytes' do
+    it 'should define equality of different units' do
       relationships = {
         numeric(  1024).bytes     => numeric(  1).kilobyte,
         numeric(  1024).kilobytes => numeric(  1).megabyte,
@@ -25,7 +25,7 @@ describe SitemapGenerator::Numeric do
       end
     end
 
-    it "should represent units as bytes" do
+    it 'should represent units as bytes' do
       expect(numeric(3).megabytes).to eq(3145728)
       expect(numeric(3).megabyte) .to eq(3145728)
       expect(numeric(3).kilobytes).to eq(3072)

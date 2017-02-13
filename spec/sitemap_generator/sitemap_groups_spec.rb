@@ -1,13 +1,13 @@
-require "spec_helper"
+require 'spec_helper'
 
-describe "Sitemap Groups" do
+describe 'Sitemap Groups' do
   let(:linkset) { ::SitemapGenerator::LinkSet.new(:default_host => 'http://test.com') }
 
   before do
     FileUtils.rm_rf(SitemapGenerator.app.root + 'public/')
   end
 
-  it "should not finalize the default sitemap if using groups" do
+  it 'should not finalize the default sitemap if using groups' do
     linkset.create do
       group(:filename => :sitemap_en) do
         add '/en'
@@ -18,14 +18,14 @@ describe "Sitemap Groups" do
     file_should_not_exist(SitemapGenerator.app.root + 'public/sitemap1.xml.gz')
   end
 
-  it "should not write out empty groups" do
+  it 'should not write out empty groups' do
     linkset.create do
       group(:filename => :sitemap_en) { }
     end
     file_should_not_exist(SitemapGenerator.app.root + 'public/sitemap_en.xml.gz')
   end
 
-  it "should add default links if no groups are created" do
+  it 'should add default links if no groups are created' do
     linkset.create do
     end
     expect(linkset.link_count).to eq(1)
@@ -33,7 +33,7 @@ describe "Sitemap Groups" do
     file_should_not_exist(SitemapGenerator.app.root + 'public/sitemap1.xml.gz')
   end
 
-  it "should add links to the default sitemap" do
+  it 'should add links to the default sitemap' do
     linkset.create do
       add '/before'
       group(:filename => :sitemap_en) do
@@ -47,7 +47,7 @@ describe "Sitemap Groups" do
     file_should_exist(SitemapGenerator.app.root + 'public/sitemap_en.xml.gz')
   end
 
-  it "should rollover when sitemaps are full" do
+  it 'should rollover when sitemaps are full' do
     linkset.max_sitemap_links = 1
     linkset.include_index = false
     linkset.include_root = false
@@ -69,7 +69,7 @@ describe "Sitemap Groups" do
     file_should_not_exist(SitemapGenerator.app.root + 'public/en/sitemap_en2.xml.gz')
   end
 
-  it "should support multiple groups" do
+  it 'should support multiple groups' do
     linkset.create do
       group(:filename => :sitemap_en, :sitemaps_path => 'en/') do
         add '/one'
@@ -84,7 +84,7 @@ describe "Sitemap Groups" do
     file_should_exist(SitemapGenerator.app.root + 'public/fr/sitemap_fr.xml.gz')
   end
 
-  it "the sitemap shouldn't be finalized until the end if the groups don't conflict" do
+  it 'the sitemap shouldn\'t be finalized until the end if the groups don\'t conflict' do
     linkset.create do
       add 'one'
       group(:filename => :first) { add '/two' }
@@ -101,7 +101,7 @@ describe "Sitemap Groups" do
     gzipped_xml_file_should_validate_against_schema(SitemapGenerator.app.root + 'public/sitemap1.xml.gz', 'sitemap')
   end
 
-  it "groups should share the sitemap if the sitemap location is unchanged" do
+  it 'groups should share the sitemap if the sitemap location is unchanged' do
     linkset.create do
       add 'one'
       group(:default_host => 'http://newhost.com') { add '/two' }
@@ -115,7 +115,7 @@ describe "Sitemap Groups" do
     gzipped_xml_file_should_validate_against_schema(SitemapGenerator.app.root + 'public/sitemap.xml.gz', 'sitemap')
   end
 
-  it "sitemaps should be finalized if virtual location settings are changed" do
+  it 'sitemaps should be finalized if virtual location settings are changed' do
     linkset.create do
       add 'one'
       group(:sitemaps_path => :en) { add '/two' }

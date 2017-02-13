@@ -1,9 +1,9 @@
 require 'spec_helper'
 
-describe "SitemapGenerator" do
+describe 'SitemapGenerator' do
   let(:schema) { SitemapGenerator::SCHEMAS['pagemap'] }
-  
-  it "should add the pagemap sitemap element" do
+
+  it 'should add the pagemap sitemap element' do
     pagemap_xml_fragment = SitemapGenerator::Builder::SitemapUrl.new('my_page.html', {
       :host => 'http://www.example.com',
 
@@ -34,11 +34,11 @@ describe "SitemapGenerator" do
     doc = Nokogiri::XML.parse(pagemap_xml_fragment)
     doc.root.add_namespace_definition('pagemap', schema)
     doc = Nokogiri::XML.parse(doc.to_xml)
-    
-    url = doc.at_xpath("//url")
-    loc = url.at_xpath("loc")
+
+    url = doc.at_xpath('//url')
+    loc = url.at_xpath('loc')
     expect(loc.text).to eq('http://www.example.com/my_page.html')
-    
+
     pagemap =  doc.at_xpath('//pagemap:PageMap', 'pagemap' => schema)
     expect(pagemap.element_children.count).to eq(2)
     dataobject = pagemap.at_xpath('//pagemap:DataObject')

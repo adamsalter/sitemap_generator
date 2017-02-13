@@ -39,7 +39,7 @@ module XmlMacros
   #
   # Example:
   #   xml_fragment_should_validate_against_schema('<video/>', 'sitemap-video', 'xmlns:video' => 'http://www.google.com/schemas/sitemap-video/1.1')
-  #   
+  #
   #   This validates the given XML using the spec/support/schemas/sitemap-video.xsd`
   #   schema.  The XML namespace `xmlns:video='http://www.google.com/schemas/sitemap-video/1.1'` is automatically
   #   added to the root element for you.
