@@ -775,6 +775,8 @@ Because the link to the sitemap index file that would otherwise be added would p
 
   The compression setting applies to groups too.  So `:all_but_first` will have the same effect (the first file in the group will not be compressed, the rest will).  So if you require different behaviour for your groups, pass in a `:compress` option e.g. `group(:compress => false) { add('/link') }`
 
+* `:max_sitemap_links` - Integer. The maximum number of links to put in each sitemap.  Default is `SitemapGenerator::MAX_SITEMAPS_LINKS`, or 50,000.
+
 ## Sitemap Groups
 
 Sitemap Groups is a powerful feature that is also very simple to use.

@@ -1,3 +1,10 @@
+### 5.3.0
+
+* Add `max_sitemap_links` option
+* Upgrade development dependencies
+* Modernize Gemfile & gemspec
+* Bring specs up to RSpec 3.5
+
 ### 5.2.0
 
 * New `SitemapGenerator::AwsSdkAdapter` adapter using the bare aws-sdk gem.
