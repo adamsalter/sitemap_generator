@@ -280,9 +280,9 @@ require 'capistrano/sitemap_generator'
 Available capistrano tasks:
 
 ```ruby
-deploy:sitemap:create   #Create sitemaps without pinging search engines
-deploy:sitemap:refresh  #Create sitemaps and ping search engines
-deploy:sitemap:clean    #Clean up sitemaps in the sitemap path
+sitemap:create   #Create sitemaps without pinging search engines
+sitemap:refresh  #Create sitemaps and ping search engines
+sitemap:clean    #Clean up sitemaps in the sitemap path
 ```
 
   **Generate sitemaps into a directory which is shared by all deployments.**
