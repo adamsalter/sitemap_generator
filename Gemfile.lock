@@ -38,10 +38,7 @@ GEM
     formatador (0.2.5)
     hashdiff (0.3.2)
     ipaddress (0.8.3)
-    metaclass (0.0.4)
     mini_portile2 (2.1.0)
-    mocha (1.2.1)
-      metaclass (~> 0.0.1)
     multi_json (1.12.1)
     nokogiri (1.6.8.1)
       mini_portile2 (~> 2.1.0)
@@ -70,7 +67,6 @@ PLATFORMS
 DEPENDENCIES
   debugger
   fog-aws (~> 1.2)
-  mocha (~> 1.2)
   nokogiri (~> 1.6.8)
   rspec (~> 3.5)
   sitemap_generator!

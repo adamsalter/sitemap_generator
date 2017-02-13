@@ -12,7 +12,6 @@ WebMock.disable_net_connect!
 SitemapGenerator.verbose = false
 
 RSpec.configure do |config|
-  config.mock_with :mocha
   config.include(FileMacros)
   config.include(XmlMacros)
 end
