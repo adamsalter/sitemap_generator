@@ -11,7 +11,7 @@ namespace :sitemap do
     begin
       require 'sitemap_generator'
     rescue LoadError => e
-      if defined?(Rails)
+      if defined?(Rails::VERSION)
         Rake::Task['sitemap:require_environment'].invoke
       else
         raise e
@@ -22,7 +22,7 @@ namespace :sitemap do
   # Require sitemap_generator after loading the Rails environment.  We still need the require
   # in case we are installed as a gem and are setup to not automatically be required.
   task :require_environment do
-    if defined?(Rails)
+    if defined?(Rails::VERSION)
       Rake::Task['environment'].invoke
     end
     require 'sitemap_generator'
