@@ -28,7 +28,6 @@ module SitemapGenerator
     MAX_SITEMAP_NEWS     = 1_000         # max news sitemap per index_file
     MAX_SITEMAP_FILESIZE = 10_000_000    # bytes
     SCHEMAS = {
-      'geo'     => 'http://www.google.com/geo/schemas/sitemap/1.0',
       'image'   => 'http://www.google.com/schemas/sitemap-image/1.1',
       'mobile'  => 'http://www.google.com/schemas/sitemap-mobile/1.0',
       'news'    => 'http://www.google.com/schemas/sitemap-news/0.9',

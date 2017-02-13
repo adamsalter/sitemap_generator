@@ -25,7 +25,6 @@ module SitemapGenerator
       # * +lastmod+
       # * +images+
       # * +video+/+videos+
-      # * +geo+
       # * +news+
       # * +mobile+
       # * +alternate+/+alternates+
@@ -37,7 +36,7 @@ module SitemapGenerator
           path = sitemap.location.path_in_public
         end
 
-        SitemapGenerator::Utilities.assert_valid_keys(options, :priority, :changefreq, :lastmod, :expires, :host, :images, :video, :geo, :news, :videos, :mobile, :alternate, :alternates, :pagemap)
+        SitemapGenerator::Utilities.assert_valid_keys(options, :priority, :changefreq, :lastmod, :expires, :host, :images, :video, :news, :videos, :mobile, :alternate, :alternates, :pagemap)
         SitemapGenerator::Utilities.reverse_merge!(options, :priority => 0.5, :changefreq => 'weekly', :lastmod => Time.now, :images => [], :news => {}, :videos => [], :mobile => false, :alternates => [])
         raise "Cannot generate a url without a host" unless SitemapGenerator::Utilities.present?(options[:host])
 
@@ -60,7 +59,6 @@ module SitemapGenerator
           :images     => prepare_images(options[:images], options[:host]),
           :news       => prepare_news(options[:news]),
           :videos     => options[:videos],
-          :geo        => options[:geo],
           :mobile     => options[:mobile],
           :alternates => options[:alternates],
           :pagemap    => options[:pagemap]
@@ -140,13 +138,6 @@ module SitemapGenerator
             attributes[:hreflang] = alternate[:lang].to_s if SitemapGenerator::Utilities.present?(alternate[:lang])
             attributes[:media] = alternate[:media].to_s if SitemapGenerator::Utilities.present?(alternate[:media])
             builder.xhtml :link, attributes
-          end
-
-          unless SitemapGenerator::Utilities.blank?(self[:geo])
-            geo = self[:geo]
-            builder.geo :geo do
-              builder.geo :format, geo[:format].to_s if geo[:format]
-            end
           end
 
           unless SitemapGenerator::Utilities.blank?(self[:mobile])

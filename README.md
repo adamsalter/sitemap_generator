@@ -7,7 +7,7 @@ Sitemaps adhere to the [Sitemap 0.9 protocol][sitemap_protocol] specification.
 ## Features
 
 * Framework agnostic
-* Supports [News sitemaps][sitemap_news], [Video sitemaps][sitemap_video], [Image sitemaps][sitemap_images], [Geo sitemaps][sitemap_geo], [Mobile sitemaps][sitemap_mobile], [PageMap sitemaps][sitemap_pagemap] and [Alternate Links][alternate_links]
+* Supports [News sitemaps][sitemap_news], [Video sitemaps][sitemap_video], [Image sitemaps][sitemap_images], [Mobile sitemaps][sitemap_mobile], [PageMap sitemaps][sitemap_pagemap] and [Alternate Links][alternate_links]
 * Supports read-only filesystems like Heroku via uploading to a remote host like Amazon S3
 * Compatible with Rails 2, 3 & 4 and tested with Ruby REE, 1.9.2, 1.9.3, 2.1.3
 * Adheres to the [Sitemap 0.9 protocol][sitemap_protocol]
@@ -103,9 +103,6 @@ Successful ping of Bing
          * [Video Sitemaps](#video-sitemaps)
             * [Example](#example-2)
             * [Supported options](#supported-options-2)
-         * [Geo Sitemaps](#geo-sitemaps)
-            * [Example:](#example-3)
-            * [Supported options](#supported-options-3)
          * [PageMap Sitemaps](#pagemap-sitemaps)
             * [Supported options](#supported-options-4)
             * [Example:](#example-4)
@@ -506,7 +503,7 @@ Now let's take a look at the file that was created.  After uncompressing and XML
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:video="http://www.google.com/schemas/sitemap-video/1.1" xmlns:geo="http://www.google.com/geo/schemas/sitemap/1.0" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+<urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:video="http://www.google.com/schemas/sitemap-video/1.1" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
   <url>
     <loc>http://www.example.com/</loc>
     <lastmod>2011-05-21T00:03:38+00:00</lastmod>
@@ -981,24 +978,6 @@ end
     * `:live` - Optional. Boolean.
     * `:requires_subscription` - Optional. Boolean.
 
-### Geo Sitemaps
-
-Pages with geo data can be added by passing a `:geo` Hash to `add`.  The Hash only supports one tag of `:format`.  Google provides an [example of a geo sitemap link here][geo_tags].  Note that the sitemap does not actually contain your KML or GeoRSS.  It merely links to a page that has this content.
-
-#### Example:
-
-```ruby
-SitemapGenerator::Sitemap.default_host = "http://www.example.com"
-SitemapGenerator::Sitemap.create do
-  add('/stores/1234.xml', :geo => { :format => 'kml' })
-end
-```
-
-#### Supported options
-
-* `:geo` - Hash
-    * `:format` - Required, string, either `'kml'` or `'georss'`
-
 ### PageMap Sitemaps
 
 Pagemaps can be added by passing a `:pagemap` hash to `add`. The hash must contain a `:dataobjects` key with an array of dataobject hashes. Each dataobject hash contains a `:type` and `:id`, and an optional array of `:attributes`.  Each attribute hash can contain two keys: `:name` and `:value`, with string values.  For more information consult the [official documentation on PageMaps][using_pagemaps].
@@ -1199,13 +1178,11 @@ Copyright (c) 2009 Karl Varga released under the MIT license
 [sitemap_images]:http://www.google.com/support/webmasters/bin/answer.py?answer=178636
 [sitemap_video]:https://support.google.com/webmasters/answer/80471?hl=en&ref_topic=4581190
 [sitemap_news]:https://support.google.com/news/publisher/topic/2527688?hl=en&ref_topic=4359874
-[sitemap_geo]:#
 [sitemap_mobile]:http://support.google.com/webmasters/bin/answer.py?hl=en&answer=34648
 [sitemap_pagemap]:https://developers.google.com/custom-search/docs/structured_data#addtositemap
 [sitemap_protocol]:http://www.sitemaps.org/protocol.html
 [video_tags]:http://www.google.com/support/webmasters/bin/answer.py?hl=en&answer=80472#4
 [image_tags]:http://www.google.com/support/webmasters/bin/answer.py?hl=en&answer=178636
-[geo_tags]:http://www.google.com/support/webmasters/bin/answer.py?hl=en&answer=94555
 [news_tags]:http://www.google.com/support/news_pub/bin/answer.py?answer=74288
 [remote_hosts]:https://github.com/kjvarga/sitemap_generator/wiki/Generate-Sitemaps-on-read-only-filesystems-like-Heroku
 [include_index_change]:https://github.com/kjvarga/sitemap_generator/issues/70

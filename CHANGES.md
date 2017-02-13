@@ -4,6 +4,7 @@
 * Upgrade development dependencies
 * Modernize Gemfile & gemspec
 * Bring specs up to RSpec 3.5
+* Remove Geo sitemap support.  Google no longer supports them.
 
 ### 5.2.0
 

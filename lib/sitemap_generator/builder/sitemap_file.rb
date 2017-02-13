@@ -34,7 +34,6 @@ module SitemapGenerator
               xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
               xmlns:image="#{SitemapGenerator::SCHEMAS['image']}"
               xmlns:video="#{SitemapGenerator::SCHEMAS['video']}"
-              xmlns:geo="#{SitemapGenerator::SCHEMAS['geo']}"
               xmlns:news="#{SitemapGenerator::SCHEMAS['news']}"
               xmlns:mobile="#{SitemapGenerator::SCHEMAS['mobile']}"
               xmlns:pagemap="#{SitemapGenerator::SCHEMAS['pagemap']}"

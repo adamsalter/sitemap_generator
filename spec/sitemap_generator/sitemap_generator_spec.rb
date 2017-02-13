@@ -238,8 +238,8 @@ describe 'SitemapGenerator' do
 
     it 'should allow changing of the filename' do
       ::SitemapGenerator::Sitemap.create(:filename => :geo_sitemap) do
-        add '/goerss', :geo => { :format => 'georss' }
-        add '/kml', :geo => { :format => 'kml' }
+        add '/goerss'
+        add '/kml'
       end
       file_should_exist(rails_path('public/geo_sitemap.xml.gz'))
       file_should_exist(rails_path('public/geo_sitemap1.xml.gz'))
