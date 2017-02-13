@@ -33,18 +33,18 @@ describe SitemapGenerator::Utilities do
   describe "truthy?" do
     it "should be truthy" do
       ['1', 1, 't', 'true', true].each do |value|
-        expect(SitemapGenerator::Utilities.truthy?(value)).to be true
+        expect(SitemapGenerator::Utilities.truthy?(value)).to be(true)
       end
-      expect(SitemapGenerator::Utilities.truthy?(nil)).to be false
+      expect(SitemapGenerator::Utilities.truthy?(nil)).to be(false)
     end
   end
 
   describe "falsy?" do
     it "should be falsy" do
       ['0', 0, 'f', 'false', false].each do |value|
-        expect(SitemapGenerator::Utilities.falsy?(value)).to be true
+        expect(SitemapGenerator::Utilities.falsy?(value)).to be(true)
       end
-      expect(SitemapGenerator::Utilities.falsy?(nil)).to be false
+      expect(SitemapGenerator::Utilities.falsy?(nil)).to be(false)
     end
   end
 

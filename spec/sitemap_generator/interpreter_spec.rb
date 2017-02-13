@@ -19,9 +19,11 @@ describe SitemapGenerator::Interpreter do
   end
 
   it "should set the verbose option" do
-    SitemapGenerator::Interpreter.any_instance.expects(:instance_eval)
+    any_instance_of(SitemapGenerator::Interpreter) do |interpreter|
+      expect(interpreter).to receive(:instance_eval)
+    end
     interpreter = SitemapGenerator::Interpreter.run(:verbose => true)
-    expect(interpreter.instance_variable_get(:@linkset).verbose).to be true
+    expect(interpreter.instance_variable_get(:@linkset).verbose).to be(true)
   end
 
   describe "link_set" do
@@ -37,14 +39,14 @@ describe SitemapGenerator::Interpreter do
   describe "public interface" do
     describe "add" do
       it "should add a link to the sitemap" do
-        link_set.expects(:add).with('test', :option => 'value')
+        expect(link_set).to receive(:add).with('test', :option => 'value')
         interpreter.add('test', :option => 'value')
       end
     end
 
     describe "group" do
       it "should start a new group" do
-        link_set.expects(:group).with('test', :option => 'value')
+        expect(link_set).to receive(:group).with('test', :option => 'value')
         interpreter.group('test', :option => 'value')
       end
     end
@@ -57,7 +59,7 @@ describe SitemapGenerator::Interpreter do
 
     describe "add_to_index" do
       it "should add a link to the sitemap index" do
-        link_set.expects(:add_to_index).with('test', :option => 'value')
+        expect(link_set).to receive(:add_to_index).with('test', :option => 'value')
         interpreter.add_to_index('test', :option => 'value')
       end
     end

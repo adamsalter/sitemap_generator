@@ -287,10 +287,10 @@ describe "SitemapGenerator" do
       original = SitemapGenerator.verbose
       SitemapGenerator.verbose = nil
       ENV['VERBOSE'] = 'true'
-      expect(SitemapGenerator.verbose).to be true
+      expect(SitemapGenerator.verbose).to be(true)
       SitemapGenerator.verbose = nil
       ENV['VERBOSE'] = 'false'
-      expect(SitemapGenerator.verbose).to be false
+      expect(SitemapGenerator.verbose).to be(false)
       SitemapGenerator.verbose = original
     end
   end
@@ -298,9 +298,9 @@ describe "SitemapGenerator" do
   describe "yield_sitemap" do
     it "should set the yield_sitemap flag" do
       SitemapGenerator.yield_sitemap = false
-      expect(SitemapGenerator.yield_sitemap?).to be false
+      expect(SitemapGenerator.yield_sitemap?).to be(false)
       SitemapGenerator.yield_sitemap = true
-      expect(SitemapGenerator.yield_sitemap?).to be true
+      expect(SitemapGenerator.yield_sitemap?).to be(true)
       SitemapGenerator.yield_sitemap = false
     end
   end
@@ -536,10 +536,10 @@ describe "SitemapGenerator" do
 
   describe "respond_to?" do
     it "should correctly identify the methods that it responds to" do
-      expect(SitemapGenerator::Sitemap.respond_to?(:create)).to be true
-      expect(SitemapGenerator::Sitemap.respond_to?(:adapter)).to be true
-      expect(SitemapGenerator::Sitemap.respond_to?(:default_host)).to be true
-      expect(SitemapGenerator::Sitemap.respond_to?(:invalid_func)).to be false
+      expect(SitemapGenerator::Sitemap.respond_to?(:create)).to be(true)
+      expect(SitemapGenerator::Sitemap.respond_to?(:adapter)).to be(true)
+      expect(SitemapGenerator::Sitemap.respond_to?(:default_host)).to be(true)
+      expect(SitemapGenerator::Sitemap.respond_to?(:invalid_func)).to be(false)
     end
   end
 

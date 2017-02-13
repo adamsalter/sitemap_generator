@@ -40,32 +40,32 @@ describe SitemapGenerator::LinkSet do
   describe "include_root include_index option" do
     it "should include the root url and the sitemap index url" do
       ls = SitemapGenerator::LinkSet.new(:default_host => default_host, :include_root => true, :include_index => true)
-      expect(ls.include_root).to be true
-      expect(ls.include_index).to be true
+      expect(ls.include_root).to be(true)
+      expect(ls.include_index).to be(true)
       ls.create { |sitemap| }
       expect(ls.sitemap.link_count).to eq(2)
     end
 
     it "should not include the root url" do
       ls = SitemapGenerator::LinkSet.new(:default_host => default_host, :include_root => false)
-      expect(ls.include_root).to be false
-      expect(ls.include_index).to be false
+      expect(ls.include_root).to be(false)
+      expect(ls.include_index).to be(false)
       ls.create { |sitemap| }
       expect(ls.sitemap.link_count).to eq(0)
     end
 
     it "should not include the sitemap index url" do
       ls = SitemapGenerator::LinkSet.new(:default_host => default_host, :include_index => false)
-      expect(ls.include_root).to be true
-      expect(ls.include_index).to be false
+      expect(ls.include_root).to be(true)
+      expect(ls.include_index).to be(false)
       ls.create { |sitemap| }
       expect(ls.sitemap.link_count).to eq(1)
     end
 
     it "should not include the root url or the sitemap index url" do
       ls = SitemapGenerator::LinkSet.new(:default_host => default_host, :include_root => false, :include_index => false)
-      expect(ls.include_root).to be false
-      expect(ls.include_index).to be false
+      expect(ls.include_root).to be(false)
+      expect(ls.include_index).to be(false)
       ls.create { |sitemap| }
       expect(ls.sitemap.link_count).to eq(0)
     end
@@ -186,22 +186,22 @@ describe SitemapGenerator::LinkSet do
 
   describe "verbose" do
     it "should be set as an initialize option" do
-      expect(SitemapGenerator::LinkSet.new(:default_host => default_host, :verbose => false).verbose).to be false
-      expect(SitemapGenerator::LinkSet.new(:default_host => default_host, :verbose => true).verbose).to be true
+      expect(SitemapGenerator::LinkSet.new(:default_host => default_host, :verbose => false).verbose).to be(false)
+      expect(SitemapGenerator::LinkSet.new(:default_host => default_host, :verbose => true).verbose).to be(true)
     end
 
     it "should be set as an accessor" do
       ls.verbose = true
-      expect(ls.verbose).to be true
+      expect(ls.verbose).to be(true)
       ls.verbose = false
-      expect(ls.verbose).to be false
+      expect(ls.verbose).to be(false)
     end
 
     it "should use SitemapGenerator.verbose as a default" do
       expect(SitemapGenerator).to receive(:verbose).and_return(true).at_least(1)
-      expect(SitemapGenerator::LinkSet.new.verbose).to be true
+      expect(SitemapGenerator::LinkSet.new.verbose).to be(true)
       expect(SitemapGenerator).to receive(:verbose).and_return(false).at_least(1)
-      expect(SitemapGenerator::LinkSet.new.verbose).to be false
+      expect(SitemapGenerator::LinkSet.new.verbose).to be(false)
     end
   end
 
@@ -260,7 +260,7 @@ describe SitemapGenerator::LinkSet do
 
     it "should not finalize the index" do
       @ls.send(:finalize_sitemap_index!)
-      expect(@ls.sitemap_index.finalized?).to be false
+      expect(@ls.sitemap_index.finalized?).to be(false)
     end
   end
 
@@ -275,7 +275,7 @@ describe SitemapGenerator::LinkSet do
       end
 
       it "should protect the sitemap_index" do
-        expect(ls.group.instance_variable_get(:@protect_index)).to be true
+        expect(ls.group.instance_variable_get(:@protect_index)).to be(true)
       end
 
       it "should not allow chaning the public_path" do
@@ -289,7 +289,7 @@ describe SitemapGenerator::LinkSet do
       end
 
       it "should default to false" do
-        expect(ls.group.include_index).to be false
+        expect(ls.group.include_index).to be(false)
       end
     end
 
@@ -299,7 +299,7 @@ describe SitemapGenerator::LinkSet do
       end
 
       it "should default to false" do
-        expect(ls.group.include_root).to be false
+        expect(ls.group.include_root).to be(false)
       end
     end
 
@@ -424,13 +424,13 @@ describe SitemapGenerator::LinkSet do
     describe "finalizing" do
       it "should only finalize the sitemaps if a block is passed" do
         @group = ls.group
-        expect(@group.sitemap.finalized?).to be false
+        expect(@group.sitemap.finalized?).to be(false)
       end
 
       it "should not finalize the sitemap if a group is created" do
         ls.create { group {} }
-        expect(ls.sitemap.empty?).to be true
-        expect(ls.sitemap.finalized?).to be false
+        expect(ls.sitemap.empty?).to be(true)
+        expect(ls.sitemap.finalized?).to be(false)
       end
 
       {:sitemaps_path => 'en/',
@@ -464,18 +464,18 @@ describe SitemapGenerator::LinkSet do
   describe "after create" do
     it "should finalize the sitemap index" do
       ls.create {}
-      expect(ls.sitemap_index.finalized?).to be true
+      expect(ls.sitemap_index.finalized?).to be(true)
     end
 
     it "should finalize the sitemap" do
       ls.create {}
-      expect(ls.sitemap.finalized?).to be true
+      expect(ls.sitemap.finalized?).to be(true)
     end
 
     it "should not finalize the sitemap if a group was created" do
       ls.instance_variable_set(:@created_group, true)
       ls.send(:finalize_sitemap!)
-      expect(ls.sitemap.finalized?).to be false
+      expect(ls.sitemap.finalized?).to be(false)
     end
   end
 
@@ -581,12 +581,12 @@ describe SitemapGenerator::LinkSet do
   describe "include_root?" do
     it "should return false" do
       ls.include_root = false
-      expect(ls.include_root).to be false
+      expect(ls.include_root).to be(false)
     end
 
     it "should return true" do
       ls.include_root = true
-      expect(ls.include_root).to be true
+      expect(ls.include_root).to be(true)
     end
   end
 
@@ -596,25 +596,25 @@ describe SitemapGenerator::LinkSet do
     it "should be true if no sitemaps_host set, or it is the same" do
       ls.include_index = true
       ls.sitemaps_host = default_host
-      expect(ls.include_index?).to be true
+      expect(ls.include_index?).to be(true)
 
       ls.sitemaps_host = nil
-      expect(ls.include_index?).to be true
+      expect(ls.include_index?).to be(true)
     end
 
     it "should be false if include_index is false or sitemaps_host differs" do
       ls.include_index = false
       ls.sitemaps_host = default_host
-      expect(ls.include_index?).to be false
+      expect(ls.include_index?).to be(false)
 
       ls.include_index = true
       ls.sitemaps_host = sitemaps_host
-      expect(ls.include_index?).to be false
+      expect(ls.include_index?).to be(false)
     end
 
     it "should return false" do
       ls = SitemapGenerator::LinkSet.new(:default_host => default_host, :sitemaps_host => sitemaps_host)
-      expect(ls.include_index?).to be false
+      expect(ls.include_index?).to be(false)
     end
   end
 
@@ -635,22 +635,22 @@ describe SitemapGenerator::LinkSet do
   describe "yield_sitemap" do
     it "should default to the value of SitemapGenerator.yield_sitemap?" do
       expect(SitemapGenerator).to receive(:yield_sitemap?).and_return(true)
-      expect(ls.yield_sitemap?).to be true
+      expect(ls.yield_sitemap?).to be(true)
       expect(SitemapGenerator).to receive(:yield_sitemap?).and_return(false)
-      expect(ls.yield_sitemap?).to be false
+      expect(ls.yield_sitemap?).to be(false)
     end
 
     it "should be settable as an option" do
       expect(SitemapGenerator).to receive(:yield_sitemap?).never
-      expect(SitemapGenerator::LinkSet.new(:yield_sitemap => true).yield_sitemap?).to be true
-      expect(SitemapGenerator::LinkSet.new(:yield_sitemap => false).yield_sitemap?).to be false
+      expect(SitemapGenerator::LinkSet.new(:yield_sitemap => true).yield_sitemap?).to be(true)
+      expect(SitemapGenerator::LinkSet.new(:yield_sitemap => false).yield_sitemap?).to be(false)
     end
 
     it "should be settable as an attribute" do
       ls.yield_sitemap = true
-      expect(ls.yield_sitemap?).to be true
+      expect(ls.yield_sitemap?).to be(true)
       ls.yield_sitemap = false
-      expect(ls.yield_sitemap?).to be false
+      expect(ls.yield_sitemap?).to be(false)
     end
 
     it "should yield the sitemap in the call to create" do
@@ -728,7 +728,7 @@ describe SitemapGenerator::LinkSet do
 
       it "should not write the index" do
         ls.send(:finalize_sitemap_index!)
-        expect(ls.sitemap_index.written?).to be false
+        expect(ls.sitemap_index.written?).to be(false)
       end
 
       it "should still add finalized sitemaps to the index (but the index is never finalized)" do
@@ -742,7 +742,7 @@ describe SitemapGenerator::LinkSet do
 
       it "should always finalize the index" do
         ls.send(:finalize_sitemap_index!)
-        expect(ls.sitemap_index.finalized?).to be true
+        expect(ls.sitemap_index.finalized?).to be(true)
       end
 
       it "should add finalized sitemaps to the index" do
@@ -755,9 +755,9 @@ describe SitemapGenerator::LinkSet do
       let(:ls)  { SitemapGenerator::LinkSet.new(:default_host => default_host, :create_index => :auto) }
 
       it "should not write the index when it is empty" do
-        expect(ls.sitemap_index.empty?).to be true
+        expect(ls.sitemap_index.empty?).to be(true)
         ls.send(:finalize_sitemap_index!)
-        expect(ls.sitemap_index.written?).to be false
+        expect(ls.sitemap_index.written?).to be(false)
       end
 
       it "should add finalized sitemaps to the index" do
@@ -767,9 +767,9 @@ describe SitemapGenerator::LinkSet do
 
       it "should write the index when a link is added manually" do
         ls.sitemap_index.add '/test'
-        expect(ls.sitemap_index.empty?).to be false
+        expect(ls.sitemap_index.empty?).to be(false)
         ls.send(:finalize_sitemap_index!)
-        expect(ls.sitemap_index.written?).to be true
+        expect(ls.sitemap_index.written?).to be(true)
 
         # Test that the index url is reported correctly
         expect(ls.sitemap_index.index_url).to eq('http://example.com/sitemap.xml.gz')
@@ -777,9 +777,9 @@ describe SitemapGenerator::LinkSet do
 
       it "should not write the index when only one sitemap is added (considered internal usage)" do
         ls.sitemap_index.add sitemap
-        expect(ls.sitemap_index.empty?).to be false
+        expect(ls.sitemap_index.empty?).to be(false)
         ls.send(:finalize_sitemap_index!)
-        expect(ls.sitemap_index.written?).to be false
+        expect(ls.sitemap_index.written?).to be(false)
 
         # Test that the index url is reported correctly
         expect(ls.sitemap_index.index_url).to eq(sitemap.location.url)
@@ -789,7 +789,7 @@ describe SitemapGenerator::LinkSet do
         ls.sitemap_index.add sitemap
         ls.sitemap_index.add sitemap.new
         ls.send(:finalize_sitemap_index!)
-        expect(ls.sitemap_index.written?).to be true
+        expect(ls.sitemap_index.written?).to be(true)
 
         # Test that the index url is reported correctly
         expect(ls.sitemap_index.index_url).to eq(ls.sitemap_index.location.url)
@@ -800,7 +800,7 @@ describe SitemapGenerator::LinkSet do
         ls.sitemap_index.add '/test1'
         ls.sitemap_index.add '/test2'
         ls.send(:finalize_sitemap_index!)
-        expect(ls.sitemap_index.written?).to be true
+        expect(ls.sitemap_index.written?).to be(true)
 
         # Test that the index url is reported correctly
         expect(ls.sitemap_index.index_url).to eq('http://example.com/sitemap.xml.gz')
@@ -814,14 +814,14 @@ describe SitemapGenerator::LinkSet do
     end
 
     it "should not be written" do
-      expect(ls.sitemap.empty?).to be true
+      expect(ls.sitemap.empty?).to be(true)
       expect(ls).to receive(:add_to_index).never
       ls.send(:finalize_sitemap!)
     end
 
     it "should be written" do
       ls.sitemap.add '/test'
-      expect(ls.sitemap.empty?).to be false
+      expect(ls.sitemap.empty?).to be(false)
       expect(ls).to receive(:add_to_index).with(ls.sitemap)
       ls.send(:finalize_sitemap!)
     end
@@ -829,36 +829,36 @@ describe SitemapGenerator::LinkSet do
 
   describe "compress" do
     it "should be true by default" do
-      expect(ls.compress).to be true
+      expect(ls.compress).to be(true)
     end
 
     it "should be set on the location objects" do
-      expect(ls.sitemap.location[:compress]).to be true
-      expect(ls.sitemap_index.location[:compress]).to be true
+      expect(ls.sitemap.location[:compress]).to be(true)
+      expect(ls.sitemap_index.location[:compress]).to be(true)
     end
 
     it "should be settable and gettable" do
       ls.compress = false
-      expect(ls.compress).to be false
+      expect(ls.compress).to be(false)
       ls.compress = :all_but_first
       expect(ls.compress).to eq(:all_but_first)
     end
 
     it "should update the location objects when set" do
       ls.compress = false
-      expect(ls.sitemap.location[:compress]).to be false
-      expect(ls.sitemap_index.location[:compress]).to be false
+      expect(ls.sitemap.location[:compress]).to be(false)
+      expect(ls.sitemap_index.location[:compress]).to be(false)
     end
 
     describe "in groups" do
       it "should inherit the current compress setting" do
         ls.compress = false
-        expect(ls.group.compress).to be false
+        expect(ls.group.compress).to be(false)
       end
 
       it "should set the compress value" do
         group = ls.group(:compress => false)
-        expect(group.compress).to be false
+        expect(group.compress).to be(false)
       end
     end
   end

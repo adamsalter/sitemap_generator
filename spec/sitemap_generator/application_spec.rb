@@ -57,7 +57,7 @@ describe SitemapGenerator::Application do
     end
 
     it "should not be Rails" do
-      expect(@app.rails?).to be false
+      expect(@app.rails?).to be(false)
     end
 
     it "should use the current working directory" do

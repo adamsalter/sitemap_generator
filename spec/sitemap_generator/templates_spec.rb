@@ -12,11 +12,10 @@ describe "Templates class" do
   describe "templates" do
     before do
       SitemapGenerator.templates.sitemap_sample = nil
-      File.expects(:read).and_return('read file')
+      expect(File).to receive(:read).and_return('read file')
     end
 
     it "should only be read once" do
-      File.expects(:read).once
       SitemapGenerator.templates.sitemap_sample
       SitemapGenerator.templates.sitemap_sample
     end
