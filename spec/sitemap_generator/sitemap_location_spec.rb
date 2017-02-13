@@ -107,8 +107,8 @@ describe SitemapGenerator::SitemapLocation do
 
   describe "filesize" do
     it "should read the size of the file at path" do
-      location.expects(:path).returns('/somepath')
-      File.expects(:size?).with('/somepath')
+      expect(location).to receive(:path).and_return('/somepath')
+      expect(File).to receive(:size?).with('/somepath')
       location.filesize
     end
   end
@@ -145,18 +145,30 @@ describe SitemapGenerator::SitemapLocation do
   end
 
   describe "write" do
-    it "should output summary line when verbose" do
-      location = SitemapGenerator::SitemapLocation.new(:public_path => 'public/', :verbose => true)
-      location.adapter.stubs(:write)
-      location.expects(:summary)
-      location.write('data', 1)
+    let(:location) do
+      SitemapGenerator::SitemapLocation.new(:public_path => 'public/', :verbose => verbose)
     end
 
-    it "should not output summary line when not verbose" do
-      location = SitemapGenerator::SitemapLocation.new(:public_path => 'public/', :verbose => false)
-      location.adapter.stubs(:write)
-      location.expects(:summary).never
-      location.write('data', 1)
+    before do
+      expect(location.adapter).to receive(:write)
+    end
+
+    context 'when verbose is true' do
+      let(:verbose) { true }
+
+      it "should output summary line" do
+        expect(location).to receive(:summary)
+        location.write('data', 1)
+      end
+    end
+
+    context 'when verbose is false' do
+      let(:verbose) { false }
+
+      it "should not output summary line" do
+        expect(location).not_to receive(:summary)
+        location.write('data', 1)
+      end
     end
   end
 
@@ -173,14 +185,14 @@ describe SitemapGenerator::SitemapLocation do
 
     it "should strip gz extension if :all_but_first and first file" do
       namer = SitemapGenerator::SimpleNamer.new(:sitemap)
-      namer.stubs(:start?).returns(true)
+      expect(namer).to receive(:start?).and_return(true)
       location = SitemapGenerator::SitemapLocation.new(:namer => namer, :compress => :all_but_first)
       expect(location.filename).to eq('sitemap.xml')
     end
 
     it "should strip gz extension if :all_but_first and first file" do
       namer = SitemapGenerator::SimpleNamer.new(:sitemap)
-      namer.stubs(:start?).returns(false)
+      expect(namer).to receive(:start?).and_return(false)
       location = SitemapGenerator::SitemapLocation.new(:namer => namer, :compress => :all_but_first)
       expect(location.filename).to eq('sitemap.xml.gz')
     end

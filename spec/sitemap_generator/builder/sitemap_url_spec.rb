@@ -24,7 +24,7 @@ describe SitemapGenerator::Builder::SitemapUrl do
 
   it "lastmod should default to the last modified date for sitemap files" do
     lastmod = (Time.now - 1209600)
-    sitemap_file.expects(:lastmod).returns(lastmod)
+    sitemap_file.expects(:lastmod).and_return(lastmod)
     url = SitemapGenerator::Builder::SitemapUrl.new(sitemap_file)
     expect(url[:lastmod]).to eq(lastmod)
   end
@@ -108,14 +108,14 @@ describe SitemapGenerator::Builder::SitemapUrl do
 
     it "should try to convert to utc" do
       time = Time.at(0)
-      time.expects(:respond_to?).times(2).returns(false, true) # iso8601, utc
+      time.expects(:respond_to?).times(2).and_return(false, true) # iso8601, utc
       expect(new_url.send(:w3c_date, time)).to eq('1970-01-01T00:00:00+00:00')
     end
 
     it "should include timezone for objects which do not respond to iso8601 or utc" do
       time = Time.at(0)
-      time.expects(:respond_to?).times(2).returns(false, false) # iso8601, utc
-      time.expects(:strftime).times(2).returns('+0800', '1970-01-01T00:00:00')
+      time.expects(:respond_to?).times(2).and_return(false, false) # iso8601, utc
+      time.expects(:strftime).times(2).and_return('+0800', '1970-01-01T00:00:00')
       expect(new_url.send(:w3c_date, time)).to eq('1970-01-01T00:00:00+08:00')
     end
 
@@ -152,13 +152,13 @@ describe SitemapGenerator::Builder::SitemapUrl do
   describe "yes_or_no_with_default" do
     it "should use the default if the value is nil" do
       url = new_url
-      url.expects(:yes_or_no).with(true).returns('surely')
+      url.expects(:yes_or_no).with(true).and_return('surely')
       expect(url.send(:yes_or_no_with_default, nil, true)).to eq('surely')
     end
 
     it "should use the value if it is not nil" do
       url = new_url
-      url.expects(:yes_or_no).with('surely').returns('absolutely')
+      url.expects(:yes_or_no).with('surely').and_return('absolutely')
       expect(url.send(:yes_or_no_with_default, 'surely', true)).to eq('absolutely')
     end
   end

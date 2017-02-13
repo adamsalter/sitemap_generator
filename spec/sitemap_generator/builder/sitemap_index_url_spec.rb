@@ -16,13 +16,13 @@ describe SitemapGenerator::Builder::SitemapIndexUrl do
 
   it "should use the host from the index" do
     host = 'http://myexample.com'
-    index.location.expects(:host).returns(host)
+    index.location.expects(:host).and_return(host)
     expect(url[:host]).to eq(host)
   end
 
   it "should use the public path for the link" do
     path = '/path'
-    index.location.expects(:path_in_public).returns(path)
+    index.location.expects(:path_in_public).and_return(path)
     expect(url[:loc]).to eq('http://test.com/path')
   end
 end

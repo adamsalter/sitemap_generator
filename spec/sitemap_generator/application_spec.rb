@@ -27,7 +27,7 @@ describe SitemapGenerator::Application do
 
     it "should identify the rails version correctly" do
       tests.each do |version, result|
-        Rails.expects(:version).returns(version)
+        expect(Rails).to receive(:version).and_return(version)
         expect(@app.rails3?).to eq(result)
       end
     end
@@ -36,7 +36,7 @@ describe SitemapGenerator::Application do
   describe "with Rails" do
     before do
       @root = '/test'
-      Rails.expects(:root).returns(@root).at_least_once
+      expect(Rails).to receive(:root).and_return(@root).at_least_once
     end
 
     it "should use the Rails.root" do

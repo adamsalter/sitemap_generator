@@ -38,7 +38,7 @@ describe 'SitemapGenerator::Builder::SitemapFile' do
     it "should be the file last modified time" do
       lastmod = (Time.now - 1209600)
       sitemap.location.reserve_name
-      File.expects(:mtime).with(sitemap.location.path).returns(lastmod)
+      File.expects(:mtime).with(sitemap.location.path).and_return(lastmod)
       expect(sitemap.lastmod).to eq(lastmod)
     end
 
@@ -81,14 +81,14 @@ describe 'SitemapGenerator::Builder::SitemapFile' do
   describe "reserve_name" do
     it "should reserve the name from the location" do
       expect(sitemap.reserved_name?).to be false
-      sitemap.location.expects(:reserve_name).returns('name')
+      sitemap.location.expects(:reserve_name).and_return('name')
       sitemap.reserve_name
       expect(sitemap.reserved_name?).to be true
       expect(sitemap.instance_variable_get(:@reserved_name)).to eq('name')
     end
 
     it "should be safe to call multiple times" do
-      sitemap.location.expects(:reserve_name).returns('name').once
+      sitemap.location.expects(:reserve_name).and_return('name').once
       sitemap.reserve_name
       sitemap.reserve_name
     end
@@ -97,13 +97,13 @@ describe 'SitemapGenerator::Builder::SitemapFile' do
   describe "add" do
     it "should use the host provided" do
       url = SitemapGenerator::Builder::SitemapUrl.new('/one', :host => 'http://newhost.com/')
-      SitemapGenerator::Builder::SitemapUrl.expects(:new).with('/one', :host => 'http://newhost.com').returns(url)
+      SitemapGenerator::Builder::SitemapUrl.expects(:new).with('/one', :host => 'http://newhost.com').and_return(url)
       sitemap.add '/one', :host => 'http://newhost.com'
     end
 
     it "should use the host from the location" do
       url = SitemapGenerator::Builder::SitemapUrl.new('/one', :host => 'http://example.com/')
-      SitemapGenerator::Builder::SitemapUrl.expects(:new).with('/one', :host => 'http://example.com/').returns(url)
+      SitemapGenerator::Builder::SitemapUrl.expects(:new).with('/one', :host => 'http://example.com/').and_return(url)
       sitemap.add '/one'
     end
   end
@@ -112,7 +112,7 @@ describe 'SitemapGenerator::Builder::SitemapFile' do
     let(:link_count) { 10 }
 
     before do
-      sitemap.expects(:max_sitemap_links).returns(max_sitemap_links)
+      sitemap.expects(:max_sitemap_links).and_return(max_sitemap_links)
       sitemap.instance_variable_set(:@link_count, link_count)
     end
 
@@ -142,7 +142,7 @@ describe 'SitemapGenerator::Builder::SitemapFile' do
 
     context 'when present in the location' do
       before do
-        sitemap.location.expects(:[]).with(:max_sitemap_links).returns(10)
+        sitemap.location.expects(:[]).with(:max_sitemap_links).and_return(10)
       end
 
       it 'returns the value from the location' do

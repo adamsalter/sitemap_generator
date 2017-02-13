@@ -277,7 +277,7 @@ describe "SitemapGenerator" do
 
   describe "external dependencies" do
     it "should work outside of Rails" do
-      Object.stubs(:Rails => nil)
+      remove_constant(Rails) if defined?(Rails)
       expect { ::SitemapGenerator::LinkSet.new }.not_to raise_exception
     end
   end
@@ -333,7 +333,7 @@ describe "SitemapGenerator" do
 
         # Test that the index url is reported correctly
         ls.search_engines = { :google => 'http://google.com/?url=%s' }
-        ls.expects(:open).with("http://google.com/?url=#{CGI.escape('http://example.com/sitemap.xml.gz')}")
+        expect(ls).to receive(:open).with("http://google.com/?url=#{CGI.escape('http://example.com/sitemap.xml.gz')}")
         ls.ping_search_engines
       end
 
@@ -349,7 +349,7 @@ describe "SitemapGenerator" do
 
         # Test that the index url is reported correctly
         ls.search_engines = { :google => 'http://google.com/?url=%s' }
-        ls.expects(:open).with("http://google.com/?url=#{CGI.escape('http://example.com/sitemap.xml.gz')}")
+        expect(ls).to receive(:open).with("http://google.com/?url=#{CGI.escape('http://example.com/sitemap.xml.gz')}")
         ls.ping_search_engines
       end
     end
@@ -368,7 +368,7 @@ describe "SitemapGenerator" do
 
         # Test that the index url is reported correctly
         ls.search_engines = { :google => 'http://google.com/?url=%s' }
-        ls.expects(:open).with("http://google.com/?url=#{CGI.escape('http://example.com/sitemap.xml.gz')}")
+        expect(ls).to receive(:open).with("http://google.com/?url=#{CGI.escape('http://example.com/sitemap.xml.gz')}")
         ls.ping_search_engines
       end
 
@@ -383,7 +383,7 @@ describe "SitemapGenerator" do
 
         # Test that the index url is reported correctly
         ls.search_engines = { :google => 'http://google.com/?url=%s' }
-        ls.expects(:open).with("http://google.com/?url=#{CGI.escape('http://example.com/sitemap.xml.gz')}")
+        expect(ls).to receive(:open).with("http://google.com/?url=#{CGI.escape('http://example.com/sitemap.xml.gz')}")
         ls.ping_search_engines
       end
     end
@@ -400,7 +400,7 @@ describe "SitemapGenerator" do
 
         # Test that the index url is reported correctly
         ls.search_engines = { :google => 'http://google.com/?url=%s' }
-        ls.expects(:open).with("http://google.com/?url=#{CGI.escape('http://example.com/sitemap.xml.gz')}")
+        expect(ls).to receive(:open).with("http://google.com/?url=#{CGI.escape('http://example.com/sitemap.xml.gz')}")
         ls.ping_search_engines
       end
 
@@ -417,7 +417,7 @@ describe "SitemapGenerator" do
 
         # Test that the index url is reported correctly
         ls.search_engines = { :google => 'http://google.com/?url=%s' }
-        ls.expects(:open).with("http://google.com/?url=#{CGI.escape('http://example.com/sitemap.xml.gz')}")
+        expect(ls).to receive(:open).with("http://google.com/?url=#{CGI.escape('http://example.com/sitemap.xml.gz')}")
         ls.ping_search_engines
       end
 
@@ -436,7 +436,7 @@ describe "SitemapGenerator" do
 
         # Test that the index url is reported correctly
         ls.search_engines = { :google => 'http://google.com/?url=%s' }
-        ls.expects(:open).with("http://google.com/?url=#{CGI.escape('http://example.com/sitemap.xml.gz')}")
+        expect(ls).to receive(:open).with("http://google.com/?url=#{CGI.escape('http://example.com/sitemap.xml.gz')}")
         ls.ping_search_engines
       end
     end
