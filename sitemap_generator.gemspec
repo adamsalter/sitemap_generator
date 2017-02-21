@@ -15,5 +15,6 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'nokogiri', '~> 1.6.8'
   s.add_development_dependency 'rspec', '~> 3.5'
   s.add_development_dependency 'webmock', '~> 2.3'
+  s.add_development_dependency 'rake', '~> 12'
   s.files = Dir.glob('{lib,rails,templates}/**/*') + %w(CHANGES.md MIT-LICENSE README.md VERSION)
 end
