@@ -12,7 +12,7 @@ Gem::Specification.new do |s|
   s.license = 'MIT'
   s.add_dependency 'builder', '~> 3.0'
   s.add_development_dependency 'fog-aws', '~> 1.2'
-  s.add_development_dependency 'nokogiri', '~> 1.6.8'
+  s.add_development_dependency 'nokogiri', '~> 1.6'
   s.add_development_dependency 'rspec', '~> 3.5'
   s.add_development_dependency 'webmock', '~> 2.3'
   s.add_development_dependency 'rake', '~> 12'
