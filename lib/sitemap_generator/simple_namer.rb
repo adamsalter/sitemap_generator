@@ -14,7 +14,7 @@ module SitemapGenerator
   #
   # Arguments:
   #   base - string or symbol that forms the base of the generated filename e.g.
-  #          if `:geo` files are generated like `geo.xml.gz`, `geo1.xml.gz`, `geo2.xml.gz` etc.
+  #          if `:geo`, files are generated like `geo.xml.gz`, `geo1.xml.gz`, `geo2.xml.gz` etc.
   #
   # Options:
   #   :extension - Default: '.xml.gz'. File extension to append.

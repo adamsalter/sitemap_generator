@@ -17,7 +17,7 @@ module XmlMacros
     doc = Nokogiri::XML(xml)
     schema_file = File.join(File.dirname(__FILE__), 'schemas', "#{schema_name}.xsd")
     schema = Nokogiri::XML::Schema File.read(schema_file)
-    schema.validate(doc).should == []
+    expect(schema.validate(doc)).to eq([])
   end
 
   # Validate a fragment of XML against a schema.  Builds a document with a root
@@ -39,7 +39,7 @@ module XmlMacros
   #
   # Example:
   #   xml_fragment_should_validate_against_schema('<video/>', 'sitemap-video', 'xmlns:video' => 'http://www.google.com/schemas/sitemap-video/1.1')
-  #   
+  #
   #   This validates the given XML using the spec/support/schemas/sitemap-video.xsd`
   #   schema.  The XML namespace `xmlns:video='http://www.google.com/schemas/sitemap-video/1.1'` is automatically
   #   added to the root element for you.
@@ -57,11 +57,11 @@ module XmlMacros
   end
 
   def xml_data_should_have_minimal_whitespace(xml_data)
-    xml_data.should_not match /^\s/
-    xml_data.should_not match /\s$/
-    xml_data.should_not match /\s\s+/
-    xml_data.should_not match /\s[<>]/
-    xml_data.should_not match /[<>]\s/
+    expect(xml_data).not_to match /^\s/
+    expect(xml_data).not_to match /\s$/
+    expect(xml_data).not_to match /\s\s+/
+    expect(xml_data).not_to match /\s[<>]/
+    expect(xml_data).not_to match /[<>]\s/
   end
 
 end

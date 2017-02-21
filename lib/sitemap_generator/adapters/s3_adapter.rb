@@ -1,3 +1,8 @@
+# Without this require, fog-core 1.2.0 raises
+# NameError: uninitialized constant Fog::ServicesMixin.
+# I don't know which versions this affects.
+require 'fog/core/services_mixin' rescue nil
+
 begin
   require 'fog/storage'
 rescue LoadError

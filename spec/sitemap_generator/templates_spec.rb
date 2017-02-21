@@ -1,22 +1,21 @@
 require 'spec_helper'
 
-describe "Templates class" do
+describe 'Templates class' do
 
-  it "should provide method access to each template" do
+  it 'should provide method access to each template' do
     SitemapGenerator::Templates::FILES.each do |name, file|
-      SitemapGenerator.templates.send(name).should_not be(nil)
-      SitemapGenerator.templates.send(name).should == File.read(File.join(SitemapGenerator.root, 'templates', file))
+      expect(SitemapGenerator.templates.send(name)).not_to be(nil)
+      expect(SitemapGenerator.templates.send(name)).to eq(File.read(File.join(SitemapGenerator.root, 'templates', file)))
     end
   end
 
-  describe "templates" do
-    before :each do
+  describe 'templates' do
+    before do
       SitemapGenerator.templates.sitemap_sample = nil
-      File.expects(:read).returns('read file')
+      expect(File).to receive(:read).and_return('read file').once
     end
 
-    it "should only be read once" do
-      File.expects(:read).once
+    it 'should only be read once' do
       SitemapGenerator.templates.sitemap_sample
       SitemapGenerator.templates.sitemap_sample
     end

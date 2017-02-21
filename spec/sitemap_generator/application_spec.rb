@@ -1,23 +1,12 @@
 require 'spec_helper'
 
 describe SitemapGenerator::Application do
-  before :all do
-    SitemapGenerator::Utilities.with_warnings(nil) do
-      Object.const_set(:Rails, Object.new)
-    end
-  end
-
-  after :all do
-    SitemapGenerator::Utilities.with_warnings(nil) do
-      Object.const_set(:Rails, nil)
-    end
-  end
-
-  before :each do
+  before do
+    stub_const('Rails::VERSION', '1')
     @app = SitemapGenerator::Application.new
   end
 
-  describe "rails3?" do
+  describe 'rails3?' do
     tests = {
       :nil => false,
       '2.3.11' => false,
@@ -25,45 +14,40 @@ describe SitemapGenerator::Application do
       '3.0.11' => true
     }
 
-    it "should identify the rails version correctly" do
+    it 'should identify the rails version correctly' do
       tests.each do |version, result|
-        Rails.expects(:version).returns(version)
-        @app.rails3?.should == result
+        expect(Rails).to receive(:version).and_return(version)
+        expect(@app.rails3?).to eq(result)
       end
     end
   end
 
-  describe "with Rails" do
-    before :each do
+  describe 'with Rails' do
+    before do
       @root = '/test'
-      Rails.expects(:root).returns(@root).at_least_once
+      expect(Rails).to receive(:root).and_return(@root).at_least(:once)
     end
 
-    it "should use the Rails.root" do
-      @app.root.should be_a(Pathname)
-      @app.root.to_s.should == @root
-      (@app.root + 'public/').to_s.should == File.join(@root, 'public/')
+    it 'should use the Rails.root' do
+      expect(@app.root).to be_a(Pathname)
+      expect(@app.root.to_s).to eq(@root)
+      expect((@app.root + 'public/').to_s).to eq(File.join(@root, 'public/'))
     end
   end
 
-  describe "with no Rails" do
-    before :each do
-      @rails = Rails
-      Object.send(:remove_const, :Rails)
+  describe 'with no Rails' do
+    before do
+      hide_const('Rails')
     end
 
-    after :each do
-      Object::Rails = @rails
+    it 'should not be Rails' do
+      expect(@app.rails?).to be(false)
     end
 
-    it "should not be Rails" do
-      @app.rails?.should be_false
-    end
-
-    it "should use the current working directory" do
-      @app.root.should be_a(Pathname)
-      @app.root.to_s.should == Dir.getwd
-      (@app.root + 'public/').to_s.should == File.join(Dir.getwd, 'public/')
+    it 'should use the current working directory' do
+      expect(@app.root).to be_a(Pathname)
+      expect(@app.root.to_s).to eq(Dir.getwd)
+      expect((@app.root + 'public/').to_s).to eq(File.join(Dir.getwd, 'public/'))
     end
   end
 end

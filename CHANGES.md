@@ -1,3 +1,14 @@
+### 5.3.0
+
+* Add `max_sitemap_links` option support for limiting how many links each sitemap can hold.  Issue [#188](https://github.com/kjvarga/sitemap_generator/issues/188) PR [#262](https://github.com/kjvarga/sitemap_generator/pull/262)
+* Upgrade development dependencies
+* Modernize Gemfile & gemspec
+* Bring specs up to RSpec 3.5
+* Remove Geo sitemap support.  Google no longer supports them. Issue [#246](https://github.com/kjvarga/sitemap_generator/issues/246)
+* Use `sitemap` namespace for Capistrano tasks (rather than `deploy`). PR [#241](https://github.com/kjvarga/sitemap_generator/pull/241)
+* Use presence of `Rails::VERSION` to detect when running under Rails, rather than just `Rails` constant.  PR [#221](https://github.com/kjvarga/sitemap_generator/pull/221)
+* Remove gem post-install message warning about incompatible changes in version 4
+
 ### 5.2.0
 
 * New `SitemapGenerator::AwsSdkAdapter` adapter using the bare aws-sdk gem.

@@ -14,13 +14,13 @@ NOT   = [ EmptyFalse.new, Object.new, true, 0, 1, 'a', [nil], { nil => 0 } ]
 describe Object do
   let(:utils) { SitemapGenerator::Utilities }
 
-  it "should define blankness" do
-    BLANK.each { |v| utils.blank?(v).should be_true }
-    NOT.each   { |v| utils.blank?(v).should be_false }
+  it 'should define blankness' do
+    BLANK.each { |v| expect(utils.blank?(v)).to be(true) }
+    NOT.each   { |v| expect(utils.blank?(v)).to be(false) }
   end
 
-  it "should define presence" do
-    BLANK.each { |v| utils.present?(v).should be_false }
-    NOT.each   { |v| utils.present?(v).should be_true }
+  it 'should define presence' do
+    BLANK.each { |v| expect(utils.present?(v)).to be(false) }
+    NOT.each   { |v| expect(utils.present?(v)).to be(true) }
   end
 end
