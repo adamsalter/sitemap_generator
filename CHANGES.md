@@ -1,3 +1,8 @@
+### 5.3.1
+
+* Ensure files have 644 permissions when building to try to address issue [#264](https://github.com/kjvarga/sitemap_generator/issues/264)
+* Use HTTPS in the Gemfile (PR #[#263](https://github.com/kjvarga/sitemap_generator/pull/263))
+
 ### 5.3.0
 
 * Add `max_sitemap_links` option support for limiting how many links each sitemap can hold.  Issue [#188](https://github.com/kjvarga/sitemap_generator/issues/188) PR [#262](https://github.com/kjvarga/sitemap_generator/pull/262)
