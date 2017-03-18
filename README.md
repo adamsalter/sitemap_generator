@@ -157,7 +157,7 @@ The Rake tasks expect your sitemap to be at `config/sitemap.rb` but if you need 
 
 ### Rails
 
-SitemapGenerator works will all versions of Rails and has been tested in Rails 2, 3 and 4.
+SitemapGenerator works with all versions of Rails and has been tested in Rails 2, 3 and 4.
 
 Add the gem to your `Gemfile`:
 
