@@ -64,7 +64,7 @@ module SitemapGenerator
     end
 
     def has_specific_credential?
-      !@aws_access_key_id.nil? && !@@aws_secret_access_key.nil?
+      !@aws_access_key_id.nil? && !@aws_secret_access_key.nil?
     end
   end
 end
