@@ -199,7 +199,7 @@ SitemapGenerator.verbose = false
 ### Rake Tasks
 
 * `rake sitemap:install` will create a `config/sitemap.rb` file which is your sitemap configuration and contains everything needed to build your sitemap.  See [**Sitemap Configuration**](#sitemap-configuration) below for more information about how to define your sitemap.
-* `rake sitemap:refresh` will create or rebuild your sitemap files as needed.  Sitemaps are generated into the `public/` folder and by default are named `sitemap_index.xml.gz`, `sitemap1.xml.gz`, `sitemap2.xml.gz`, etc.  As you can see they are automatically gzip compressed for you.
+* `rake sitemap:refresh` will create or rebuild your sitemap files as needed.  Sitemaps are generated into the `public/` folder and by default are named `sitemap.xml.gz`, `sitemap1.xml.gz`, `sitemap2.xml.gz`, etc.  As you can see they are automatically gzip compressed for you.
 * `rake sitemap:refresh` will output information about each sitemap that is written including its location, how many links it contains and the size of the file.
 
 
@@ -375,7 +375,7 @@ Sitemap Generator uses CarrierWave to support uploading to Amazon S3 store, Rack
 3. Update your `robots.txt` file to point robots to the remote sitemap index file, e.g:
 
     ```
-    Sitemap: http://s3.amazonaws.com/sitemap-generator/sitemaps/sitemap_index.xml.gz
+    Sitemap: http://s3.amazonaws.com/sitemap-generator/sitemaps/sitemap.xml.gz
     ```
 
     You generate your sitemaps as usual using `rake sitemap:refresh`.
