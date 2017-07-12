@@ -274,6 +274,12 @@ To include the capistrano tasks just add the following to your Capfile:
 require 'capistrano/sitemap_generator'
 ```
 
+Configurable options:
+
+```ruby
+set :sitemap_roles, :web # default
+```
+
 Available capistrano tasks:
 
 ```ruby
