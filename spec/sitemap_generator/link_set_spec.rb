@@ -415,7 +415,6 @@ describe SitemapGenerator::LinkSet do
       {
         :filename => :xxx,
         :sitemaps_path => 'en/',
-        :filename => :example,
         :namer => SitemapGenerator::SimpleNamer.new(:sitemap)
       }.each do |key, value|
         it 'if #{key} is present' do
