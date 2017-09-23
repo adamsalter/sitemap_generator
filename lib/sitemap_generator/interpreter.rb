@@ -6,9 +6,11 @@ module SitemapGenerator
   # and API methods available to it.
   class Interpreter
 
-    if SitemapGenerator.app.rails3?
-      include ::Rails.application.routes.url_helpers
-    elsif SitemapGenerator.app.rails?
+    if SitemapGenerator.app.is_at_least_rails3?
+      if !::Rails.application.nil?
+        include ::Rails.application.routes.url_helpers
+      end
+    elsif SitemapGenerator.app.is_rails?
       require 'action_controller'
       include ActionController::UrlWriter
     end
@@ -34,7 +36,7 @@ module SitemapGenerator
     def add_to_index(*args)
       @linkset.add_to_index(*args)
     end
-    
+
     # Start a new group of sitemaps.  Any of the options to SitemapGenerator.new may
     # be passed.  Pass a block with calls to +add+ to add links to the sitemaps.
     #

@@ -82,4 +82,4 @@ module SitemapGenerator
   self.app       = SitemapGenerator::Application.new
 end
 
-require 'sitemap_generator/railtie' if SitemapGenerator.app.rails3?
+require 'sitemap_generator/railtie' if SitemapGenerator.app.is_at_least_rails3?

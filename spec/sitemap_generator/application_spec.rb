@@ -6,7 +6,7 @@ describe SitemapGenerator::Application do
     @app = SitemapGenerator::Application.new
   end
 
-  describe 'rails3?' do
+  describe 'is_at_least_rails3?' do
     tests = {
       :nil => false,
       '2.3.11' => false,
@@ -17,7 +17,7 @@ describe SitemapGenerator::Application do
     it 'should identify the rails version correctly' do
       tests.each do |version, result|
         expect(Rails).to receive(:version).and_return(version)
-        expect(@app.rails3?).to eq(result)
+        expect(@app.is_at_least_rails3?).to eq(result)
       end
     end
   end
@@ -41,7 +41,7 @@ describe SitemapGenerator::Application do
     end
 
     it 'should not be Rails' do
-      expect(@app.rails?).to be(false)
+      expect(@app.is_rails?).to be(false)
     end
 
     it 'should use the current working directory' do
