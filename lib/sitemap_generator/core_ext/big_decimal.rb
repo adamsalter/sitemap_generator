@@ -19,7 +19,7 @@ class SitemapGenerator::BigDecimal < BigDecimal
   #
   # Note that reconstituting YAML floats to native floats may lose precision.
   def to_yaml(opts = {})
-    return super if defined?(YAML::ENGINE) && !YAML::ENGINE.syck?
+    return super unless defined?(YAML::ENGINE) && YAML::ENGINE.syck?
 
     YAML.quick_emit(nil, opts) do |out|
       string = to_s
