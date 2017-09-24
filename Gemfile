@@ -5,5 +5,5 @@ ruby '2.4.1'
 gemspec
 
 group :test do
-  gem 'byebug', require: false
+  gem 'byebug'
 end
