@@ -3,11 +3,12 @@ require 'aws-sdk-core'
 require 'aws-sdk-s3'
 
 describe 'SitemapGenerator::AwsSdkAdapter' do
-  let(:location) { SitemapGenerator::SitemapLocation.new }
+  let(:location) { SitemapGenerator::SitemapLocation.new(compress: compress) }
   let(:adapter)  { SitemapGenerator::AwsSdkAdapter.new('bucket', options) }
   let(:options) { {} }
+  let(:compress) { nil }
 
-  describe 'write' do
+  shared_examples 'it writes the raw data to a file and then uploads that file to S3' do
     it 'writes the raw data to a file and then uploads that file to S3' do
       s3_object = double(:s3_object)
       s3_resource = double(:s3_resource)
@@ -20,10 +21,25 @@ describe 'SitemapGenerator::AwsSdkAdapter' do
       expect(s3_object).to receive(:upload_file).with('path', hash_including(
         acl: 'public-read',
         cache_control: 'private, max-age=0, no-cache',
-        content_type: 'application/xml'
+        content_type: content_type
       )).and_return(nil)
       expect_any_instance_of(SitemapGenerator::FileAdapter).to receive(:write).with(location, 'raw_data')
       adapter.write(location, 'raw_data')
+    end
+  end
+
+  describe 'write' do
+    context 'with no compress option' do
+      let(:content_type) { 'application/xml' }
+
+      it_behaves_like 'it writes the raw data to a file and then uploads that file to S3'
+    end
+
+    context 'with compress true' do
+      let(:content_type) { 'application/x-gzip' }
+      let(:compress) { true }
+
+      it_behaves_like 'it writes the raw data to a file and then uploads that file to S3'
     end
   end
 
