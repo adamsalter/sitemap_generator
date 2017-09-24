@@ -15,6 +15,8 @@ module SitemapGenerator
     #   :aws_secret_access_key [String] Your AWS secret access key
     #   :aws_region [String] Your AWS region
     #
+    # Requires Aws::S3::Resource and Aws::Credentials to be defined.
+    #
     # @param [String] bucket Name of the S3 bucket
     # @param [Hash] options AWS credential overrides, see above
     def initialize(bucket, options = {})
