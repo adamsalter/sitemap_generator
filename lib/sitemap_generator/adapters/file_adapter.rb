@@ -1,7 +1,6 @@
 module SitemapGenerator
   # Class for writing out data to a file.
   class FileAdapter
-
     # Write data to a file.
     # @param location - File object giving the full path and file name of the file.
     #    If the location specifies a directory(ies) which does not exist, the directory(ies)

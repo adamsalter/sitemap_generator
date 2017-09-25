@@ -1,20 +1,21 @@
-# Without this require, fog-core 1.2.0 raises
-# NameError: uninitialized constant Fog::ServicesMixin.
-# I don't know which versions this affects.
-begin
-  require 'fog/core/services_mixin'
-rescue LoadError
-end
-
-begin
-  require 'fog/storage'
-rescue LoadError
-  raise LoadError.new("Missing required 'fog-aws'.  Please 'gem install fog-aws' and require it in your application.")
+if !defined?(Fog::Storage)
+  raise "Error: `Fog::Storage` is not defined.\n\n"\
+        "Please `require 'fog-aws'` - or another library that defines this class."
 end
 
 module SitemapGenerator
+  # Class for uploading sitemaps to an S3 bucket using the Fog gem.
   class S3Adapter
-
+    # Requires Fog::Storage to be defined.
+    #
+    # @param [Hash] opts Fog configuration options
+    # @option :aws_access_key_id [String] Your AWS access key id
+    # @option :aws_secret_access_key [String] Your AWS secret access key
+    # @option :fog_provider [String]
+    # @option :fog_directory [String]
+    # @option :fog_region [String]
+    # @option :fog_path_style [String]
+    # @option :fog_storage_options [Hash] Other options to pass to `Fog::Storage`
     def initialize(opts = {})
       @aws_access_key_id = opts[:aws_access_key_id] || ENV['AWS_ACCESS_KEY_ID']
       @aws_secret_access_key = opts[:aws_secret_access_key] || ENV['AWS_SECRET_ACCESS_KEY']
@@ -49,6 +50,5 @@ module SitemapGenerator
         :public => true
       )
     end
-
   end
 end

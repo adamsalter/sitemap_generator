@@ -1,5 +1,6 @@
 # encoding: UTF-8
 require 'spec_helper'
+require 'fog-aws'
 
 describe SitemapGenerator::S3Adapter do
   let(:location) do

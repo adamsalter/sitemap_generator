@@ -1,10 +1,10 @@
-begin
-  require 'carrierwave'
-rescue LoadError
-  raise LoadError.new("Missing required 'carrierwave'.  Please 'gem install carrierwave' and require it in your application.")
+if !defined?(::CarrierWave::Uploader::Base)
+  raise "Error: `CarrierWave::Uploader::Base` is not defined.\n\n"\
+        "Please `require 'carrierwave'` - or another library that defines this class."
 end
 
 module SitemapGenerator
+  # Class for uploading sitemaps to a remote server using the CarrierWave gem.
   class WaveAdapter < ::CarrierWave::Uploader::Base
     attr_accessor :store_dir
 

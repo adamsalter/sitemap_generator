@@ -1,12 +1,16 @@
-begin
-  require 'fog'
-rescue LoadError
-  raise LoadError.new("Missing required 'fog'.  Please 'gem install fog' and require it in your application.")
+if !defined?(Fog::Storage)
+  raise "Error: `Fog::Storage` is not defined.\n\n"\
+        "Please `require 'fog'` - or another library that defines this class."
 end
 
 module SitemapGenerator
+  # Class for uploading sitemaps to a Fog supported endpoint.
   class FogAdapter
-
+    # Requires Fog::Storage to be defined.
+    #
+    # @param [Hash] opts Fog configuration options
+    # @option :fog_credentials [Hash] Credentials for connecting to the remote server
+    # @option :fog_directory [String] Your AWS S3 bucket or similar directory name
     def initialize(opts = {})
       @fog_credentials = opts[:fog_credentials]
       @fog_directory = opts[:fog_directory]
