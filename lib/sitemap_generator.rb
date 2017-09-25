@@ -26,7 +26,7 @@ module SitemapGenerator
     MAX_SITEMAP_LINKS    = 50_000        # max links per sitemap
     MAX_SITEMAP_IMAGES   = 1_000         # max images per url
     MAX_SITEMAP_NEWS     = 1_000         # max news sitemap per index_file
-    MAX_SITEMAP_FILESIZE = 10_000_000    # bytes
+    MAX_SITEMAP_FILESIZE = 50_000_000    # bytes
     SCHEMAS = {
       'image'   => 'http://www.google.com/schemas/sitemap-image/1.1',
       'mobile'  => 'http://www.google.com/schemas/sitemap-mobile/1.0',
