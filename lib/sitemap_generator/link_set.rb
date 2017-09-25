@@ -217,6 +217,7 @@ module SitemapGenerator
         @sitemap.location.merge!(@group.sitemap_location)
         if block_given?
           @group.interpreter.eval(:yield_sitemap => @yield_sitemap || SitemapGenerator.yield_sitemap?, &block)
+          @group.finalize_sitemap!
           @sitemap.location.merge!(@original_location)
         end
       else
@@ -430,13 +431,14 @@ module SitemapGenerator
     # Add default links if those options are turned on.  Record the fact that we have done so
     # in an instance variable.
     def add_default_links
+      @added_default_links = true
+      link_options = { :lastmod => Time.now, :changefreq => 'always', :priority => 1.0 }
       if include_root?
-        sitemap.add('/', :lastmod => Time.now, :changefreq => 'always', :priority => 1.0, :host => @default_host)
+        add('/', link_options)
       end
       if include_index?
-        sitemap.add(sitemap_index, :lastmod => Time.now, :changefreq => 'always', :priority => 1.0)
+        add(sitemap_index, link_options)
       end
-      @added_default_links = true
     end
 
     # Finalize a sitemap by including it in the index and outputting a summary line.
