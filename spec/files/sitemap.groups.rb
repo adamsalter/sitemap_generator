@@ -40,9 +40,6 @@ SitemapGenerator::Sitemap.create(
 
   add '/ten'
 
-  # This should have no effect.  Already added default links.
-  group(:include_root => true, :include_index => true) {}
-
   # Not technically valid to have a link with a different host, but people like
   # to do strange things sometimes
   add '/merchant_path', :host => 'https://www.merchanthost.com'
