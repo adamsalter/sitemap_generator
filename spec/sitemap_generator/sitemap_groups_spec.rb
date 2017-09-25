@@ -111,8 +111,14 @@ describe 'Sitemap Groups' do
     end
     expect(linkset.link_count).to eq(6)
     file_should_exist(SitemapGenerator.app.root + 'public/sitemap.xml.gz')
-    file_should_not_exist(SitemapGenerator.app.root + 'public/sitemap1.xml.gz')
-    gzipped_xml_file_should_validate_against_schema(SitemapGenerator.app.root + 'public/sitemap.xml.gz', 'sitemap')
+    file_should_exist(SitemapGenerator.app.root + 'public/sitemap1.xml.gz')
+    file_should_exist(SitemapGenerator.app.root + 'public/sitemap2.xml.gz')
+    file_should_exist(SitemapGenerator.app.root + 'public/sitemap3.xml.gz')
+    file_should_not_exist(SitemapGenerator.app.root + 'public/sitemap4.xml.gz')
+    gzipped_xml_file_should_validate_against_schema(SitemapGenerator.app.root + 'public/sitemap.xml.gz', 'siteindex')
+    gzipped_xml_file_should_validate_against_schema(SitemapGenerator.app.root + 'public/sitemap1.xml.gz', 'sitemap')
+    gzipped_xml_file_should_validate_against_schema(SitemapGenerator.app.root + 'public/sitemap2.xml.gz', 'sitemap')
+    gzipped_xml_file_should_validate_against_schema(SitemapGenerator.app.root + 'public/sitemap3.xml.gz', 'sitemap')
   end
 
   it 'sitemaps should be finalized if virtual location settings are changed' do
