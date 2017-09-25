@@ -1,3 +1,16 @@
+### 6.0.0
+
+*Backwards incompatible changes*
+
+* Adapters (AWS SDK, S3, Fog & Wave) no longer load their dependencies.  It is up to the user
+  to `require` the appropriate libraries for the adapter to work.
+* AwsSdkAdapter: Fixed [#279](https://github.com/kjvarga/sitemap_generator/issues/279) where sitemaps were incorrectly nested under a `sitemaps/` directory in S3
+* Stop supporting Ruby < 2.0, test with Ruby 2.4.
+
+*Other changes*
+
+* If Rails is defined but the application is not loaded, don't include the URL helpers.
+
 ### 5.3.1
 
 * Ensure files have 644 permissions when building to try to address issue [#264](https://github.com/kjvarga/sitemap_generator/issues/264)
