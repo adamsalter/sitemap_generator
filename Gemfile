@@ -6,5 +6,4 @@ gemspec
 
 group :test do
   gem 'byebug'
-  gem 'fog-aws'
 end
