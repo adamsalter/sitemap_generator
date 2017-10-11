@@ -240,7 +240,6 @@ every 1.day, :at => '5:00 am' do
 end
 ```
 
-
 ### Robots.txt
 
 You should add the URL of the sitemap index file to `public/robots.txt` to help search engines find your sitemaps.  The URL should be the complete URL to the sitemap index.  For example:
@@ -259,7 +258,7 @@ of the `SitemapGenerator::Interpreter`:
 SitemapGenerator::Interpreter.send :include, RoutingHelper
 ```
 
-## Deployments & Capistrano
+### Deployments & Capistrano
 
 To include the capistrano tasks just add the following to your Capfile:
 
@@ -325,8 +324,8 @@ because the sitemap files need to be written out before uploading.  So generally
 give you write access to a temporary directory.  On Heroku this is `tmp/` within your application
 directory.
 
-
 #### Supported Adapters
+
 * `SitemapGenerator::FileAdapter`
 
   Standard adapter, writes out to a file.
@@ -372,11 +371,13 @@ directory.
 
   Some documentation exists [on the wiki page][remote_hosts].
 
-##### An Example of Using an Adapter
+#### An Example of Using an Adapter
 
-1. Please see [this wiki page][remote_hosts] for more information about setting up CarrierWave, SitemapGenerator and Rails.
+1. Please see [this wiki page][remote_hosts] for more information about setting up SitemapGenerator to upload to a
+   remote host.
 
-2. Once you have CarrierWave setup and configured all you need to do is set some options in your sitemap config, such as
+2. This example uses the CarrierWave adapter.  It shows some common settings that are used when the hostname hosting
+   the sitemaps differs from the hostname of the sitemap links.
 
      ```ruby
      # Your website's host name
@@ -391,6 +392,7 @@ directory.
      # Set this to a directory/path if you don't want to upload to the root of your `sitemaps_host`
      SitemapGenerator::Sitemap.sitemaps_path = 'sitemaps/'
 
+     # The adapter to perform the upload of sitemap files.
      SitemapGenerator::Sitemap.adapter = SitemapGenerator::WaveAdapter.new
      ```
 
@@ -408,9 +410,10 @@ directory.
     in the sitemap, something that the sitemap rules forbid.  (Since version 3.2 this is no
     longer an issue because [`include_index` is off by default][include_index_change].)
 
-4. Verify to google that you own the s3 url
+4. Verify to Google that you own the S3 url
 
-    In order for Google to use your sitemap, you need to prove you own the s3 bucket through [google webmaster tools](https://www.google.com/webmasters/tools/home?hl=en).  In the example above, you would add the site `http://s3.amazonaws.com/sitemap-generator/sitemaps`.  Once you have verified you own the directory then add your `sitemap.xml.gz` to this list of sitemaps for the site.
+    In order for Google to use your sitemap, you need to prove you own the S3 bucket through [google webmaster tools](https://www.google.com/webmasters/tools/home?hl=en).  In the example above, you would add the site `http://s3.amazonaws.com/sitemap-generator/sitemaps`.  Once you have verified you own the directory, then add your
+    sitemap index to the list of sitemaps for the site.
 
 ### Generating Multiple Sitemaps
 
@@ -488,7 +491,6 @@ If you want to use a non-standard configuration file, or have multiple configura
 ```
 rake sitemap:refresh CONFIG_FILE="config/geo_sitemap.rb"
 ```
-
 
 ### A Simple Example
 
