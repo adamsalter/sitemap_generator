@@ -59,69 +59,61 @@ Successful ping of Google
 Successful ping of Bing
 ```
 
-## Index
+## Contents
 
-   * [SitemapGenerator](#sitemapgenerator)
-      * [Features](#features)
-         * [Show Me](#show-me)
-      * [Contribute](#contribute)
-      * [Foreword](#foreword)
-      * [Install](#install)
-         * [Ruby](#ruby)
-         * [Rails](#rails)
-      * [Getting Started](#getting-started)
-         * [Preventing Output](#preventing-output)
-         * [Rake Tasks](#rake-tasks)
-         * [Pinging Search Engines](#pinging-search-engines)
-         * [Crontab](#crontab)
-         * [Robots.txt](#robotstxt)
-         * [Ruby Modules](#ruby-modules)
-      * [Deployments &amp; Capistrano](#deployments--capistrano)
-         * [Sitemaps with no Index File](#sitemaps-with-no-index-file)
-         * [Upload Sitemaps to a Remote Host using Adapters](#upload-sitemaps-to-a-remote-host-using-adapters)
-            * [Supported Adapters](#supported-adapters)
-         * [Generating Multiple Sitemaps](#generating-multiple-sitemaps)
-      * [Sitemap Configuration](#sitemap-configuration)
-         * [A Simple Example](#a-simple-example)
-         * [Adding Links](#adding-links)
-         * [Supported Options to add](#supported-options-to-add)
-         * [Adding Links to the Sitemap Index](#adding-links-to-the-sitemap-index)
-         * [Accessing the LinkSet instance](#accessing-the-linkset-instance)
-         * [Speeding Things Up](#speeding-things-up)
-      * [Customizing your Sitemaps](#customizing-your-sitemaps)
-         * [Sitemap Options](#sitemap-options)
-      * [Sitemap Groups](#sitemap-groups)
-         * [A Groups Example](#a-groups-example)
-         * [Using `group` without a block](#using-group-without-a-block)
-      * [Sitemap Extensions](#sitemap-extensions)
-         * [News Sitemaps](#news-sitemaps)
-            * [Example](#example)
-            * [Supported options](#supported-options)
-         * [Image Sitemaps](#image-sitemaps)
-            * [Example](#example-1)
-            * [Supported options](#supported-options-1)
-         * [Video Sitemaps](#video-sitemaps)
-            * [Example](#example-2)
-            * [Supported options](#supported-options-2)
-         * [PageMap Sitemaps](#pagemap-sitemaps)
-            * [Supported options](#supported-options-4)
-            * [Example:](#example-4)
-         * [Alternate Links](#alternate-links)
-            * [Example](#example-5)
-            * [Supported options](#supported-options-5)
-         * [<a name="user-content-internal_mobile"></a> Mobile Sitemaps](#-mobile-sitemaps)
-            * [Example](#example-6)
-            * [Supported options](#supported-options-6)
-      * [Raison d'être](#raison-dêtre)
-      * [Compatibility](#compatibility)
-      * [Known Bugs](#known-bugs)
-      * [Deprecation Notices and Non-Backwards Compatible Changes](#deprecation-notices-and-non-backwards-compatible-changes)
-         * [Version 5.0.0](#version-500)
-         * [Version 4.0.0](#version-400)
-            * [So what has changed?](#so-what-has-changed)
-            * [I don't want it!  How can I keep everything as it was?](#i-dont-want-it--how-can-i-keep-everything-as-it-was)
-            * [I want it!  What do I need to do?](#i-want-it--what-do-i-need-to-do)
-      * [Thanks (in no particular order)](#thanks-in-no-particular-order)
+* [Features](#features)
+  + [Show Me](#show-me)
+* [Contents](#contents)
+* [Contribute](#contribute)
+* [Foreword](#foreword)
+* [Installation](#installation)
+  + [Ruby](#ruby)
+  + [Rails](#rails)
+* [Getting Started](#getting-started)
+  + [Preventing Output](#preventing-output)
+  + [Rake Tasks](#rake-tasks)
+  + [Pinging Search Engines](#pinging-search-engines)
+  + [Crontab](#crontab)
+  + [Robots.txt](#robotstxt)
+  + [Ruby Modules](#ruby-modules)
+* [Deployments & Capistrano](#deployments--capistrano)
+  + [Sitemaps with no Index File](#sitemaps-with-no-index-file)
+  + [Upload Sitemaps to a Remote Host using Adapters](#upload-sitemaps-to-a-remote-host-using-adapters)
+    - [Supported Adapters](#supported-adapters)
+  + [Generating Multiple Sitemaps](#generating-multiple-sitemaps)
+* [Sitemap Configuration](#sitemap-configuration)
+  + [A Simple Example](#a-simple-example)
+  + [Adding Links](#adding-links)
+  + [Supported Options to `add`](#supported-options-to-add)
+  + [Adding Links to the Sitemap Index](#adding-links-to-the-sitemap-index)
+  + [Accessing the LinkSet instance](#accessing-the-linkset-instance)
+  + [Speeding Things Up](#speeding-things-up)
+* [Customizing your Sitemaps](#customizing-your-sitemaps)
+  + [Sitemap Options](#sitemap-options)
+* [Sitemap Groups](#sitemap-groups)
+  + [A Groups Example](#a-groups-example)
+  + [Using `group` without a block](#using-group-without-a-block)
+* [Sitemap Extensions](#sitemap-extensions)
+  + [News Sitemaps](#news-sitemaps)
+    - [Example](#example)
+    - [Supported options](#supported-options)
+  + [Image Sitemaps](#image-sitemaps)
+    - [Example](#example-1)
+    - [Supported options](#supported-options-1)
+  + [Video Sitemaps](#video-sitemaps)
+    - [Example](#example-2)
+    - [Supported options](#supported-options-2)
+  + [PageMap Sitemaps](#pagemap-sitemaps)
+    - [Supported options](#supported-options-3)
+    - [Example:](#example)
+  + [Alternate Links](#alternate-links)
+    - [Example](#example-3)
+    - [Supported options](#supported-options-4)
+  + [Mobile Sitemaps](#-mobile-sitemaps)
+    - [Example](#example-4)
+    - [Supported options](#supported-options-5)
+* [Compatibility](#compatibility)
+* [Licence](#licence)
 
 ## Contribute
 
@@ -139,7 +131,7 @@ Those who knew him know what an amazing guy he was, and what an excellent Rails 
 The canonical repository is: [http://github.com/kjvarga/sitemap_generator][canonical_repo]
 
 
-## Install
+## Installation
 
 ### Ruby
 
@@ -171,19 +163,6 @@ Alternatively, if you are not using a `Gemfile` add the gem to your `config/envi
 config.gem 'sitemap_generator'
 ```
 
-
-**Rails 1 or 2 only**, add the following code to your `Rakefile` to include the gem's Rake tasks in your project (Rails 3 does this for you automatically, so this step is not necessary):
-
-```ruby
-begin
-  require 'sitemap_generator/tasks'
-rescue Exception => e
-  puts "Warning, couldn't load gem tasks: #{e.message}! Skipping..."
-end
-```
-
-_If you would prefer to install as a plugin (deprecated) don't do any of the above.  Simply run `script/plugin install git://github.com/kjvarga/sitemap_generator.git` from your application root directory._
-
 ## Getting Started
 
 ### Preventing Output
@@ -198,14 +177,23 @@ SitemapGenerator.verbose = false
 
 ### Rake Tasks
 
-* `rake sitemap:install` will create a `config/sitemap.rb` file which is your sitemap configuration and contains everything needed to build your sitemap.  See [**Sitemap Configuration**](#sitemap-configuration) below for more information about how to define your sitemap.
-* `rake sitemap:refresh` will create or rebuild your sitemap files as needed.  Sitemaps are generated into the `public/` folder and by default are named `sitemap.xml.gz`, `sitemap1.xml.gz`, `sitemap2.xml.gz`, etc.  As you can see they are automatically gzip compressed for you.
-* `rake sitemap:refresh` will output information about each sitemap that is written including its location, how many links it contains and the size of the file.
+* `rake sitemap:install` will create a `config/sitemap.rb` file which is your sitemap configuration
+  and contains everything needed to build your sitemap.  See
+  [**Sitemap Configuration**](#sitemap-configuration) below for more information about how to
+  define your sitemap.
 
+* `rake sitemap:refresh` will create or rebuild your sitemap files as needed.  Sitemaps are
+  generated into the `public/` folder and by default are named `sitemap.xml.gz`, `sitemap1.xml.gz`,
+  `sitemap2.xml.gz`, etc.  As you can see, they are automatically GZip compressed for you.  In this case,
+  `sitemap.xml.gz` is your sitemap "index" file.
+
+  `rake sitemap:refresh` will output information about each sitemap that is written including its
+  location, how many links it contains, and the size of the file.
 
 ### Pinging Search Engines
 
-Using `rake sitemap:refresh` will notify major search engines to let them know that a new sitemap is available (Google, Bing).  To generate new sitemaps without notifying search engines (for example when running in a local environment) use `rake sitemap:refresh:no_ping`.
+Using `rake sitemap:refresh` will notify Google and Bing to let them know that a new sitemap
+is available.  To generate new sitemaps without notifying search engines, use `rake sitemap:refresh:no_ping`.
 
 If you want to customize the hash of search engines you can access it at:
 
@@ -213,24 +201,27 @@ If you want to customize the hash of search engines you can access it at:
 SitemapGenerator::Sitemap.search_engines
 ```
 
-Usually you would be adding a new search engine to ping.  In this case you can modify the `search_engines` hash directly.  This ensures that when `SitemapGenerator::Sitemap.ping_search_engines` is called your new search engine will be included.
+Usually you would be adding a new search engine to ping.  In this case you can modify
+the `search_engines` hash directly.  This ensures that when
+`SitemapGenerator::Sitemap.ping_search_engines` is called, your new search engine will be included.
 
-If you are calling `ping_search_engines` manually (for example if you have to wait some time or perform a custom action after your sitemaps have been regenerated) then you can pass you new search engine directly in the call as in the following example:
+If you are calling `ping_search_engines` manually, then you can pass your new search engine
+directly in the call, as in the following example:
 
 ```ruby
-SitemapGenerator::Sitemap.ping_search_engines(:newengine => 'http://newengine.com/ping?url=%s')
+SitemapGenerator::Sitemap.ping_search_engines(newengine: 'http://newengine.com/ping?url=%s')
 ```
 
-The key gives the name of the search engine as a string or symbol and the value is the full URL to ping with a string interpolation that will be replaced by the CGI escaped sitemap index URL.  If you have any literal percent characters in your URL you need to escape them with `%%`.
+The key gives the name of the search engine, as a string or symbol, and the value is the full URL to ping, with a string interpolation that will be replaced by the CGI escaped sitemap index URL.  If you have any literal percent characters in your URL you need to escape them with `%%`.
 
-If you are calling `SitemapGenerator::Sitemap.ping_search_engines` from outside of your sitemap config file then you will need to set `SitemapGenerator::Sitemap.default_host` and any other options that you set in your sitemap config which affect the location of the sitemap index file.  For example:
+If you are calling `SitemapGenerator::Sitemap.ping_search_engines` from outside of your sitemap config file, then you will need to set `SitemapGenerator::Sitemap.default_host` and any other options that you set in your sitemap config which affect the location of the sitemap index file.  For example:
 
 ```ruby
 SitemapGenerator::Sitemap.default_host = 'http://example.com'
 SitemapGenerator::Sitemap.ping_search_engines
 ```
 
-Alternatively you can pass in the full URL to your sitemap index in which case we would have just the following:
+Alternatively, you can pass in the full URL to your sitemap index, in which case we would have just the following:
 
 ```ruby
 SitemapGenerator::Sitemap.ping_search_engines('http://example.com/sitemap.xml.gz')
@@ -260,7 +251,9 @@ Sitemap: http://www.example.com/sitemap.xml.gz
 
 ### Ruby Modules
 
-If you need to include a module (e.g. a rails helper) you can add the following line:
+If you need to include a module (e.g. a rails helper), you must include it in the sitemap interpreter
+class.  The part of your sitemap configuration that defines your sitemaps is run within an instance
+of the `SitemapGenerator::Interpreter`:
 
 ```ruby
 SitemapGenerator::Interpreter.send :include, RoutingHelper
@@ -325,37 +318,61 @@ SitemapGenerator::Sitemap.create_index = :auto
 
 _This section needs better documentation.  Please consider contributing._
 
+Sometimes it is desirable to host your sitemap files on a remote server, and point robots
+and search engines to the remote files.  For example, if you are using a host like Heroku,
+which doesn't allow writing to the local filesystem.  You still require *some* write access,
+because the sitemap files need to be written out before uploading.  So generally a host will
+give you write access to a temporary directory.  On Heroku this is `tmp/` within your application
+directory.
+
+
 #### Supported Adapters
 * `SitemapGenerator::FileAdapter`
 
-  Standard adapter, writes out to a file
+  Standard adapter, writes out to a file.
 
 * `SitemapGenerator::FogAdapter`
 
-  Uses `fog` to upload to any service supported by Fog.
+  Uses `Fog::Storage` to upload to any service supported by Fog.
+
+  You must `require 'fog'` in your sitemap config before using this adapter,
+  or `require` another library that defines `Fog::Storage`.
 
 * `SitemapGenerator::S3Adapter`
 
-  Uses `fog-aws` to upload to Amazon S3 storage.
+  Uses `Fog::Storage` to upload to Amazon S3 storage.
+
+  You must `require 'fog-aws'` in your sitemap config before using this adapter.
 
 * `SitemapGenerator::AwsSdkAdapter`
 
-  Uses `aws-sdk` to upload to Amazon S3 storage.
+  Uses `Aws::S3::Resource` to upload to Amazon S3 storage.  Includes automatic detection of your AWS
+  credentials using `Aws::Credentials`.
+
+  You must `require 'aws-sdk'` in your sitemap config before using this adapter,
+  or `require` another library that defines `Aws::S3::Resource` and `Aws::Credentials`.
+
+  An example of using this adapter in your sitemap configuration:
+
+  ```ruby
+  SitemapGenerator::Sitemap.adapter = SitemapGenerator::AwsSdkAdapter.new('s3_bucket',
+    aws_access_key_id: 'AKIAI3SW5CRAZBL4WSTA',
+    aws_secret_access_key: 'asdfadsfdsafsadf',
+    aws_region: 'us-east-1'
+  )
+  ```
 
 * `SitemapGenerator::WaveAdapter`
 
-  Uses `carrierwave` to upload to any service supported by CarrierWave.
+  Uses `CarrierWave::Uploader::Base` to upload to any service supported by CarrierWave, for example,
+  Amazon S3, Rackspace Cloud Files, and MongoDB's GridF.
 
-Some documentation exists [on the wiki page][remote_hosts].
+  You must `require 'carrierwave'` in your sitemap config before using this adapter,
+  or `require` another library that defines `CarrierWave::Uploader::Base`.
 
-Sometimes it is desirable to host your sitemap files on a remote server and point robots
-and search engines to the remote files.  For example if you are using a host like Heroku
-which doesn't allow writing to the local filesystem.  You still require *some* write access
-because the sitemap files need to be written out before uploading, so generally a host will
-give you write access to a temporary directory.  On Heroku this is `tmp/` in your application
-directory.
+  Some documentation exists [on the wiki page][remote_hosts].
 
-Sitemap Generator uses CarrierWave to support uploading to Amazon S3 store, Rackspace Cloud Files store, and MongoDB's GridF - whatever CarrierWave supports.
+##### An Example of Using an Adapter
 
 1. Please see [this wiki page][remote_hosts] for more information about setting up CarrierWave, SitemapGenerator and Rails.
 
@@ -374,7 +391,6 @@ Sitemap Generator uses CarrierWave to support uploading to Amazon S3 store, Rack
      # Set this to a directory/path if you don't want to upload to the root of your `sitemaps_host`
      SitemapGenerator::Sitemap.sitemaps_path = 'sitemaps/'
 
-     # Instance of `SitemapGenerator::WaveAdapter`
      SitemapGenerator::Sitemap.adapter = SitemapGenerator::WaveAdapter.new
      ```
 
@@ -1064,117 +1080,18 @@ end
 
 * `:mobile` - Presence of this option will turn on the mobile flag regardless of value.
 
-## Raison d'être
-
-Most of the Sitemap plugins out there seem to try to recreate the Sitemap links by iterating the Rails routes. In some cases this is possible, but for a great deal of cases it isn't.
-
-a) There are probably quite a few routes in your routes file that don't need inclusion in the Sitemap. (AJAX routes I'm looking at you.)
-
-and
-
-b) How would you infer the correct series of links for the following route?
-
-```ruby
-map.zipcode 'location/:state/:city/:zipcode', :controller => 'zipcode', :action => 'index'
-```
-
-Don't tell me it's trivial, because it isn't. It just looks trivial.
-
-So my idea is to have another file similar to 'routes.rb' called 'sitemap.rb', where you can define what goes into the Sitemap.
-
-Here's my solution:
-
-```ruby
-Zipcode.find(:all, :include => :city).each do |z|
-  add zipcode_path(:state => z.city.state, :city => z.city, :zipcode => z)
-end
-```
-
-Easy hey?
-
 ## Compatibility
 
-Tested and working on:
+Compatible with all versions of Rails and Ruby.
+Ruby 1.9.3 support was dropped in Version 6.0.0 of this gem.
 
-* **Rails** 3.0.0, 3.0.7, 4.2.3
-* **Rails** 1.x - 2.3.8
-* **Ruby** 1.8.6, 1.8.7, 1.8.7 Enterprise Edition, 1.9.1, 1.9.2, 2.1.3
+## Licence
 
+Released under the MIT License.  See the (MIT-LICENSE)[MIT-LICENSE] file.
 
-## Known Bugs
+MIT. See the LICENSE.md file.
 
-* There's no check on the size of a URL which [isn't supposed to exceed 2,048 bytes][sitemaps_xml].
-* Currently only supports one Sitemap Index file, which can contain 50,000 Sitemap files which can each contain 50,000 urls, so it _only_ supports up to 2,500,000,000 (2.5 billion) urls.
-
-
-## Deprecation Notices and Non-Backwards Compatible Changes
-
-### Version 5.0.0
-
-In version 5.0.0 I've removed a few deprecated methods that have been deprecated for a long time.  The reason being that they would have made some new features more difficult and complex to implement.  I never actually ouput deprecation notices from these methods, so I understand it you're a little annoyed that your config has suddenly broken.  Apologies.
-
-Here's a list of the methods that have been removed:
-* Removed options to `LinkSet::add()`: `:sitemaps_namer` and `:sitemap_index_namer` (use `:namer` option)
-* Removed `LinkSet::sitemaps_namer=`, `LinkSet::sitemaps_namer` (use `LinkSet::namer=` and `LinkSet::namer`)
-* Removed `LinkSet::sitemaps_index_namer=`, `LinkSet::sitemaps_index_namer` (use `LinkSet::namer=` and `LinkSet::namer`)
-* Removed the `SitemapGenerator::SitemapNamer` class (use `SitemapGenerator::SimpleNamer`)
-* Removed `LinkSet::add_links()` (use `LinkSet::create()`)
-
-### Version 4.0.0
-
-Version 4.0 introduces a new **non-backwards compatible** naming scheme.  **If you are running version 3 or earlier and you upgrade to version 4, you need to make a couple small changes to ensure that search engines can still find your sitemaps!**  Your sitemaps will still work fine, but the name of the index file has changed.
-
-#### So what has changed?
-
-* **The index is generated intelligently**.  SitemapGenerator now detects whether you need an index or not, and only generates one if you need it or have requested it.  So small sites (less than 50,000 links) won't have one, large sites will.  You don't have to worry about anything.  And with the `create_index` option, it's easier than ever to control index creation to suit your needs.
-
-* **The default index file name has changed** from `sitemap_index.xml.gz` to just `sitemap.xml.gz`.  So the `_index` part has been removed.  This is a more standard naming scheme for the sitemaps. Any further sitemaps are named `sitemap1.xml.gz`, `sitemap2.xml.gz`, `sitemap3.xml.gz` etc, just as before.
-
-* **Everyone now points search engines to the `sitemap.xml.gz` file**.  It doesn't matter whether your site has 10 links or a million links, just point to `sitemap.xml.gz`.  If your site needs an index, that is the index.  If it doesn't, then that's your sitemap.  Simple.
-
-* **It's easier to write custom namers** because the index and the sitemaps share the same namer instance (which is now a `SitemapGenerator::SimpleNamer` instance).
-
-* **Groups share the new naming convention**.  So the files in your `geo` group will be named `geo.xml.gz`, `geo1.xml.gz`, `geo2.xml.gz` etc.  Pre-version 4 these files would have been named `geo1.xml.gz`, `geo2.xml.gz`, `geo3.xml.gz` etc.
-
-#### I don't want it!  How can I keep everything as it was?
-
-You don't care, you just want to get on with your day.  To resort to pre-version 4 behaviour add the following to your sitemap config:
-
-```ruby
-SitemapGenerator::Sitemap.create_index = true
-SitemapGenerator::Sitemap.namer = SitemapGenerator::SimpleNamer.new(:sitemap, :zero => '_index')
-```
-
-This tells SitemapGenerator to always create an index file and to name it `sitemap_index.xml.gz`.  If you are already using custom namers, you don't need to set `namer`; your old namers should still work as before.  If you are using named groups, setting the sitemap namer in this way won't affect your groups, which will still be using the new naming scheme.  If this is an issue for you, you may have to create namers for your groups.
-
-#### I want it!  What do I need to do?
-
-1. Update your `robots.txt` file and make sure it points to `sitemap.xml.gz`.
-2. Generate your sitemaps to create the new `sitemap.xml.gz` file.
-3. Optionally remove the old `sitemap_index.xml.gz` file (or link it to the new file if you want to make sure that search engines can find it while you update them.)
-4. Go to your Google Webmaster tools and other places where you've pointed search engines to your sitemaps and point them to your new `sitemap.xml.gz` file.
-
-That's it!  Welcome to the future!
-
-## Thanks (in no particular order)
-
-I've kind of stopped maintaining the list of contributors.  To all those who have contributed code or a donation, many thanks!
-
-Some past contributors:
-
-* [Eric Hochberger][ehoch]
-* [Rodrigo Flores](https://github.com/rodrigoflores) for News sitemaps
-* [Alex Soto](http://github.com/apsoto) for Video sitemaps
-* [Alexadre Bini](http://github.com/alexandrebini) for Image sitemaps
-* [Dan Pickett](http://github.com/dpickett)
-* [Rob Biedenharn](http://github.com/rab)
-* [Richie Vos](http://github.com/jerryvos)
-* [Adrian Mugnolo](http://github.com/xymbol)
-* [Jason Weathered](http://github.com/jasoncodes)
-* [Andy Stewart](http://github.com/airblade)
-* [Brian Armstrong](https://github.com/barmstrong) for Geo sitemaps
-
-Copyright (c) 2009 Karl Varga released under the MIT license
+Copyright (c) Karl Varga released under the MIT license
 
 [canonical_repo]:http://github.com/kjvarga/sitemap_generator
 [enterprise_class]:https://twitter.com/dhh/status/1631034662 "I use enterprise in the same sense the Phusion guys do - i.e. Enterprise Ruby. Please don't look down on my use of the word 'enterprise' to represent being a cut above. It doesn't mean you ever have to work for a company the size of IBM. Or constantly fight inertia, writing crappy software, adhering to change management practices and spending hours in meetings... Not that there's anything wrong with that - Wait, what?"
