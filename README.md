@@ -164,6 +164,8 @@ Alternatively, if you are not using a `Gemfile` add the gem to your `config/envi
 config.gem 'sitemap_generator'
 ```
 
+Note: SitemapGenerator automatically loads its Rake tasks when used with Rails. You **do not need** to require the `sitemap_generator/tasks` file.
+
 ## Getting Started
 
 ### Preventing Output
