@@ -1,3 +1,7 @@
+### 6.0.1
+
+* Use `yaml_tag` instead of `yaml_as`, which was deprecated in Ruby 2.4, and removed in 2.5 [#298](https://github.com/kjvarga/sitemap_generator/pull/298).
+
 ### 6.0.0
 
 *Backwards incompatible changes*
