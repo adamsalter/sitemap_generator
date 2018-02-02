@@ -30,6 +30,7 @@ module SitemapGenerator
         # Store the URL of the first sitemap added because if create_index is
         # false this is the "index" URL
         @first_sitemap_url = nil
+        @create_index = nil
       end
 
       # Finalize sitemaps as they are added to the index.
