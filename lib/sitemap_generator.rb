@@ -56,6 +56,7 @@ module SitemapGenerator
     attr_accessor :root, :app, :templates
     attr_writer :yield_sitemap, :verbose
   end
+  @yield_sitemap = nil
 
   # Global default for the verbose setting.
   def self.verbose
