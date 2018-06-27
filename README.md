@@ -158,7 +158,7 @@ Add the gem to your `Gemfile`:
 gem 'sitemap_generator'
 ```
 
-Alternatively, if you are not using a `Gemfile` add the gem to your `config/environment.rb` file config block:
+Alternatively, if you are not using a `Gemfile` add the gem to your `config/application.rb` file config block:
 
 ```ruby
 config.gem 'sitemap_generator'
