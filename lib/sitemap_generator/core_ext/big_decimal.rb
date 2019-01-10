@@ -8,11 +8,23 @@ end
 require 'yaml'
 
 # Define our own class rather than modify the global class
-class SitemapGenerator::BigDecimal < BigDecimal
+class SitemapGenerator::BigDecimal
   YAML_TAG = 'tag:yaml.org,2002:float'
   YAML_MAPPING = { 'Infinity' => '.Inf', '-Infinity' => '-.Inf', 'NaN' => '.NaN' }
 
   yaml_tag YAML_TAG
+
+  def initialize(num)
+    @value = BigDecimal(num)
+  end
+
+  def *(other)
+    other * @value
+  end
+
+  def /(other)
+    SitemapGenerator::BigDecimal === other ? @value / other.instance_variable_get(:@value) : @value / other
+  end
 
   # This emits the number without any scientific notation.
   # This is better than self.to_f.to_s since it doesn't lose precision.
@@ -37,9 +49,7 @@ class SitemapGenerator::BigDecimal < BigDecimal
   end
 
   DEFAULT_STRING_FORMAT = 'F'
-  def to_formatted_s(format = DEFAULT_STRING_FORMAT)
-    _original_to_s(format)
+  def to_s(format = DEFAULT_STRING_FORMAT)
+    @value.to_s(format)
   end
-  alias_method :_original_to_s, :to_s
-  alias_method :to_s, :to_formatted_s
 end
