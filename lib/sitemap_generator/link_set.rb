@@ -118,6 +118,8 @@ module SitemapGenerator
     # Note: When adding a new option be sure to include it in `options_for_group()` if
     # the option should be inherited by groups.
     def initialize(options={})
+      @default_host, @sitemaps_host, @yield_sitemap, @sitemaps_path, @adapter, @verbose, @protect_index, @sitemap_index, @added_default_links, @created_group, @sitemap = nil
+
       options = SitemapGenerator::Utilities.reverse_merge(options,
         :include_root => true,
         :include_index => false,

@@ -11,7 +11,7 @@ module SitemapGenerator
     }
 
     # Dynamically define accessors for each key defined in <tt>FILES</tt>
-    attr_accessor *FILES.keys
+    attr_accessor(*FILES.keys)
     FILES.keys.each do |name|
       eval <<-END
         define_method(:#{name}) do

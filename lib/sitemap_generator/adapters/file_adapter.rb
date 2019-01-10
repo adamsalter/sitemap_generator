@@ -11,7 +11,7 @@ module SitemapGenerator
     def write(location, raw_data)
       # Ensure that the directory exists
       dir = location.directory
-      if !File.exists?(dir)
+      if !File.exist?(dir)
         FileUtils.mkdir_p(dir)
       elsif !File.directory?(dir)
         raise SitemapError.new("#{dir} should be a directory!")
