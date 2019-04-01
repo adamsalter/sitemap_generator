@@ -24,6 +24,7 @@ module SitemapGenerator
       @aws_access_key_id = options[:aws_access_key_id]
       @aws_secret_access_key = options[:aws_secret_access_key]
       @aws_region = options[:aws_region]
+      @aws_endpoint = options[:aws_endpoint]
     end
 
     # Call with a SitemapLocation and string data
@@ -46,6 +47,7 @@ module SitemapGenerator
     def s3_resource_options
       options = {}
       options[:region] = @aws_region if !@aws_region.nil?
+      options[:endpoint] = @aws_endpoint if !@aws_endpoint.nil?
       if !@aws_access_key_id.nil? && !@aws_secret_access_key.nil?
         options[:credentials] = Aws::Credentials.new(
           @aws_access_key_id,

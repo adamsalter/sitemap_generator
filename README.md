@@ -351,7 +351,7 @@ directory.
   Uses `Aws::S3::Resource` to upload to Amazon S3 storage.  Includes automatic detection of your AWS
   credentials using `Aws::Credentials`.
 
-  You must `require 'aws-sdk'` in your sitemap config before using this adapter,
+  You must `require 'aws-sdk-s3'` in your sitemap config before using this adapter,
   or `require` another library that defines `Aws::S3::Resource` and `Aws::Credentials`.
 
   An example of using this adapter in your sitemap configuration:
@@ -361,6 +361,25 @@ directory.
     aws_access_key_id: 'AKIAI3SW5CRAZBL4WSTA',
     aws_secret_access_key: 'asdfadsfdsafsadf',
     aws_region: 'us-east-1'
+  )
+  ```
+
+* `SitemapGenerator::AwsSdkAdapter (DigitalOcean Spaces)`
+
+  Uses `Aws::S3::Resource` to upload to Amazon S3 storage.  Includes automatic detection of your AWS
+  credentials using `Aws::Credentials`.
+
+  You must `require 'aws-sdk-s3'` in your sitemap config before using this adapter,
+  or `require` another library that defines `Aws::S3::Resource` and `Aws::Credentials`.
+
+  An example of using this adapter in your sitemap configuration:
+
+  ```ruby
+  SitemapGenerator::Sitemap.adapter = SitemapGenerator::AwsSdkAdapter.new('s3_bucket',
+    aws_access_key_id: 'AKIAI3SW5CRAZBL4WSTA',
+    aws_secret_access_key: 'asdfadsfdsafsadf',
+    aws_region: 'sfo2',
+    aws_endpoint: 'https://sfo2.digitaloceanspaces.com'
   )
   ```
 
