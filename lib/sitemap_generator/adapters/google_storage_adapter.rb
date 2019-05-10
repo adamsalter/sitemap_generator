@@ -4,25 +4,27 @@ if !defined?(Google::Cloud::Storage)
 end
 
 module SitemapGenerator
-  # Class for uploading sitemaps to a Google Storage supported endpoint.
+  # Class for uploading sitemaps to a Google Storage using google-cloud-storage gem.
   class GoogleStorageAdapter
     # Requires Google::Cloud::Storage to be defined.
     #
-    # @param [Hash] opts Fog configuration options
-    # @option :credentials [Hash] Path to the google service account keyfile.json
-    # @option :project_id [String] Google Accounts project_id where the storage bucket resides
-    # @option :bucket [String] Name of Google Storage Bucket where the file is to be uploaded
+    # Options:
+    #   :credentials [String] Path to the google service account keyfile.json
+    #   :project_id [String] Google Accounts project_id where the storage bucket resides
+    #   :bucket [String] Name of Google Storage Bucket where the file is to be uploaded
+
+    # @param [Hash] opts Google::Cloud::Storage configuration options
     def initialize(opts = {})
-      @credentials = opts[:keyfile] || ENV['']
-      @project_id = opts[:project_id] || ENV['']
-      @bucket = opts[:bucket] || ENV['']
+      @credentials = opts[:keyfile] || ENV['GOOGLE_CLOUD_PROJECT']
+      @project_id = opts[:project_id] || ENV['GOOGLE_APPLICATION_CREDENTIALS']
+      @bucket = opts[:bucket]
     end
 
     # Call with a SitemapLocation and string data
     def write(location, raw_data)
       SitemapGenerator::FileAdapter.new.write(location, raw_data)
 
-      storage   = Google::Cloud::Storage.new(project_id: @project_id, credentials: @credentials)
+      storage = Google::Cloud::Storage.new(project_id: @project_id, credentials: @credentials)
       bucket = storage.bucket @bucket
       bucket.create_file location.path, location.path_in_public, acl: 'public'
     end
