@@ -18,5 +18,6 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'rake'
   s.add_development_dependency 'aws-sdk-core'
   s.add_development_dependency 'aws-sdk-s3'
+  s.add_development_dependency 'google-cloud-storage'
   s.files = Dir.glob('{lib,rails,templates}/**/*') + %w(CHANGES.md MIT-LICENSE README.md VERSION)
 end
