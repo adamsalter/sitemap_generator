@@ -374,6 +374,27 @@ directory.
 
   Some documentation exists [on the wiki page][remote_hosts].
 
+* `SitemapGenerator::GoogleStorageAdapter`
+
+  Uses `Google::Cloud::Storage` to upload to Google Cloud storage.
+
+  You must `require 'google-cloud-storage'` in your sitemap config before using this adapter.
+
+  An example of using this adapter in your sitemap configuration with options:
+
+  ```ruby
+  SitemapGenerator::Sitemap.adapter = SitemapGenerator::GoogleStorageAdapter.new(
+    keyfile: 'path/to/keyfile.json',
+    project_id: 'google_account_project_id',
+    bucket: 'name_of_bucket'
+  )
+  ```
+  Also, inline with Google Authentication options, it can also pick credentials from environment variables. Variables required to be set for proper authentication with google are `GOOGLE_CLOUD_PROJECT` and `GOOGLE_APPLICATION_CREDENTIALS`. An example of using this adapter with the environment variables is:
+
+  ```ruby
+  SitemapGenerator::Sitemap.adapter = SitemapGenerator::GoogleStorageAdapter.new( bucket: 'name_of_bucket' )
+  ```  
+
 #### An Example of Using an Adapter
 
 1. Please see [this wiki page][remote_hosts] for more information about setting up SitemapGenerator to upload to a
