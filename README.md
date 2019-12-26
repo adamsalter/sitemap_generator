@@ -80,6 +80,12 @@ Successful ping of Bing
   + [Sitemaps with no Index File](#sitemaps-with-no-index-file)
   + [Upload Sitemaps to a Remote Host using Adapters](#upload-sitemaps-to-a-remote-host-using-adapters)
     - [Supported Adapters](#supported-adapters)
+      * [`SitemapGenerator::FileAdapter`](#sitemapgeneratorfileadapter)
+      * [`SitemapGenerator::FogAdapter`](#sitemapgeneratorfogadapter)
+      * [`SitemapGenerator::S3Adapter`](#sitemapgenerators3adapter)
+      * [`SitemapGenerator::AwsSdkAdapter`](#sitemapgeneratorawssdkadapter)
+      * [`SitemapGenerator::WaveAdapter`](#sitemapgeneratorwaveadapter)
+      * [`SitemapGenerator::GoogleStorageAdapter`](#sitemapgeneratorgooglestorageadapter)
     - [An Example of Using an Adapter](#an-example-of-using-an-adapter)
   + [Generating Multiple Sitemaps](#generating-multiple-sitemaps)
 * [Sitemap Configuration](#sitemap-configuration)
@@ -329,24 +335,24 @@ directory.
 
 #### Supported Adapters
 
-* `SitemapGenerator::FileAdapter`
+##### `SitemapGenerator::FileAdapter`
 
   Standard adapter, writes out to a file.
 
-* `SitemapGenerator::FogAdapter`
+##### `SitemapGenerator::FogAdapter`
 
   Uses `Fog::Storage` to upload to any service supported by Fog.
 
   You must `require 'fog'` in your sitemap config before using this adapter,
   or `require` another library that defines `Fog::Storage`.
 
-* `SitemapGenerator::S3Adapter`
+##### `SitemapGenerator::S3Adapter`
 
   Uses `Fog::Storage` to upload to Amazon S3 storage.
 
   You must `require 'fog-aws'` in your sitemap config before using this adapter.
 
-* `SitemapGenerator::AwsSdkAdapter`
+##### `SitemapGenerator::AwsSdkAdapter`
 
   Uses `Aws::S3::Resource` to upload to Amazon S3 storage.  Includes automatic detection of your AWS
   credentials using `Aws::Credentials`.
@@ -364,7 +370,7 @@ directory.
   )
   ```
 
-* `SitemapGenerator::WaveAdapter`
+##### `SitemapGenerator::WaveAdapter`
 
   Uses `CarrierWave::Uploader::Base` to upload to any service supported by CarrierWave, for example,
   Amazon S3, Rackspace Cloud Files, and MongoDB's GridF.
@@ -374,7 +380,7 @@ directory.
 
   Some documentation exists [on the wiki page][remote_hosts].
 
-* `SitemapGenerator::GoogleStorageAdapter`
+##### `SitemapGenerator::GoogleStorageAdapter`
 
   Uses [`Google::Cloud::Storage`][google_cloud_storage_gem] to upload to Google Cloud storage.
 
