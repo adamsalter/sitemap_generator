@@ -397,7 +397,7 @@ directory.
   )
   ```
 
-  All options other than the `:bucket` option are passed to the `Google::Cloud::Storage.new` initializer giving you maximum configurability.  See [Google Cloud Storage Authentication][google_cloud_storage_authentication] for all the supported environment variables and the [Google Cloud Storage initializer][google_cloud_storage_initializer] for supported options.
+  All options other than the `:bucket` option are passed to the `Google::Cloud::Storage.new` initializer giving you maximum configurability.  See the [Google Cloud Storage initializer][google_cloud_storage_initializer] for supported options.
 
 #### An Example of Using an Adapter
 
