@@ -376,24 +376,28 @@ directory.
 
 * `SitemapGenerator::GoogleStorageAdapter`
 
-  Uses `Google::Cloud::Storage` to upload to Google Cloud storage.
+  Uses [`Google::Cloud::Storage`][google_cloud_storage_gem] to upload to Google Cloud storage.
 
-  You must `require 'google-cloud-storage'` in your sitemap config before using this adapter.
+  You must `require 'google/cloud/storage'` in your sitemap config before using this adapter.
 
   An example of using this adapter in your sitemap configuration with options:
 
   ```ruby
   SitemapGenerator::Sitemap.adapter = SitemapGenerator::GoogleStorageAdapter.new(
-    keyfile: 'path/to/keyfile.json',
+    credentials: 'path/to/keyfile.json',
     project_id: 'google_account_project_id',
     bucket: 'name_of_bucket'
   )
   ```
-  Also, inline with Google Authentication options, it can also pick credentials from environment variables. Variables required to be set for proper authentication with google are `GOOGLE_CLOUD_PROJECT` and `GOOGLE_APPLICATION_CREDENTIALS`. An example of using this adapter with the environment variables is:
+  Also, inline with Google Authentication options, it can also pick credentials from environment variables. All [supported environment variables][google_cloud_storage_authentication] can be used, for example: `GOOGLE_CLOUD_PROJECT` and `GOOGLE_CLOUD_CREDENTIALS`.  An example of using this adapter with the environment variables is:
 
   ```ruby
-  SitemapGenerator::Sitemap.adapter = SitemapGenerator::GoogleStorageAdapter.new( bucket: 'name_of_bucket' )
-  ```  
+  SitemapGenerator::Sitemap.adapter = SitemapGenerator::GoogleStorageAdapter.new(
+    bucket: 'name_of_bucket'
+  )
+  ```
+
+  All options other than the `:bucket` option are passed to the `Google::Cloud::Storage.new` initializer giving you maximum configurability.  See [Google Cloud Storage Authentication][google_cloud_storage_authentication] for all the supported environment variables and the [Google Cloud Storage initializer][google_cloud_storage_initializer] for supported options.
 
 #### An Example of Using an Adapter
 
@@ -1141,3 +1145,6 @@ Copyright (c) Karl Varga released under the MIT license
 [iso_4217]:http://en.wikipedia.org/wiki/ISO_4217
 [media]:https://developers.google.com/webmasters/smartphone-sites/details
 [expires]:https://support.google.com/customsearch/answer/2631051?hl=en
+[google_cloud_storage_gem]:https://rubygems.org/gems/google-cloud-storage
+[google_cloud_storage_authentication]:https://googleapis.dev/ruby/google-cloud-storage/latest/file.AUTHENTICATION.html
+[google_cloud_storage_initializer]:https://github.com/googleapis/google-cloud-ruby/blob/master/google-cloud-storage/lib/google/cloud/storage.rb
