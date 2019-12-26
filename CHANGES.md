@@ -1,3 +1,7 @@
+### 6.1.0
+
+* Support uploading files to Google Cloud Storage [#326](https://github.com/kjvarga/sitemap_generator/pull/326) and [#340](https://github.com/kjvarga/sitemap_generator/pull/340)
+
 ### 6.0.2
 
 * Resolve `BigDecimal.new is deprecated` warnings in Ruby 2.5 [#305](https://github.com/kjvarga/sitemap_generator/pull/305).
