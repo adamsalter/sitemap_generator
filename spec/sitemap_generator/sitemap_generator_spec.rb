@@ -315,6 +315,10 @@ describe 'SitemapGenerator' do
       )
     }
 
+    let!(:request) do
+      stub_request(:get, "http://google.com/?url=#{CGI.escape('http://example.com/sitemap.xml.gz')}")
+    end
+
     before do
       clean_sitemap_files_from_rails_app
     end
@@ -333,8 +337,8 @@ describe 'SitemapGenerator' do
 
         # Test that the index url is reported correctly
         ls.search_engines = { :google => 'http://google.com/?url=%s' }
-        expect(ls).to receive(:open).with("http://google.com/?url=#{CGI.escape('http://example.com/sitemap.xml.gz')}")
         ls.ping_search_engines
+        expect(request).to have_been_requested.once
       end
 
       it 'should always create index' do
@@ -349,8 +353,8 @@ describe 'SitemapGenerator' do
 
         # Test that the index url is reported correctly
         ls.search_engines = { :google => 'http://google.com/?url=%s' }
-        expect(ls).to receive(:open).with("http://google.com/?url=#{CGI.escape('http://example.com/sitemap.xml.gz')}")
         ls.ping_search_engines
+        expect(request).to have_been_requested.once
       end
     end
 
@@ -368,8 +372,8 @@ describe 'SitemapGenerator' do
 
         # Test that the index url is reported correctly
         ls.search_engines = { :google => 'http://google.com/?url=%s' }
-        expect(ls).to receive(:open).with("http://google.com/?url=#{CGI.escape('http://example.com/sitemap.xml.gz')}")
         ls.ping_search_engines
+        expect(request).to have_been_requested.once
       end
 
       it 'should never create index' do
@@ -383,8 +387,8 @@ describe 'SitemapGenerator' do
 
         # Test that the index url is reported correctly
         ls.search_engines = { :google => 'http://google.com/?url=%s' }
-        expect(ls).to receive(:open).with("http://google.com/?url=#{CGI.escape('http://example.com/sitemap.xml.gz')}")
         ls.ping_search_engines
+        expect(request).to have_been_requested.once
       end
     end
 
@@ -400,8 +404,8 @@ describe 'SitemapGenerator' do
 
         # Test that the index url is reported correctly
         ls.search_engines = { :google => 'http://google.com/?url=%s' }
-        expect(ls).to receive(:open).with("http://google.com/?url=#{CGI.escape('http://example.com/sitemap.xml.gz')}")
         ls.ping_search_engines
+        expect(request).to have_been_requested.once
       end
 
       it 'should create index if more than one sitemap file' do
@@ -417,8 +421,8 @@ describe 'SitemapGenerator' do
 
         # Test that the index url is reported correctly
         ls.search_engines = { :google => 'http://google.com/?url=%s' }
-        expect(ls).to receive(:open).with("http://google.com/?url=#{CGI.escape('http://example.com/sitemap.xml.gz')}")
         ls.ping_search_engines
+        expect(request).to have_been_requested.once
       end
 
       it 'should create index if more than one group' do
@@ -436,8 +440,8 @@ describe 'SitemapGenerator' do
 
         # Test that the index url is reported correctly
         ls.search_engines = { :google => 'http://google.com/?url=%s' }
-        expect(ls).to receive(:open).with("http://google.com/?url=#{CGI.escape('http://example.com/sitemap.xml.gz')}")
         ls.ping_search_engines
+        expect(request).to have_been_requested.once
       end
     end
   end

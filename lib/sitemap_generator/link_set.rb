@@ -295,7 +295,7 @@ module SitemapGenerator
         name = Utilities.titleize(engine.to_s)
         begin
           Timeout::timeout(10) {
-            open(link)
+            URI.open(link)
           }
           output("  Successful ping of #{name}")
         rescue Timeout::Error, StandardError => e

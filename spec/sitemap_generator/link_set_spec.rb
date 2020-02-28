@@ -150,8 +150,9 @@ describe SitemapGenerator::LinkSet do
 
   describe 'ping search engines' do
     it 'should not fail' do
-      expect(ls).to receive(:open).at_least(1)
+      request = stub_request(:get, //)
       expect { ls.ping_search_engines }.not_to raise_error
+      expect(request).to have_been_requested.at_least_once
     end
 
     it 'should raise if no host is set' do
@@ -161,8 +162,9 @@ describe SitemapGenerator::LinkSet do
     it 'should use the sitemap index url provided' do
       index_url = 'http://example.com/index.xml'
       ls = SitemapGenerator::LinkSet.new(:search_engines => { :google => 'http://google.com/?url=%s' })
-      expect(ls).to receive(:open).with("http://google.com/?url=#{CGI.escape(index_url)}")
+      request = stub_request(:get, "http://google.com/?url=#{CGI.escape(index_url)}")
       ls.ping_search_engines(index_url)
+      expect(request).to have_been_requested
     end
 
     it 'should use the sitemap index url from the link set' do
@@ -170,17 +172,20 @@ describe SitemapGenerator::LinkSet do
         :default_host => default_host,
         :search_engines => { :google => 'http://google.com/?url=%s' })
       index_url = ls.sitemap_index_url
-      expect(ls).to receive(:open).with("http://google.com/?url=#{CGI.escape(index_url)}")
+      request = stub_request(:get, "http://google.com/?url=#{CGI.escape(index_url)}")
       ls.ping_search_engines
+      expect(request).to have_been_requested
     end
 
     it 'should include the given search engines' do
       ls.search_engines = nil
-      expect(ls).to receive(:open).with(/^http:\/\/newnegine\.com\?/)
+      request = stub_request(:get, /^http:\/\/newnegine\.com\?/)
       ls.ping_search_engines(:newengine => 'http://newnegine.com?%s')
+      expect(request).to have_been_requested
 
-      expect(ls).to receive(:open).with(/^http:\/\/newnegine\.com\?/).twice
+      WebMock.reset_executed_requests!
       ls.ping_search_engines(:newengine => 'http://newnegine.com?%s', :anotherengine => 'http://newnegine.com?%s')
+      expect(request).to have_been_requested.twice
     end
   end
 
