@@ -7,14 +7,15 @@ require 'sitemap_generator/application'
 require 'sitemap_generator/sitemap_location'
 
 module SitemapGenerator
-  autoload(:Interpreter,   'sitemap_generator/interpreter')
-  autoload(:FileAdapter,   'sitemap_generator/adapters/file_adapter')
-  autoload(:S3Adapter,     'sitemap_generator/adapters/s3_adapter')
-  autoload(:AwsSdkAdapter, 'sitemap_generator/adapters/aws_sdk_adapter')
-  autoload(:WaveAdapter,   'sitemap_generator/adapters/wave_adapter')
-  autoload(:FogAdapter,    'sitemap_generator/adapters/fog_adapter')
-  autoload(:BigDecimal,    'sitemap_generator/core_ext/big_decimal')
-  autoload(:Numeric,       'sitemap_generator/core_ext/numeric')
+  autoload(:Interpreter,              'sitemap_generator/interpreter')
+  autoload(:FileAdapter,              'sitemap_generator/adapters/file_adapter')
+  autoload(:S3Adapter,                'sitemap_generator/adapters/s3_adapter')
+  autoload(:AwsSdkAdapter,            'sitemap_generator/adapters/aws_sdk_adapter')
+  autoload(:WaveAdapter,              'sitemap_generator/adapters/wave_adapter')
+  autoload(:FogAdapter,               'sitemap_generator/adapters/fog_adapter')
+  autoload(:GoogleStorageAdapter,     'sitemap_generator/adapters/google_storage_adapter')
+  autoload(:BigDecimal,               'sitemap_generator/core_ext/big_decimal')
+  autoload(:Numeric,                  'sitemap_generator/core_ext/numeric')
 
   SitemapError          = Class.new(StandardError)
   SitemapFullError      = Class.new(SitemapError)

@@ -80,6 +80,12 @@ Successful ping of Bing
   + [Sitemaps with no Index File](#sitemaps-with-no-index-file)
   + [Upload Sitemaps to a Remote Host using Adapters](#upload-sitemaps-to-a-remote-host-using-adapters)
     - [Supported Adapters](#supported-adapters)
+      * [`SitemapGenerator::FileAdapter`](#sitemapgeneratorfileadapter)
+      * [`SitemapGenerator::FogAdapter`](#sitemapgeneratorfogadapter)
+      * [`SitemapGenerator::S3Adapter`](#sitemapgenerators3adapter)
+      * [`SitemapGenerator::AwsSdkAdapter`](#sitemapgeneratorawssdkadapter)
+      * [`SitemapGenerator::WaveAdapter`](#sitemapgeneratorwaveadapter)
+      * [`SitemapGenerator::GoogleStorageAdapter`](#sitemapgeneratorgooglestorageadapter)
     - [An Example of Using an Adapter](#an-example-of-using-an-adapter)
   + [Generating Multiple Sitemaps](#generating-multiple-sitemaps)
 * [Sitemap Configuration](#sitemap-configuration)
@@ -329,24 +335,24 @@ directory.
 
 #### Supported Adapters
 
-* `SitemapGenerator::FileAdapter`
+##### `SitemapGenerator::FileAdapter`
 
   Standard adapter, writes out to a file.
 
-* `SitemapGenerator::FogAdapter`
+##### `SitemapGenerator::FogAdapter`
 
   Uses `Fog::Storage` to upload to any service supported by Fog.
 
   You must `require 'fog'` in your sitemap config before using this adapter,
   or `require` another library that defines `Fog::Storage`.
 
-* `SitemapGenerator::S3Adapter`
+##### `SitemapGenerator::S3Adapter`
 
   Uses `Fog::Storage` to upload to Amazon S3 storage.
 
   You must `require 'fog-aws'` in your sitemap config before using this adapter.
 
-* `SitemapGenerator::AwsSdkAdapter`
+##### `SitemapGenerator::AwsSdkAdapter`
 
   Uses `Aws::S3::Resource` to upload to Amazon S3 storage.  Includes automatic detection of your AWS
   credentials using `Aws::Credentials`.
@@ -364,7 +370,7 @@ directory.
   )
   ```
 
-* `SitemapGenerator::AwsSdkAdapter (DigitalOcean Spaces)`
+##### `SitemapGenerator::AwsSdkAdapter (DigitalOcean Spaces)`
 
   Uses `Aws::S3::Resource` to upload to Amazon S3 storage.  Includes automatic detection of your AWS
   credentials using `Aws::Credentials`.
@@ -383,7 +389,7 @@ directory.
   )
   ```
 
-* `SitemapGenerator::WaveAdapter`
+##### `SitemapGenerator::WaveAdapter`
 
   Uses `CarrierWave::Uploader::Base` to upload to any service supported by CarrierWave, for example,
   Amazon S3, Rackspace Cloud Files, and MongoDB's GridF.
@@ -392,6 +398,31 @@ directory.
   or `require` another library that defines `CarrierWave::Uploader::Base`.
 
   Some documentation exists [on the wiki page][remote_hosts].
+
+##### `SitemapGenerator::GoogleStorageAdapter`
+
+  Uses [`Google::Cloud::Storage`][google_cloud_storage_gem] to upload to Google Cloud storage.
+
+  You must `require 'google/cloud/storage'` in your sitemap config before using this adapter.
+
+  An example of using this adapter in your sitemap configuration with options:
+
+  ```ruby
+  SitemapGenerator::Sitemap.adapter = SitemapGenerator::GoogleStorageAdapter.new(
+    credentials: 'path/to/keyfile.json',
+    project_id: 'google_account_project_id',
+    bucket: 'name_of_bucket'
+  )
+  ```
+  Also, inline with Google Authentication options, it can also pick credentials from environment variables. All [supported environment variables][google_cloud_storage_authentication] can be used, for example: `GOOGLE_CLOUD_PROJECT` and `GOOGLE_CLOUD_CREDENTIALS`.  An example of using this adapter with the environment variables is:
+
+  ```ruby
+  SitemapGenerator::Sitemap.adapter = SitemapGenerator::GoogleStorageAdapter.new(
+    bucket: 'name_of_bucket'
+  )
+  ```
+
+  All options other than the `:bucket` option are passed to the `Google::Cloud::Storage.new` initializer giving you maximum configurability.  See the [Google Cloud Storage initializer][google_cloud_storage_initializer] for supported options.
 
 #### An Example of Using an Adapter
 
@@ -1139,3 +1170,6 @@ Copyright (c) Karl Varga released under the MIT license
 [iso_4217]:http://en.wikipedia.org/wiki/ISO_4217
 [media]:https://developers.google.com/webmasters/smartphone-sites/details
 [expires]:https://support.google.com/customsearch/answer/2631051?hl=en
+[google_cloud_storage_gem]:https://rubygems.org/gems/google-cloud-storage
+[google_cloud_storage_authentication]:https://googleapis.dev/ruby/google-cloud-storage/latest/file.AUTHENTICATION.html
+[google_cloud_storage_initializer]:https://github.com/googleapis/google-cloud-ruby/blob/master/google-cloud-storage/lib/google/cloud/storage.rb

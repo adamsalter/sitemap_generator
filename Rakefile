@@ -25,7 +25,7 @@ def gem_file;     "#{name}-#{version}.gem" end
 #
 
 desc "Build #{gem_file} into the pkg/ directory"
-task :build do
+task :build => [:prepare] do
   sh "mkdir -p pkg"
   sh "gem build #{gemspec_file}"
   sh "mv #{gem_file} pkg"
@@ -38,7 +38,7 @@ task :prepare do
 end
 
 desc "Create tag v#{version}, build the gem and push to Git"
-task :release => [:prepare, :build] do
+task :release => [:build] do
   unless `git branch` =~ /^\* master$/
     puts "You must be on the master branch to release!"
     exit!
