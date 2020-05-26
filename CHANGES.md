@@ -1,3 +1,8 @@
+### 6.1.1
+
+* Resolve deprecation warning on using Kernel#open in Ruby 2.7 (use URI.open instead) [#342](https://github.com/kjvarga/sitemap_generator/pull/342)
+* Support S3 Endpoints for S3 Compliant Providers like DigitalOcean Spaces [#325](https://github.com/kjvarga/sitemap_generator/pull/325)
+
 ### 6.1.0
 
 * Support uploading files to Google Cloud Storage [#326](https://github.com/kjvarga/sitemap_generator/pull/326) and [#340](https://github.com/kjvarga/sitemap_generator/pull/340)
