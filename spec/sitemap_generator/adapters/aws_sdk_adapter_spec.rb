@@ -69,6 +69,18 @@ describe 'SitemapGenerator::AwsSdkAdapter' do
       end
     end
 
+    it 'does not include endpoint' do
+      expect(adapter.send(:s3_resource_options)[:endpoint]).to be_nil
+    end
+
+    context 'with AWS endpoint option' do
+      let(:options) { { aws_endpoint: 'endpoint' } }
+
+      it 'includes the endpoint' do
+        expect(adapter.send(:s3_resource_options)[:endpoint]).to eql('endpoint')
+      end
+    end
+
     context 'with AWS access key id and secret access key options' do
       let(:options) do
         {
