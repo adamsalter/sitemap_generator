@@ -295,7 +295,11 @@ module SitemapGenerator
         name = Utilities.titleize(engine.to_s)
         begin
           Timeout::timeout(10) {
-            URI.open(link)
+            if URI.respond_to?(:open) # Available since Ruby 2.5
+              URI.open(link)
+            else
+              open(link) # using Kernel#open became deprecated since Ruby 2.7. See https://bugs.ruby-lang.org/issues/15893
+            end
           }
           output("  Successful ping of #{name}")
         rescue Timeout::Error, StandardError => e
