@@ -116,6 +116,7 @@ Successful ping of Bing
   + [Alternate Links](#alternate-links)
     - [Example](#example-3)
     - [Supported options](#supported-options-4)
+    - [Alternates example](#alternates-example)
   + [Mobile Sitemaps](#-mobile-sitemaps)
     - [Example](#example-4)
     - [Supported options](#supported-options-5)
@@ -1115,6 +1116,26 @@ end
     * `:lang`  - Optional, string.
     * `:nofollow` - Optional, boolean. Used to mark link as "nofollow".
     * `:media` - Optional, string.  Specify [media targets for responsive design pages][media].
+
+#### Alternates Example 
+
+```ruby
+SitemapGenerator::Sitemap.default_host = "http://www.example.com"
+SitemapGenerator::Sitemap.create do
+ add('/index.html', :alternates => [
+        {
+            :href => 'http://www.example.de/index.html',
+            :lang => 'de',
+            :nofollow => true
+        },
+        {
+            :href => 'http://www.example.es/index.html',
+            :lang => 'es',
+            :nofollow => true
+        }
+    ])
+end
+```
 
 ### <a name="internal_mobile"></a> Mobile Sitemaps
 
