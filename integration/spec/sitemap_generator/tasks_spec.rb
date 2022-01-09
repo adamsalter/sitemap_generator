@@ -14,17 +14,17 @@ describe "SitemapGenerator" do
 
     it "should set a new LinkSet instance" do
       first = SitemapGenerator::Sitemap.instance_variable_get(:@link_set)
-      first.should be_a(SitemapGenerator::LinkSet)
+      expect(first).to be_a(SitemapGenerator::LinkSet)
       SitemapGenerator::Sitemap.reset!
       second = SitemapGenerator::Sitemap.instance_variable_get(:@link_set)
-      second.should be_a(SitemapGenerator::LinkSet)
-      first.should_not be(second)
+      expect(second).to be_a(SitemapGenerator::LinkSet)
+      expect(first).not_to be(second)
     end
   end
 
   describe "app root" do
     it "should be set to the Rails root" do
-      SitemapGenerator.app.root.to_s.should == Rails.root.to_s
+      expect(SitemapGenerator.app.root.to_s).to eq(Rails.root.to_s)
     end
   end
 
@@ -85,7 +85,7 @@ describe "SitemapGenerator" do
     end
 
     it "should have 13 links" do
-      SitemapGenerator::Sitemap.link_count.should == 13
+      expect(SitemapGenerator::Sitemap.link_count).to eq(13)
     end
 
     it "index XML should validate" do
@@ -136,7 +136,7 @@ describe "SitemapGenerator" do
     end
 
     it "should have 16 links" do
-      SitemapGenerator::Sitemap.link_count.should == 16
+      expect(SitemapGenerator::Sitemap.link_count).to eq(16)
     end
 
     it "index XML should validate" do
@@ -215,8 +215,8 @@ describe "SitemapGenerator" do
       end
 
       it "should work outside of Rails" do
-        defined?(Rails).should be_nil
-        lambda { ::SitemapGenerator::LinkSet.new }.should_not raise_exception
+        expect(defined?(Rails)).to be_nil
+        expect { ::SitemapGenerator::LinkSet.new }.not_to raise_exception
       end
     end
   end
