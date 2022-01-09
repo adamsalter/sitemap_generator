@@ -7,19 +7,14 @@ require 'sitemap_generator/tasks' # Combusition fails to load these tasks
 SitemapGenerator.verbose = false
 
 require 'rspec/rails'
-
-# Requires supporting files with custom matchers and macros, etc,
-# in ./support/ and its subdirectories.
-Dir[File.expand_path(File.join(File.dirname(__FILE__),'support','**','*.rb'))].each {|f| require f}
+require 'support/sitemap_macros'
+require '../spec/support/file_macros'
+require '../spec/support/xml_macros'
 
 RSpec.configure do |config|
   config.include(FileMacros)
   config.include(XmlMacros)
   config.include(SitemapMacros)
-
-  config.expect_with(:rspec) do |c|
-    c.syntax = :expect
-  end
 
   config.after(:all) do
     clean_sitemap_files_from_rails_app
