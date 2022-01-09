@@ -30,25 +30,10 @@ jobs:
     steps:
       - checkout:
           path: ~/sitemap_generator
-      # - restore_cache:
-      #     keys:
-      #       - v1-integration-dependencies-<< parameters.ruby-version >>-<< parameters.rails-versio >>
-      # - run:
-      #     name: install bundler
-      #     command: |
-      #       if [ "<< parameters.ruby-version >>" == "2.7.5" ]; then
-      #         export BUNDLER_VERSION=2.1.4
-      #       elif [ "<< parameters.ruby-version >>" == "3.0.3" ]; then
-      #         export BUNDLER_VERSION=2.1.4
-      #       else
-      #         export BUNDLER_VERSION=1.17.3
-      #       fi
-      #       export BUNDLE_PATH=vendor/bundle
-      #       gem install bundler:$BUNDLER_VERSION
       - run:
           name: Install appraisal
           command: |
-            bundle install appraisal --path vendor/bundle
+            gem install appraisal
       - run:
           name: Generate gemfiles
           command: bundle exec appraisal generate
@@ -61,15 +46,6 @@ jobs:
             then
                 bundle install --path vendor/bundle
             fi
-      # - save_cache:
-      #     paths:
-      #       - ./vendor/bundle
-      #     key: v1-integration-dependencies-<< parameters.ruby-version >>-<< parameters.rails-version >>
-
-      # - run:
-      #     name: set up sphinx
-      #     command: "./bin/loadsphinx << parameters.sphinx_version >> << parameters.sphinx_engine >>"
-
       - run:
           name: Run Rails integration tests
           environment:
