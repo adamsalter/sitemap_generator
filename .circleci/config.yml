@@ -69,5 +69,5 @@ workflows:
           # See https://circleci.com/blog/circleci-matrix-jobs/
           matrix:
             parameters:
-              ruby-version: ["2.7"]  # No manifest exists for: 2.9, 2.8, 2.3, 2.0
+              ruby-version: ["2.7", "3.1"]  # No manifest exists for: 2.9, 2.8, 2.3, 2.0
               rails-version: ["5_2"] # , "6_0", "6_1", "7_0"
