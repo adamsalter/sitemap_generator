@@ -16,7 +16,7 @@ jobs:
     steps:
       - checkout
       - ruby/install-deps:
-          # bundler-version: '1.17.3' # December 27, 2018
+          bundler-version: '1.17.3' # December 27, 2018
           with-cache: false
       - ruby/rspec-test
 
@@ -32,4 +32,4 @@ workflows:
             parameters:
               # https://github.com/CircleCI-Public/cimg-ruby
               # only supports the last three ruby versions
-              ruby-version: ["2.0", "2.3", "2.6", "2.9", "3.0", "3.1"]
+              ruby-version: ["2.9", "3.0", "3.1"]
