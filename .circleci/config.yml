@@ -36,7 +36,7 @@ jobs:
             gem install appraisal
       - run:
           name: Generate gemfiles
-          command: bundle exec appraisal generate
+          command: appraisal generate
       - run:
           name: Install Rails dependencies
           environment:
