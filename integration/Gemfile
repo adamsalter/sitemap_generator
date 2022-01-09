@@ -1,10 +1,5 @@
 source 'https://rubygems.org'
 
-gem 'rails', '~> 6.1'
-
-gem 'combustion'
-gem 'nokogiri'
-gem 'rspec-rails'
+gem 'appraisal'
 gem 'sitemap_generator', :path => '../../'
 gem 'sqlite3'
-# gem 'byebug'

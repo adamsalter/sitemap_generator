@@ -1,19 +1,29 @@
 appraise 'rails_4_2' do
+  gem 'combustion'
   gem 'rails', '~> 4.2'
+  gem 'rspec-rails'
 end if RUBY_VERSION.to_f <= 2.4
 
 appraise 'rails_5_2' do
+  gem 'combustion'
   gem 'rails', '~> 5.2'
+  gem 'rspec-rails'
 end if RUBY_VERSION.to_f < 3.0
 
 appraise 'rails_6_0' do
+  gem 'combustion'
   gem 'rails', '~> 6.0'
+  gem 'rspec-rails'
 end if RUBY_VERSION.to_f >= 2.5
 
 appraise 'rails_6_1' do
+  gem 'combustion'
   gem 'rails', '~> 6.1'
+  gem 'rspec-rails'
 end if RUBY_VERSION.to_f >= 2.5
 
 appraise 'rails_7_0' do
+  gem 'combustion'
   gem 'rails',  '~> 7.0'
+  gem 'rspec-rails'
 end if RUBY_VERSION.to_f >= 2.7

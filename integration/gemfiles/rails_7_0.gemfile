@@ -2,10 +2,9 @@
 
 source "https://rubygems.org"
 
-gem "rails", "~> 7.0"
 gem "appraisal"
-gem "combustion"
-gem "nokogiri"
-gem "rspec-rails"
 gem "sitemap_generator", path: "../../../"
 gem "sqlite3"
+gem "combustion"
+gem "rails", "~> 7.0"
+gem "rspec-rails"
