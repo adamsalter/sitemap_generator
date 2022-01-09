@@ -1,33 +1,28 @@
 version: 2.1
 
 orbs:
-  # https://github.com/CircleCI-Public/ruby-orb
+  # See https://github.com/CircleCI-Public/ruby-orb
   ruby: circleci/ruby@1.3.0
 
 jobs:
-  # skipping build step because Gemfile.lock is not included in the source
-  # this makes the bundler caching step a noop
   test:
     parameters:
       ruby-version:
         type: string
     docker:
+      # See https://github.com/CircleCI-Public/cimg-ruby
       - image: cimg/ruby:<< parameters.ruby-version >>
     steps:
       - checkout
       - ruby/install-deps
       - ruby/rspec-test
 
-# strangely, there seems to be very little documentation about exactly how martix builds work.
-# By defining a param inside your job definition, Circle CI will automatically spawn a job for
-# unique param value passed via `matrix`. Neat!
-# https://circleci.com/blog/circleci-matrix-jobs/
+
 workflows:
   build_and_test:
     jobs:
       - test:
+          # See https://circleci.com/blog/circleci-matrix-jobs/
           matrix:
             parameters:
-              # https://github.com/CircleCI-Public/cimg-ruby
-              # No manifest exists for: 2.9, 2.8, 2.3, 2.0
-              ruby-version: ["2.7", "3.0", "3.1"]
+              ruby-version: ["2.7", "3.0", "3.1"]  # No manifest exists for: 2.9, 2.8, 2.3, 2.0
