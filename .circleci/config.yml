@@ -16,7 +16,7 @@ jobs:
     steps:
       - checkout
       - ruby/install-deps:
-          bundler-version: '1.17.3' # December 27, 2018
+          bundler-version: '2.1.4' # December 27, 2018
           with-cache: false
       - ruby/rspec-test
 
