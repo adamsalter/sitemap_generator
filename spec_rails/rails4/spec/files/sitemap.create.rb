@@ -1,4 +1,6 @@
 require File.expand_path('./spec/internal/db/schema.rb')
+require File.expand_path('./spec/internal/db/seed.rb')
+
 SitemapGenerator::Sitemap.default_host = "http://www.example.com"
 
 SitemapGenerator::Sitemap.create do

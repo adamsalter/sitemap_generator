@@ -1,5 +1,6 @@
 require 'bundler/setup'
 Bundler.require
+# Setting load_schema: false results in "uninitialized constant ActiveRecord::MigrationContext" error
 Combustion.initialize! :active_record, :action_view, database_reset: false
 Combustion::Application.load_tasks
 SitemapGenerator.verbose = false

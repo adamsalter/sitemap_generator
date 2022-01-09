@@ -1,26 +1,7 @@
-
-class Content < ActiveRecord::Base
-  validates_presence_of :title
-end
-
-# Define the schema and models dynamically
-debugger
-unless Content.table_exists?
-  begin
-    ActiveRecord::Schema.define(:version => 1) do
-      create_table "contents" do |t|
-        t.string   "title"
-        t.datetime "created_at"
-        t.datetime "updated_at"
-      end
+  ActiveRecord::Schema.define(:version => 1) do
+    create_table "contents", force: true do |t|
+      t.string   "title"
+      t.datetime "created_at"
+      t.datetime "updated_at"
     end
-  rescue
-    nil
   end
-end
-
-if Content.count == 0
-  (1..10).each do |i|
-    Content.create!(:title => "content #{i}")
-  end
-end

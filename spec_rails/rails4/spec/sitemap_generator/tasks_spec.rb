@@ -106,7 +106,6 @@ describe "SitemapGenerator" do
     end
   end
 
-
   describe "sitemap with groups" do
     before :all do
       SitemapGenerator::Sitemap.reset!
