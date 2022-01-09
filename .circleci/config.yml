@@ -31,5 +31,5 @@ workflows:
           matrix:
             parameters:
               # https://github.com/CircleCI-Public/cimg-ruby
-              # No manifest exists for: 2.9, 2.3, 2.0
-              ruby-version: ["2.8", "3.0", "3.1"]
+              # No manifest exists for: 2.9, 2.8, 2.3, 2.0
+              ruby-version: ["2.7", "3.0", "3.1"]
