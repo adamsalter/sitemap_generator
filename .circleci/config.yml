@@ -53,7 +53,7 @@ jobs:
           command: |
             if [[ -f $BUNDLE_GEMFILE ]]
             then
-                bundle exec rspec
+                bundle exec rspec --profile 10 --format RspecJunitFormatter --out ./test-results/rspec/results.xml --format progress
             fi
       - store_test_results:
           path: test-results
