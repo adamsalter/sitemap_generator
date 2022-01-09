@@ -17,7 +17,6 @@ jobs:
       - ruby/install-deps
       - ruby/rspec-test
 
-
 workflows:
   build_and_test:
     jobs:

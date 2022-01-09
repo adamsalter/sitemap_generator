@@ -1,0 +1,1 @@
+Rails integration tests for sitemap_generator[http://github.com/kjvarga/sitemap_generator]
