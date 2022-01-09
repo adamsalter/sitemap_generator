@@ -8,3 +8,4 @@ tmp/**/*
 coverage
 .idea
 public
+integration/gemfiles/*.lock
