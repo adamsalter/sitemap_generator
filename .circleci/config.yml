@@ -15,9 +15,7 @@ jobs:
       - image: cimg/ruby:<< parameters.ruby-version >>
     steps:
       - checkout
-      - ruby/install-deps:
-          bundler-version: '2.1.4' # December 27, 2018
-          with-cache: false
+      - ruby/install-deps
       - ruby/rspec-test
 
 # strangely, there seems to be very little documentation about exactly how martix builds work.
