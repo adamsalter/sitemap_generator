@@ -55,6 +55,8 @@ jobs:
             then
                 bundle exec rspec
             fi
+      - store_test_results:
+          path: test-results
 workflows:
   build_and_test:
     jobs:
