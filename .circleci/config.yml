@@ -63,8 +63,8 @@ workflows:
           # See https://circleci.com/blog/circleci-matrix-jobs/
           matrix:
             parameters:
-              # No manifest exists for: 2.9, 2.8, 2.3, 2.0
               ruby-version: ["3.1", "3.0", "2.7", "2.5"]
+          name: gem-test-ruby-<< matrix.ruby-version >>
       - integration-test:
           # See https://circleci.com/blog/circleci-matrix-jobs/
           # See https://www.fastruby.io/blog/ruby/rails/versions/compatibility-table.html for Ruby and Rails compatibility
