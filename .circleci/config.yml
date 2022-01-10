@@ -13,7 +13,7 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-           bundle install --path vendor/bundle
+           bundle install --path vendor/bundle --jobs=2
       - run:
           name: Run tests
           command: |
@@ -35,18 +35,11 @@ jobs:
       - checkout:
           path: ~/sitemap_generator
       - run:
-          name: Install base dependencies
-          command: |
-            bundle install --path vendor/bundle
-      - run:
-          name: Generate gemfiles
-          command: bundle exec appraisal generate
-      - run:
           name: Install Rails dependencies
           environment:
             BUNDLE_GEMFILE: "./gemfiles/rails_<< parameters.rails-version >>.gemfile"
           command: |
-            bundle install --path vendor/bundle
+            bundle install --path vendor/bundle --jobs=2
       - run:
           name: Run integration tests
           environment:
