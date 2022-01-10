@@ -2,6 +2,8 @@
 
 source "https://rubygems.org"
 
+ruby ">= 2.7.0"
+
 gem "appraisal"
 gem "rspec_junit_formatter"
 gem "sitemap_generator", path: "../../../"
