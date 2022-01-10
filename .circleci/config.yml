@@ -1,9 +1,5 @@
 version: 2.1
 
-orbs:
-  # See https://github.com/CircleCI-Public/ruby-orb
-  ruby: circleci/ruby@1.3.0
-
 jobs:
   gem_test:
     parameters:
@@ -14,8 +10,16 @@ jobs:
       - image: cimg/ruby:<< parameters.ruby-version >>
     steps:
       - checkout
-      - ruby/install-deps
-      - ruby/rspec-test
+      - run:
+          name: Install dependencies
+          command: |
+           bundle install --path vendor/bundle
+      - run:
+          name: Run tests
+          command: |
+            bundle exec rspec --profile 10 --format RspecJunitFormatter --out ./test-results/rspec/results.xml --format progress
+      - store_test_results:
+          path: test-results
 
   integration_test:
     parameters:
@@ -42,19 +46,13 @@ jobs:
           environment:
             BUNDLE_GEMFILE: "./gemfiles/rails_<< parameters.rails-version >>.gemfile"
           command: |
-            if [[ -f $BUNDLE_GEMFILE ]]
-            then
-                bundle install --path vendor/bundle
-            fi
+            bundle install --path vendor/bundle
       - run:
           name: Run integration tests
           environment:
             BUNDLE_GEMFILE: "./gemfiles/rails_<< parameters.rails-version >>.gemfile"
           command: |
-            if [[ -f $BUNDLE_GEMFILE ]]
-            then
-                bundle exec rspec --profile 10 --format RspecJunitFormatter --out ./test-results/rspec/results.xml --format progress
-            fi
+            bundle exec rspec --profile 10 --format RspecJunitFormatter --out ./test-results/rspec/results.xml --format progress
       - store_test_results:
           path: test-results
 
