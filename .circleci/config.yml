@@ -1,7 +1,7 @@
 version: 2.1
 
 jobs:
-  gem_test:
+  gem-test:
     parameters:
       ruby-version:
         type: string
@@ -21,7 +21,7 @@ jobs:
       - store_test_results:
           path: test-results
 
-  integration_test:
+  integration-test:
     parameters:
       ruby-version:
         type: string
@@ -58,13 +58,13 @@ jobs:
 workflows:
   test:
     jobs:
-      - gem_test:
+      - gem-test:
           # See https://circleci.com/blog/circleci-matrix-jobs/
           matrix:
             parameters:
               # No manifest exists for: 2.9, 2.8, 2.3, 2.0
               ruby-version: ["3.1", "3.0", "2.7", "2.5"]
-      - integration_test:
+      - integration-test:
           # See https://circleci.com/blog/circleci-matrix-jobs/
           # See https://www.fastruby.io/blog/ruby/rails/versions/compatibility-table.html for Ruby and Rails compatibility
           matrix:
